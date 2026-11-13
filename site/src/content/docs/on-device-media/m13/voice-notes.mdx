@@ -1,0 +1,47 @@
+---
+title: "Worked example: an offline voice-notes assistant"
+description: "A KMP agent with search_notes, create_note and an HITL-gated delete_note, evals in commonMain, the same tools as MCP, a privacy check before cloud summaries, and the Android backends that are still untested."
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+The goal is an assistant that runs on the Galaxy A73 with no network: speak a note, ask about your notes, delete one (with confirmation). This page shows the half that exists and is tested, and marks the half that isn't.
+
+## What exists (commonMain, tested on the JVM)
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m13/VoiceNotes.kt" lang="kotlin" />
+
+<Snippet path="kmp/shared/src/commonTest/kotlin/course/m13/VoiceNotesTest.kt" lang="kotlin" />
+
+The 8 tests cover: search then answer; delete refused without confirmation and done with it; unknown tools and the turn budget; missing arguments; the tool-call parser; golden evals running in commonMain; the availability machine and router; and the same tools over MCP (listed, annotated, delete refused).
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m13/Router.kt" lang="kotlin" />
+
+## What's planned and untested
+
+| Piece | Plan | Status |
+|---|---|---|
+| androidMain `LocalModel`: LiteRT-LM | CPU, FunctionGemma 270M for tool routing, Gemma 3 1B for answers | **untested** (no Android SDK) |
+| androidMain `LocalModel`: llama.cpp | NDK/JNI, GGUF Q4 | **untested** |
+| androidMain `LocalModel`: ExecuTorch | XNNPACK CPU | **untested** |
+| voice input | ML Kit GenAI speech recognition, Basic mode | **untested** (documented as supported on the A73) |
+| Gemini Nano + `AgentRunner` + AppFunctions flavour | compiled against fakes, needs a supported device | **not built** |
+| A73 benchmark table | TTFT, tokens/s, peak RSS per model × runtime | **empty until measured** |
+
+<Aside type="note">
+`kmp/shared/build.gradle.kts` still has only the `jvm()` target; adding `androidTarget()` needs the Android Gradle Plugin and SDK, which the course box deliberately doesn't install.
+</Aside>
+
+## Kotlin notes
+- KMP layout: commonMain agent + interface-injected backends; one single-thread owner for native engines; structured concurrency (cancel the agent's scope and the engine call is cancelled); `Flow` for tokens; `AutoCloseable` engines tied to `ViewModel`/`Lifecycle`.
+
+## C++/Rust notes
+- The llama.cpp backend is a thin JNI layer over `llama.h` (check that examples match the v1.0 API before copying them); ship `arm64-v8a` and `x86_64` ABIs.
+
+## Sources
+- LiteRT-LM Android: https://developers.google.com/edge/litert-lm/android
+- FunctionGemma: https://huggingface.co/google/functiongemma-270m-it · on-device function calling post: https://developers.googleblog.com/on-device-function-calling-in-google-ai-edge-gallery/
+- MCP Kotlin SDK: https://github.com/modelcontextprotocol/kotlin-sdk

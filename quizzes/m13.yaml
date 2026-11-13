@@ -1,0 +1,57 @@
+module: m13
+title: "M13 quiz: on-device & Android agents"
+questions:
+  - id: m13q1
+    type: single
+    prompt: "An ML Kit GenAI call fails with BACKGROUND_USE_BLOCKED. Why?"
+    choices: ["The model isn't downloaded", "Inference only runs while the app is the top foreground app", "The prompt is over the token limit", "The device has an unlocked bootloader"]
+    answer: 1
+    explanation: "ML Kit GenAI documents foreground-only inference. The right UX is 'open the app to continue', not a silent background retry."
+  - id: m13q2
+    type: single
+    prompt: "Which quantization change shrinks the KV cache?"
+    choices: ["Q8_0 to Q4_0 weights", "A quantized KV cache type (llama.cpp -ctk/-ctv), fewer KV heads, or a shorter context", "Using Q4_K_M instead of Q4_0", "Memory-mapping the weights"]
+    answer: 1
+    explanation: "The KV cache holds K and V for every layer and position; weight quant types don't touch it. Our test also hit a real limit: stories15M's 48-dim heads can't use a q8_0 KV cache (block size 32)."
+  - id: m13q3
+    type: single
+    prompt: "On a Galaxy A73, which ML Kit GenAI feature do the docs say works?"
+    choices: ["Prompt API on Gemini Nano", "genai-agent AgentRunner", "Speech recognition in Basic mode", "Summarization"]
+    answer: 2
+    explanation: "The A73 isn't on the Gemini Nano device lists; Basic-mode speech recognition needs API 31+. These are documented answers, not values the course has read from the phone (untested)."
+  - id: m13q4
+    type: single
+    prompt: "Firebase AI Logic is set to PREFER_ON_DEVICE on an A73. What happens (by the course's inference from the device lists)?"
+    choices: ["It runs Gemini Nano", "It falls back to the cloud model, because the on-device half needs Gemini Nano", "It throws", "It uses LiteRT-LM automatically"]
+    answer: 1
+    explanation: "Inferred, not observed. That's why the course builds its own router for the A73: LiteRT-LM locally, cloud only when allowed."
+  - id: m13q5
+    type: single
+    prompt: "In our llama.cpp run on stories15M, Q8_0 vs F32 had a PPL ratio of about 1.001 while Q4_0 was about 1.13. What is the honest conclusion?"
+    choices: ["Q4_0 is always 13% worse", "On this tiny model and text, Q8_0 was nearly lossless and Q4_0 was clearly worse; re-measure on your model, task and device", "Quantization never matters", "Q4_K_M is always fastest"]
+    answer: 1
+    explanation: "Numbers from a 15M-parameter model on an x86 box. Q4_K_M was even slower than Q4_0 here. Measure on the A73 with task evals, not just perplexity."
+  - id: m13q6
+    type: multi
+    prompt: "Which keep a PII-tagged prompt correctly handled by the M13 router? (Pick all that apply.)"
+    choices: ["Run it locally if the local model is available and it fits", "Refuse and ask the user if the local model can't take it", "Send it to the cloud when the task is hard", "Send it to the cloud when the battery is low"]
+    answer: [0, 1]
+    explanation: "Private data never 'falls back' to the cloud. Difficulty and battery only matter for non-private prompts."
+  - id: m13q7
+    type: single
+    prompt: "Why does the KMP voice-notes agent run every model call on Dispatchers.Default.limitedParallelism(1)?"
+    choices: ["It's faster", "Native engine contexts (LiteRT-LM, llama.cpp) should have one owning thread; concurrent calls are unsafe", "Kotlin requires it", "To save battery"]
+    answer: 1
+    explanation: "One single-threaded owner for the native engine, AutoCloseable lifecycles, and Flow for token streams are the Kotlin notes for this module."
+  - id: m13q8
+    type: single
+    prompt: "Which statement about NPUs on the A73 (Snapdragon 778G) matches the course's research?"
+    choices: ["LiteRT's Qualcomm NPU path supports it", "LiteRT and ExecuTorch NPU support exclude it; ORT's QNN EP on the Hexagon HTP is an experimental 'may not work' stretch", "ExecuTorch QNN supports SM7325", "NPUs need no quantization"]
+    answer: 1
+    explanation: "Vendor tables list newer chips. CPU first, GPU 'verify on device', NPU only as a labelled experiment (untested here)."
+  - id: m13q9
+    type: single
+    prompt: "What does the MediaPipe LLM Inference API's status mean for new code?"
+    choices: ["Use it; it's the newest", "It's deprecated/maintenance-only in favour of LiteRT-LM, so cover it only for migration", "It was renamed to ExecuTorch", "It's required for Gemini Nano"]
+    answer: 1
+    explanation: "LlmInference is @Deprecated (tasks-genai 0.10.35). Ex 13.4 is the migration, and it is a device exercise (untested here)."

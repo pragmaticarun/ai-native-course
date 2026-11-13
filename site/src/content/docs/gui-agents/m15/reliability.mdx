@@ -1,0 +1,32 @@
+---
+title: "L15.4 Reliability engineering"
+description: "Grounding with set-of-marks and element IDs, coordinate scaling, waiting for idle, verify-after-act, recovery, step and time budgets, and deterministic replays, all exercised with real Playwright."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+GUI agents fail in boring ways: they click next to the button, act before the page loads, and claim success without checking. Each has an engineering fix, and each is tested in `examples/python/m15/test_m15.py`.
+
+| Problem | Fix in `gui_agents.py` | Test |
+|---|---|---|
+| clicks miss | element IDs (set-of-marks) instead of coordinates | `test_poor_grounding_costs_invalid_actions` (sigma 0 → 0 invalid; sigma 12 px → some) |
+| wrong scale | the model sees a 640 px-wide screenshot; `execute` maps back to the 1280 px viewport | covered by every pixel episode |
+| acting mid-navigation | `settle()`: give a click a moment to start a navigation, then wait for `load`; `observe()` retries once if the page navigated under it | the first version crashed with "Execution context was destroyed" |
+| claiming success | verify-after-act: the policy only says `done` when the event is listed on the calendar; otherwise it redoes the form once | three-ways test |
+| invalid actions crash the run | Playwright errors become `invalid:` notes with a 2 s timeout | mini-benchmark with `slip` |
+| loops | `max_steps` and `max_seconds` | `test_step_budget_stops_a_stuck_agent` |
+| "it worked on my machine" | record executed actions; replay them with no model | `test_replay_coords_vs_names` |
+
+## Deterministic replay
+
+<Snippet path="examples/python/m15/test_m15.py" />
+
+A pixel run's trajectory replayed **by coordinates** passes on the original layout and fails on layout `b` (same app, elements moved). Replayed **by accessible name** (`target`), it passes on both. Record targets, not just pixels. Ex 15.4 turns such a trajectory into a regression test.
+
+## C++/Rust notes
+- For a native harness, hash each observation (screenshot bytes or a canonicalised tree) into the trajectory; on replay, compare hashes to find the first divergent step instead of the final failure.
+
+## Sources
+- Playwright auto-waiting and actionability: https://playwright.dev/python/docs/actionability

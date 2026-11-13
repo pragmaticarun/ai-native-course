@@ -1,0 +1,47 @@
+---
+title: "L15.2 Computer-use APIs in practice"
+description: "Anthropic computer_toolset_20260801 and browser_toolset_20260801, the OpenAI Responses computer tool, Playwright, browser-use and Playwright MCP for the web, and sandboxes (Docker + Xvfb, E2B Desktop, cua)."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+The providers' computer-use tools are action schemas plus a loop you run. The model emits actions; **your** code executes them in a sandbox and sends back a screenshot. M3 has adapters from both providers' payload shapes to one vendor-neutral `Action`; M15's `gui_agents.Action` is the same idea with element-ID actions added.
+
+| | Anthropic | OpenAI |
+|---|---|---|
+| Tool | `computer_toolset_20260801` (stable, client-executed, 17 member tools such as `screenshot`, `left_click`, `type`, `zoom`; batched actions), plus `browser_toolset_20260801` | Responses API `tools: [{type: "computer"}]` |
+| Model output | tool-use blocks with member-tool calls | `computer_call` items with ordered `actions` (`click`, `double_click`, `drag`, `move`, `scroll`, `keypress`, `type`, `wait`, `screenshot`) |
+| You return | tool results with screenshots | `computer_call_output` with a screenshot |
+| Extras | — | a code-execution approach (Playwright/PyAutoGUI) recommended for the newest model; SDK `ComputerToolset`/`BrowserToolset` helpers with `before_action`/`confirm` hooks |
+
+<Aside type="caution" title="Untested here">
+No provider API was called. The adapters in M3 are tested against recorded payload *shapes*; the M15 loop runs on scripted policies. The `before_action`/`confirm` hooks map onto the M15 `Guard.check` step.
+</Aside>
+
+## The web: Playwright first
+
+Playwright (1.65.1) is the executor in M15. What the example uses:
+
+- `page.screenshot()` for pixel observations, `page.evaluate(...)` to collect interactive elements and draw set-of-marks labels;
+- `page.mouse.click(x, y)` for coordinate actions, `locator.fill/click` for element actions, with short timeouts so a bad action is an *invalid action*, not a hang;
+- `page.route("**/*", …)` as an egress allowlist; a new browser context per episode as a fresh profile.
+
+<Snippet path="examples/python/m15/gui_agents.py" />
+
+**browser-use** (1.0.3) wraps an LLM + Playwright agent; **Playwright MCP** (`@playwright/mcp` 0.0.85) exposes browser actions as MCP tools, mostly over accessibility snapshots. Both are compared, not depended on.
+
+## Sandboxes
+
+Run GUI agents in something you can throw away: a Docker container with Xvfb and a browser, E2B Desktop (`e2b-desktop` 2.7.2), or trycua/cua (`cua-agent` 0.9.1). The course's sandbox is a local app on 127.0.0.1 plus Playwright routing; a Docker image with no outbound network (planned as `envs/cua-web`) is not built yet.
+
+## C++/Rust notes
+- If you write your own executor, CDP (Chrome DevTools Protocol) over a WebSocket is the layer Playwright uses for Chromium; a Rust client can drive `Input.dispatchMouseEvent` and `Page.captureScreenshot` directly.
+
+## Sources
+- Anthropic computer use: https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool
+- OpenAI computer use: https://developers.openai.com/api/docs/guides/tools-computer-use
+- Playwright Python: https://playwright.dev/python/ · Playwright MCP: https://github.com/microsoft/playwright-mcp
+- browser-use: https://github.com/browser-use/browser-use · cua: https://github.com/trycua/cua · E2B Desktop: https://github.com/e2b-dev/desktop

@@ -45,6 +45,17 @@ export default defineConfig({
             { label: "M12 · Team practice by level", items: [{ autogenerate: { directory: "ai-native/m12" } }] },
           ],
         },
+        {
+          label: "On-device & Media",
+          items: [
+            { label: "M13 · On-device & Android agents", items: [{ autogenerate: { directory: "on-device-media/m13" } }] },
+            { label: "M14 · Multimedia & multimodal agents", items: [{ autogenerate: { directory: "on-device-media/m14" } }] },
+          ],
+        },
+        {
+          label: "GUI Agents",
+          items: [{ label: "M15 · Computer-use & mobile-use agents", items: [{ autogenerate: { directory: "gui-agents/m15" } }] }],
+        },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         { label: "Syllabus", link: "/syllabus/" },
         { label: "Changelog", link: "/changelog/" },

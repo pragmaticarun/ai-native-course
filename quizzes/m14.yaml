@@ -1,0 +1,51 @@
+module: m14
+title: "M14 quiz: multimedia & multimodal agents"
+questions:
+  - id: m14q1
+    type: single
+    prompt: "Why does the M14 ffmpeg tool take typed arguments instead of a command string from the model?"
+    choices: ["It's shorter", "A model-written string can smuggle options (-f concat), protocols (http:, concat:) or shell syntax; typed tools build argv themselves", "ffmpeg doesn't accept strings", "For speed"]
+    answer: 1
+    explanation: "The model picks which tool and which numbers; the code writes the flags. Ex 14.2 is the fallback when you must accept arguments: an allowlist."
+  - id: m14q2
+    type: single
+    prompt: "In our tests, a cut from pure red to pure green was not detected by select='gt(scene,0.3)'. The best explanation?"
+    choices: ["ffmpeg is broken", "The two colours have nearly the same luma, and the scene score barely moved", "Green isn't supported", "The clip was too short"]
+    answer: 1
+    explanation: "An observed behaviour on our fixtures. Check detectors against fixtures you understand, and pick fixture colours with different brightness."
+  - id: m14q3
+    type: single
+    prompt: "Why does the highlight-reel renderer do two loudnorm passes?"
+    choices: ["Tradition", "Pass 1 measures integrated loudness, true peak and LRA; pass 2 applies linear normalisation with those measurements, landing on the target accurately", "To double the volume", "ffmpeg requires it"]
+    answer: 1
+    explanation: "The output then verifies at -16 LUFS within 1 LU using ebur128."
+  - id: m14q4
+    type: multi
+    prompt: "Which does the highlight-reel verify() step check against the plan? (Pick all that apply.)"
+    choices: ["Output duration within 0.1 s", "One video and one audio stream", "Integrated loudness near target", "Cut points within one frame", "That the model said it succeeded"]
+    answer: [0, 1, 2, 3]
+    explanation: "Objective checks on the file, never the agent's claim."
+  - id: m14q5
+    type: single
+    prompt: "A model proposes a GStreamer pipeline with souphttpsrc. What does the M14 validator do?"
+    choices: ["Runs it with a timeout", "Rejects it: the element isn't on the allowlist (no network sources)", "Rewrites it to filesrc", "Asks the model to retry"]
+    answer: 1
+    explanation: "Parse, then allowlist elements, check file properties stay in the sandbox, require bounded sources, and only then run with a timeout and no shell."
+  - id: m14q6
+    type: single
+    prompt: "What is 'cheap filter first, VLM second' in the vision cascade?"
+    choices: ["Using a smaller VLM", "Cheap signals (scene cuts, luma stats, small detectors) pick which frames are worth an expensive VLM call", "Compressing frames", "Caching captions"]
+    answer: 1
+    explanation: "In the example, five shot keyframes became four VLM calls because the black shot was dropped; uniform 0.5 s sampling would have been 22 frames."
+  - id: m14q7
+    type: single
+    prompt: "Why is corpus WER computed as total edits / total reference words?"
+    choices: ["It's faster", "Averaging per-utterance WERs over-weights short utterances (one wrong word in 'yes' is 100%)", "Because of punctuation", "It isn't; average is correct"]
+    answer: 1
+    explanation: "Word-weighted is the standard corpus measure."
+  - id: m14q8
+    type: single
+    prompt: "A screen recording an agent produced shows an OTP code. What should the privacy check do?"
+    choices: ["Nothing; it's internal", "Flag it before sharing: sensitive text on screen needs redaction, and on-device-only data must not be uploaded", "Blur faces only", "Compress it"]
+    answer: 1
+    explanation: "Faces, voices and screen text are the three privacy surfaces in L14.6."

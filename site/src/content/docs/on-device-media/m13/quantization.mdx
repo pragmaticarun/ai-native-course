@@ -1,0 +1,71 @@
+---
+title: "L13.6 Quantization & acceleration basics"
+description: "Weights vs activations vs KV cache, int8/int4, block scales, GGUF quant types measured with llama-quantize, perplexity and KL divergence, ONNX Runtime int8, and reading NPU support tables with the A73 as the example."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Three things you can quantize
+
+- **Weights:** the file size and most of the memory. GGUF types like `Q8_0` (8-bit, one scale per block of 32), `Q4_0` (4-bit, one scale per block) and `Q4_K_M` (k-quants: super-blocks with per-block scales, mixed precision across tensors).
+- **Activations:** matter for integer-only accelerators (NPUs/HTP need quantized activations too).
+- **KV cache:** grows with context × layers × KV heads × head dim. Weight quantization doesn't touch it; a KV cache type (`-ctk/-ctv` in llama.cpp), fewer KV heads (GQA/MQA) or a shorter context does.
+
+## Measured: llama.cpp on stories15M
+
+<Snippet path="examples/python/m13/llama_quant.py" />
+
+Run on the course box (x86 "Intel Xeon Processor", 4 threads), llama.cpp **b12359** (= v1.0.0), `stories15M.gguf` F32, 128-token context, our own 1,000-word eval text:
+
+| quant | size MB | PPL | PPL/F32 | mean KLD | same top-1 % | prompt t/s | gen t/s |
+|---|---|---|---|---|---|---|---|
+| F32 | 98.4 | 5.282 | 1.0 | 0.0 | 100.0 | 9021.2 | 1057.3 |
+| Q8_0 | 26.7 | 5.289 | 1.0014 | 0.0011 | 97.4 | 23279.7 | 2982.0 |
+| Q4_K_M | 21.0 | 5.429 | 1.0279 | 0.0269 | 90.7 | 11779.7 | 2235.5 |
+| Q4_0 | 19.1 | 6.02 | 1.1396 | 0.1242 | 82.9 | 24590.3 | 3456.8 |
+
+What to take from it (and what not to):
+
+- **KL divergence and "same top-1" are better quality signals than perplexity alone**: they compare each token's distribution against the F32 model's (`--kl-divergence-base`, then `--kl-divergence`).
+- Q8_0 was nearly lossless here; Q4_0 lost noticeably (17% of next-token picks changed); Q4_K_M sat between them.
+- **Q4_K_M was slower than Q4_0 and Q8_0 on this CPU and model.** Speed depends on kernels and hardware; don't assume.
+- Repeated runs moved some numbers (Q4_0 PPL was 5.94 in one run, 6.02 in another). Treat the last digits as noise and check tasks, not just perplexity.
+- A real finding: `-ctk q8_0` (quantized KV cache) **failed on this model**: "K cache type q8_0 with block size 32 does not divide n_embd_head_k=48". Quantized KV caches need a head dimension divisible by the block size.
+- These are x86 numbers on a toy model. **No A73 numbers** until measured on the phone (*untested*).
+
+The CI `llamacpp` job downloads the same release and model and re-runs this table on every push (assertions check ordering, not exact values).
+
+## ONNX Runtime int8 (host half of the NPU stretch)
+
+<Snippet path="examples/python/m13/onnx_quant.py" />
+
+A 64→256→3 MLP trained with numpy and written with `onnx.helper`; `quantize_dynamic` (int8 weights) shrank it from 68.2 KB to 19.0 KB on the box with the same test accuracy (0.996) and full agreement with FP32. The **ORT QNN EP on the A73's Hexagon HTP** (HTP V68, compile the context on the device) is the "may not work" stretch, and it is *untested*.
+
+## Accelerators, using the A73 as the example
+
+| Path | A73 (SM7325) |
+|---|---|
+| LiteRT NPU (Qualcomm AI Engine Direct) | not supported (list: SM8450 → SM8850) |
+| ExecuTorch Qualcomm backend | not supported (SM7325 isn't in `QcomChipset`) |
+| ORT QNN EP (HTP) | possible, not verified (ORT documents SM8350, also HTP V68) |
+| llama.cpp OpenCL (Adreno) | Adreno 642L not on the verified list |
+| CPU (XNNPACK / NEON) | the safe path |
+
+LiteRT `CompiledModel` NPU paths (Qualcomm, MediaTek NeuroPilot, Google Tensor AOT) and Google Play for On-device AI delivery are covered conceptually. `torchao` / LiteRT Torch export are not run here.
+
+<Aside type="tip">
+Read vendor tables by chip ID (SM7325), not marketing name, and check the date you read them.
+</Aside>
+
+## C++/Rust notes
+- `llama-quantize` takes `--imatrix` (importance matrix) to protect the weights that matter most at low bit widths; it's worth trying before you give up on Q4 for a task.
+- Memory-mapped GGUF weights + page cache: on Android, a model that "fits" can still get paged out under memory pressure; measure peak RSS and first-token time after the app has been backgrounded.
+
+## Sources
+- llama-quantize: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md · perplexity tool: https://github.com/ggml-org/llama.cpp/tree/master/tools/perplexity
+- stories15M GGUF: https://huggingface.co/ggml-org/models/tree/main/tinyllamas
+- ORT quantization: https://onnxruntime.ai/docs/performance/model-optimizations/quantization.html · QNN EP: https://onnxruntime.ai/docs/execution-providers/QNN-ExecutionProvider.html
+- LiteRT Qualcomm NPU: https://developers.google.com/edge/litert/next/qualcomm · ExecuTorch Qualcomm: https://docs.pytorch.org/executorch/stable/backends-qualcomm.html

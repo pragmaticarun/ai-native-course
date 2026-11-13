@@ -1,0 +1,26 @@
+---
+title: "M14 · Multimedia & multimodal agents"
+description: "Agents that drive ffmpeg and GStreamer safely, speech and vision pipelines with cheap filters before expensive models, objective media evals, and a highlight-reel agent in Python and TypeScript."
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3 (the agent loop), M6 (evals; `media_eval.py`), M9 (the media-probe MCP server).
+
+| Lesson | Worked example |
+|---|---|
+| [L14.1 Multimodal inputs & frame budgets](/ai-native-course/on-device-media/m14/multimodal-inputs/) | uniform vs scene vs budgeted frame sampling, cost per frame with *your* prices |
+| [L14.2 Agents driving ffmpeg safely](/ai-native-course/on-device-media/m14/ffmpeg/) | typed tools, `ffprobe` JSON observations, scene/silence/loudness filters, dry run then verify (real ffmpeg) |
+| [L14.3 GStreamer pipelines as tools](/ai-native-course/on-device-media/m14/gstreamer/) | parse → element allowlist → sandboxed run with a timeout; `level` bus messages as observations (real GStreamer 1.28.9) |
+| [L14.4 Speech & audio agents](/ai-native-course/on-device-media/m14/speech/) | energy VAD → (fake) ASR → toy diarization → post-processing; streaming vs batch latency |
+| [L14.5 Vision & video pipelines](/ai-native-course/on-device-media/m14/vision/) | "cheap filter first, VLM second" with ffmpeg scene cuts and luma stats |
+| [L14.6 Evaluating media agents](/ai-native-course/on-device-media/m14/evaluating/) | objective invariants, a caption judge rubric (mock), privacy findings |
+| [Worked example: the highlight-reel agent](/ai-native-course/on-device-media/m14/highlight-reel/) | probe → scenes → transcript → score → EDL → concat + two-pass loudnorm → verify, Python and TS |
+| [Exercises](/ai-native-course/on-device-media/m14/exercises/) | detection-driven recorder (host half), ffmpeg allowlist (TS), WER vs latency, Kotlin `MediaExtractor` port (*untested*) |
+
+**What really ran:** ffmpeg 7.1.5 on the course box and Ubuntu's ffmpeg in CI, on clips generated with `lavfi`; GStreamer **1.28.9** (conda-forge build) on the box and Ubuntu's GStreamer in CI. **What didn't:** any real ASR/VLM model (mocks with fixed transcripts and captions), silero-vad, faster-whisper, whisper.cpp, pyannote.audio, PySceneDetect, MediaPipe, PyAV, the GStreamer `onnxinference`/`tensordecodebin` elements (not in the box's build), a live camera, and the Android Media3/CameraX paths. The syllabus's pinned FFmpeg 9.0.2 / GStreamer container (`envs/media`) isn't built yet: CI uses distro packages.
+
+<Quiz src="m14" />

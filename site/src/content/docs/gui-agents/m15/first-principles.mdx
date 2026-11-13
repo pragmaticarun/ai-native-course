@@ -1,0 +1,37 @@
+---
+title: "L15.1 GUI agents from first principles"
+description: "Observation spaces (pixels, accessibility tree or DOM, annotated screenshots, app APIs) and action spaces (coordinates, element IDs, intents and AppFunctions), and the rule: use an API, MCP tool or AppFunction when one exists."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+A GUI agent is the M3 loop with a screen as the environment. Two choices define it: what it observes and how it acts.
+
+| Observation | Size to the model | Strengths | Weaknesses |
+|---|---|---|---|
+| pixels (screenshot) | large | works on anything, sees layout | grounding errors, cost, injection via any visible text |
+| accessibility tree / DOM | small | exact elements and names | missing on canvas/games, can be noisy |
+| annotated screenshot (set-of-marks) | large + small | names *and* layout | needs the tree to draw marks |
+| app API / MCP tool / AppFunction | tiny | exact, fast, typed | only where someone built it |
+
+| Action | Example | Failure mode |
+|---|---|---|
+| coordinates | `click(412, 318)` | misses, layout changes, scaling bugs |
+| element IDs | `click([7])`, `fill([3], "…")` | stale IDs after navigation |
+| intents / AppFunctions / API calls | `POST /api/events` | none of the GUI ones; needs a contract |
+
+**The rule:** use an API, MCP tool or AppFunction when one exists; use GUI automation only when it doesn't. The [worked example](/ai-native-course/gui-agents/m15/three-ways/) measures why: on the same task, the API path took 4 steps and sent ~1 KB to the model; the pixel path took ~10 steps and ~220 KB of screenshots, and made invalid clicks.
+
+The sandbox app the module uses (mail + calendar + JSON API, with a prompt-injection email and a layout switch):
+
+<Snippet path="examples/python/m15/sandbox_app.py" />
+
+## C++/Rust/Kotlin notes
+- A tiny Kotlin `AccessibilityService` (or UI Automator helper) can stream a compact UI tree over a local socket: faster than `uiautomator dump`, which writes XML to storage on every call (*untested*).
+- The Android emulator's gRPC endpoint (`-grpc <port>`, which AndroidWorld uses) can serve screenshots to a Rust/C++ harness much faster than `adb exec-out screencap` (*untested*).
+
+## Sources
+- AppFunctions: https://developer.android.com/ai/appfunctions
+- AccessibilityNodeInfo: https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo

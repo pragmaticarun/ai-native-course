@@ -1,0 +1,9 @@
+{
+  "_source": "examples/python/m13/llama_quant.py on the course box, 14 Nov 2026 (IST): llama.cpp b12359 (v1.0.0), stories15M.gguf, x86 CPU, 4 threads, ctx 128. Not A73 numbers.",
+  "rows": [
+    {"quant": "F32", "size_mb": 98.4, "ppl": 5.282, "mean_kld": 0.0, "same_top_pct": 100.0, "pp_tps": 9021.2, "tg_tps": 1057.3},
+    {"quant": "Q8_0", "size_mb": 26.7, "ppl": 5.289, "mean_kld": 0.0011, "same_top_pct": 97.4, "pp_tps": 23279.7, "tg_tps": 2982.0},
+    {"quant": "Q4_K_M", "size_mb": 21.0, "ppl": 5.429, "mean_kld": 0.0269, "same_top_pct": 90.7, "pp_tps": 11779.7, "tg_tps": 2235.5},
+    {"quant": "Q4_0", "size_mb": 19.1, "ppl": 6.02, "mean_kld": 0.1242, "same_top_pct": 82.9, "pp_tps": 24590.3, "tg_tps": 3456.8}
+  ]
+}

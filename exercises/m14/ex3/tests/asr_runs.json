@@ -1,0 +1,17 @@
+{
+  "_note": "SYNTHETIC. Hand-written hypotheses and invented rtf values for exercising the code; not whisper.cpp measurements.",
+  "runs": [
+    {"model": "tiny", "rtf": 0.05, "utterances": [
+      {"ref": "Turn the volume down, please.", "hyp": "turn the volume town please"},
+      {"ref": "Add milk and eggs to the list", "hyp": "add milk and x to the list"},
+      {"ref": "What's the weather tomorrow", "hyp": "what's weather tomorrow"}]},
+    {"model": "base", "rtf": 0.1, "utterances": [
+      {"ref": "Turn the volume down, please.", "hyp": "turn the volume down please"},
+      {"ref": "Add milk and eggs to the list", "hyp": "add milk and eggs to list"},
+      {"ref": "What's the weather tomorrow", "hyp": "what's the weather tomorrow"}]},
+    {"model": "small", "rtf": 0.3, "utterances": [
+      {"ref": "Turn the volume down, please.", "hyp": "turn the volume down please"},
+      {"ref": "Add milk and eggs to the list", "hyp": "add milk and eggs to the list"},
+      {"ref": "What's the weather tomorrow", "hyp": "what's the weather tomorrow"}]}
+  ]
+}

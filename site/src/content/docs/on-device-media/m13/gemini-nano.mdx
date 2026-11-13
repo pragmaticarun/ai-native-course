@@ -1,0 +1,56 @@
+---
+title: "L13.2 Gemini Nano via ML Kit GenAI (documented path)"
+description: "AICore, task APIs vs the Prompt API, availability checks and downloads, documented limits and error codes, model tiers, and why the Galaxy A73 can't use it, with a tested availability state machine."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Preview API · documented path, not runnable on the A73">
+The Galaxy A73 isn't on the Gemini Nano supported-device lists, and the course box has no Android SDK. The code here models the documented flow with our own types and fakes; **nothing ran against ML Kit or on a device**.
+</Aside>
+
+## What it is
+
+ML Kit GenAI runs Gemini Nano on the device through **AICore**, an Android system service. There are **task APIs** (summarization, proofreading, rewriting, image description, speech recognition) and **direct model access** through the Prompt API (`com.google.mlkit:genai-prompt`, latest `1.0.0-beta5`; the docs show beta4).
+
+Documented limits to design around:
+
+- input under about **4,000 tokens**; API 26+;
+- inference only while the app is the **top foreground app** (`BACKGROUND_USE_BLOCKED` otherwise);
+- per-app quotas (`BUSY`, `PER_APP_BATTERY_USE_QUOTA_EXCEEDED`);
+- not supported on unlocked bootloaders;
+- outputs differ across Nano versions (`getBaseModelName()`), so evaluate prompts per version;
+- model tiers per Firebase docs: `STABLE` (Nano 3 `nano-v3` / `nano-v2`), `PREVIEW` (Nano 4 Full, based on Gemma 4 E4B), `PREVIEW_FAST` (Nano 4 Fast, based on Gemma 4 E2B).
+
+## The A73's answers (from the docs)
+
+| Feature | Expected status on the A73 |
+|---|---|
+| Prompt API, summarization, proofreading, rewriting, image description | unsupported (not on the device list) |
+| `genai-agent` `AgentRunner` | unsupported (needs a listed device in the AICore Developer Preview) |
+| speech recognition, **Basic** mode | supported (API 31+; the A73 launched on Android 12) |
+| speech recognition, Advanced mode | unsupported |
+
+## Availability as a state machine
+
+Feature status (`UNAVAILABLE`, `DOWNLOADABLE`, `DOWNLOADING`, `AVAILABLE`) and runtime errors map to honest UI states: "not on this phone, using the fallback", "download the model?", progress that never goes backwards, "open the app to continue", bounded retries on `BUSY`, then fallback.
+
+<Snippet path="examples/python/m13/availability.py" />
+
+The Kotlin twin lives in commonMain and is tested on the JVM:
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m13/Availability.kt" lang="kotlin" />
+
+`A73_EXPECTED` is documentation, not a capture. When you have the phone, log the real `checkFeatureStatus` answers and replace it with a fixture (Ex 13.1 asks for exactly this).
+
+## Kotlin notes
+- Expose availability as a `StateFlow<UiState>` from a `ViewModel`; collect download progress as a `Flow` and fold it with `max` so the bar never moves backwards.
+- Gate calls on `Lifecycle.State.RESUMED`: the foreground-only rule makes background work a design error, not a retry.
+
+## Sources
+- ML Kit GenAI: https://developers.google.com/ml-kit/genai · Prompt API: https://developers.google.com/ml-kit/genai/prompt/android/get-started
+- Speech recognition: https://developers.google.com/ml-kit/genai/speech-recognition/android
+- Model tiers: https://firebase.google.com/docs/ai-logic/hybrid/android/configuration-options

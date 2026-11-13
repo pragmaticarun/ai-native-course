@@ -1,0 +1,39 @@
+---
+title: "L13.5 Bring-your-own-model runtimes"
+description: "LiteRT-LM, migrating off the deprecated MediaPipe LLM Inference API, llama.cpp v1.0, ExecuTorch, ONNX Runtime GenAI and MLC LLM, compared on formats, accelerators, tool calling and licensing."
+sidebar:
+  order: 5
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+| Runtime | Version (checked) | Model format | A73 path | Tool calling | Licence (GitHub) |
+|---|---|---|---|---|---|
+| **LiteRT-LM** | 0.19.1 | `.litertlm` | CPU (XNNPACK) baseline; GPU "verify on device" | supported (per docs) | Apache-2.0 |
+| **llama.cpp** | v1.0.0 (build b12359) | GGUF | CPU (arm64 NEON); Adreno 642L not on the OpenCL verified list | via `llama-server` / chat templates | MIT |
+| **ExecuTorch** | v1.6.0 (Maven `executorch-android` 1.5.1) | `.pte` | XNNPACK CPU; Qualcomm backend excludes SM7325 | in your app code | BSD-style (GitHub reports NOASSERTION) |
+| **ONNX Runtime GenAI** | 0.19.0 (ORT 1.32.0) | ONNX | CPU; QNN EP on HTP is a stretch | in your app code | MIT |
+| **MLC LLM** | not verified (no stable release) | MLC | conceptual only | — | Apache-2.0 |
+| MediaPipe LLM Inference | tasks-genai 0.10.35, **deprecated** | `.task` | migrate to LiteRT-LM | — | — |
+
+What we actually ran: **llama.cpp b12359 on x86 CPU** (quantize, perplexity, bench: [L13.6](/ai-native-course/on-device-media/m13/quantization/)) and **ONNX Runtime 1.32.0 on x86 CPU**. LiteRT-LM, ExecuTorch and ORT GenAI were **not run** (they need Android or model exports outside this module's scope).
+
+<Aside type="note" title="A llama.cpp v1.0.0 detail">
+The `v1.0.0` GitHub release carries no binaries, just `nightly-tag.txt`, which points at build `b12359`. The course downloads `llama-b12359-bin-ubuntu-x64.tar.gz`, whose tools report `version: 1.0.0-dev (build 12359)`.
+</Aside>
+
+## LiteRT-LM on Android (documented)
+
+Kotlin `Engine` / `Conversation` with a streaming `Flow`; `.litertlm` models from the A73 ladder; initialise **off the main thread**; CPU backend first, GPU tried on the device; check the ABI (`arm64-v8a`). Migrating from MediaPipe's `LlmInference` is Ex 13.4 (*untested*).
+
+## Kotlin notes
+- One engine per process, owned by one thread; share it through a repository object, and close it when the last `ViewModel` goes away.
+
+## C++/Rust notes
+- llama.cpp/whisper.cpp through the NDK + JNI: build per ABI (`arm64-v8a` for the phone, `x86_64` for the emulator) and ship ABI splits. Memory-mapped weights are paged in on first touch: the first token is slower, and the OS can evict pages under memory pressure.
+
+## Sources
+- LiteRT-LM: https://github.com/google-ai-edge/LiteRT-LM · Android guide: https://developers.google.com/edge/litert-lm/android
+- llama.cpp: https://github.com/ggml-org/llama.cpp · v1.0 post: https://huggingface.co/blog/ggml-org/llama-cpp-v1 · Android: https://github.com/ggml-org/llama.cpp/blob/master/docs/android.md
+- ExecuTorch: https://docs.pytorch.org/executorch/stable/index.html · ORT GenAI: https://onnxruntime.ai/docs/genai/
+- MLC LLM: https://llm.mlc.ai/docs/ · MediaPipe LLM Inference (deprecated): https://developers.google.com/edge/mediapipe/solutions/genai/llm_inference

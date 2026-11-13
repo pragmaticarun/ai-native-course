@@ -1,0 +1,48 @@
+---
+title: "L14.4 Speech & audio agents"
+description: "VAD, ASR, diarization and LLM post-processing as a pipeline; streaming vs batch latency budgets; and what is real vs mocked in the example."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+A speech agent is a pipeline before it's an agent: **VAD** finds speech, **ASR** turns it into text, **diarization** says who spoke, and an **LLM** cleans up, summarises or acts. Each stage has its own latency and failure modes.
+
+<Snippet path="examples/python/m14/speech_pipeline.py" />
+
+| Stage | Production choice (syllabus) | In the example | Status |
+|---|---|---|---|
+| VAD | silero-vad 6.2.3 | `energy_vad`: frame RMS in dBFS with hangover, on PCM decoded by ffmpeg | real (energy gate), silero *untested* |
+| ASR | whisper.cpp v1.9.5 / faster-whisper 1.2.1 | `scripted_asr`: fixed lines | mock |
+| Diarization | pyannote.audio 4.0.7 | `toy_diarize`: clusters by dominant FFT frequency; works only because the fixture "speakers" are tones | toy |
+| Post-processing | an LLM | a function you pass in | mock |
+
+The test builds a clip with silence, a 300 Hz "speaker", silence, a 600 Hz "speaker" and the 300 Hz one again, and checks the regions (±0.1 s) and the labels `SPEAKER_00, SPEAKER_01, SPEAKER_00`.
+
+## Latency budgets
+
+- **Batch:** wait for the whole recording, then process it: `audio_s + audio_s × rtf`.
+- **Streaming:** first text after one chunk: `chunk_s + chunk_s × rtf (+ overhead)`. A stream only keeps up while `rtf < 1`; otherwise the backlog grows without bound.
+- Smaller ASR models lower `rtf` and raise WER. Ex 14.3 builds the chooser; measuring real whisper.cpp model sizes is *untested* here.
+
+## WER, correctly
+
+Use corpus WER (total edits / total reference words), not the mean of per-utterance WERs: one wrong word in "yes" is 100%. `corpus_wer` reuses M6's `wer`.
+
+<Aside type="note" title="Android">
+ML Kit GenAI speech recognition (alpha) runs in **Basic** mode on any Android device on API 31+, which includes the Galaxy A73 per the docs (*untested on the device*). Advanced mode needs newer flagship chips.
+</Aside>
+
+## C++/Rust notes
+- whisper.cpp is C/C++ with a small C API; wrap it once (JNI on Android, `bindgen` in Rust) and keep one context per thread.
+- Use a lock-free ring buffer between the audio callback and the VAD/ASR thread; never allocate or block in the audio callback.
+
+## Kotlin notes
+- `Flow<AudioChunk>` from `AudioRecord`, `buffer()` with a bounded capacity and `DROP_OLDEST` for live captions; collect on a single-thread dispatcher that owns the native ASR context.
+
+## Sources
+- whisper.cpp: https://github.com/ggml-org/whisper.cpp · silero-vad: https://github.com/snakers4/silero-vad
+- pyannote.audio: https://github.com/pyannote/pyannote-audio · faster-whisper: https://github.com/SYSTRAN/faster-whisper
+- ML Kit GenAI speech recognition: https://developers.google.com/ml-kit/genai/speech-recognition/android

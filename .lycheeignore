@@ -12,3 +12,7 @@ example\.com
 ^https://news\.samsung\.com/
 # Sitemap/canonical links to the site itself are checked after deploy, not here.
 ^https://pragmaticarun\.github\.io/
+# Returns 403 to automated checkers; verified with a fetch on 14 Nov 2026 (EBU R 128 v5.0 page).
+^https://tech\.ebu\.ch/
+# RFC 2606 reserved .example hosts used in the M15 sandbox (never resolvable)
+\.example/

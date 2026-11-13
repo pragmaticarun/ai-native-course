@@ -1,0 +1,61 @@
+{
+ "_source": "sandbox_app /calendar (layout a), captured with gui_agents.MARK_JS in headless Chromium via Playwright 1.65.1; the last (non-interactive) entry was added by hand",
+ "elements": [
+  {
+   "role": "link",
+   "name": "Mail",
+   "x": 12,
+   "y": 12,
+   "w": 29.3,
+   "h": 18
+  },
+  {
+   "role": "link",
+   "name": "Calendar",
+   "x": 57.3,
+   "y": 12,
+   "w": 64.9,
+   "h": 18
+  },
+  {
+   "role": "textbox",
+   "name": "Title",
+   "x": 16,
+   "y": 207.8,
+   "w": 238,
+   "h": 24
+  },
+  {
+   "role": "textbox",
+   "name": "Date",
+   "x": 16,
+   "y": 257.8,
+   "w": 238,
+   "h": 24
+  },
+  {
+   "role": "textbox",
+   "name": "Time",
+   "x": 16,
+   "y": 307.8,
+   "w": 238,
+   "h": 24
+  },
+  {
+   "role": "button",
+   "name": "Save event",
+   "x": 16,
+   "y": 335.8,
+   "w": 108.1,
+   "h": 34
+  },
+  {
+   "role": "text",
+   "name": "Calendar heading",
+   "x": 16,
+   "y": 60,
+   "w": 200,
+   "h": 37
+  }
+ ]
+}

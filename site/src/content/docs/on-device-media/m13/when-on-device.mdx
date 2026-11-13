@@ -1,0 +1,29 @@
+---
+title: "L13.1 Why (and when not) to run on-device"
+description: "Latency, privacy, offline use and cost against capability, context size, battery, storage, model download and fragmentation; a decision matrix for on-device, cloud or hybrid."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+On-device inference buys latency, privacy, offline use and zero marginal cost. It costs capability, context length, battery, storage, a model download, and testing across a fragmented device fleet. Write the trade-off down:
+
+<Snippet path="examples/python/m13/decision_matrix.py" />
+
+The scores are **our teaching defaults**, not measurements: a 0–3 scale per criterion for a small phone-class model. Two things matter more than the arithmetic:
+
+- **Hard constraints veto options.** "Must work offline" removes cloud; "data must stay on the device" removes cloud and hybrid; "needs a context the local model can't take" removes on-device. If everything is vetoed, a requirement has to give.
+- **Hybrid is usually the honest answer**: local for the frequent, small, private things; cloud for the rare, hard, non-private ones, behind a router (L13.4).
+
+For the Galaxy A73 (Snapdragon 778G, 6 or 8 GB RAM), the A73 model ladder is FunctionGemma 270M → Gemma 3 1B → Gemma 4 E2B (the last only on 8 GB variants, if RAM headroom allows). The course quotes **no A73 speed numbers until they're measured** (L13.7).
+
+## Kotlin notes
+- Make the decision a value, not scattered `if`s: a `RoutePolicy` object in commonMain, unit-tested on the JVM, injected into the Android UI.
+
+## C++/Rust notes
+- Storage and download are real costs: memory-mapped GGUF/`.litertlm` weights load fast and share the page cache, but the file still has to fit on the device and survive app updates (keep models out of the APK; download and verify a checksum).
+
+## Sources
+- Samsung Galaxy A73 specs: https://www.samsung.com/ph/smartphones/galaxy-a/galaxy-a73-5g-awesome-white-128gb-sm-a736bzwdphl/
+- Snapdragon 778G: https://www.qualcomm.com/smartphones/products/7-series/snapdragon-778g-5g-mobile-platform

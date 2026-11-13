@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<!-- Synthetic screen in `uiautomator dump` format (hand-written, not captured from a device). -->
+<hierarchy rotation="0">
+  <node index="0" text="" resource-id="com.example.calendar:id/title" class="android.widget.EditText" package="com.example.calendar" content-desc="Title" clickable="true" bounds="[40,300][1040,420]"/>
+  <node index="1" text="" resource-id="com.example.calendar:id/date" class="android.widget.EditText" package="com.example.calendar" content-desc="Date" clickable="true" bounds="[40,460][1040,580]"/>
+  <node index="2" text="" resource-id="com.example.calendar:id/time" class="android.widget.EditText" package="com.example.calendar" content-desc="Time" clickable="true" bounds="[40,620][1040,740]"/>
+  <node index="3" text="Save" resource-id="com.example.calendar:id/save" class="android.widget.Button" package="com.example.calendar" content-desc="" clickable="true" bounds="[600,2150][1040,2300]"/>
+</hierarchy>

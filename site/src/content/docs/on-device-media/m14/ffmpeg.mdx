@@ -1,0 +1,54 @@
+---
+title: "L14.2 Agents driving ffmpeg safely"
+description: "Typed tool wrappers instead of shell strings, ffprobe JSON as the observation, the filters agents need (scene select, silencedetect, ebur128, loudnorm, thumbnail, concat), and the dry-run then verify pattern."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+ffmpeg can read from the network, write anywhere, and run filters that open other files. Giving a model a shell string is giving it all of that. The pattern: **the model chooses a tool and numbers; your code writes the argv**.
+
+## The tools
+
+<Snippet path="examples/python/m14/media_tools.py" />
+
+| Tool | ffmpeg feature | Observation the agent gets |
+|---|---|---|
+| `probe` | `ffprobe -print_format json -show_format -show_streams` | `Probe(duration, width, height, fps, audio_streams, …)` |
+| `scene_cuts` | `select='gt(scene,T)',showinfo` | list of cut timestamps |
+| `silences` | `silencedetect=noise=-40dB:d=0.3` | list of `(start, end)` |
+| `loudness_lufs` | `ebur128` summary | integrated loudness (LUFS) |
+| `thumbnail` / `best_thumbnail` | `-ss` + `-frames:v 1` / `thumbnail` filter | a PNG path |
+| `render` | `trim`/`atrim` → `concat` → two-pass `loudnorm` | the output path (then verify) |
+
+Every path goes through `resolve_in_root`: protocol-style names (`concat:`, `http:`, `pipe:`), absolute paths and `..` escapes are refused before ffmpeg ever sees them. Every call has a timeout and returns the last stderr line on failure, which is a useful error for the model.
+
+## Dry run, then verify
+
+`concat_argv(...)` builds the command without running it, so the plan can be logged, shown to a human, or diffed. `render` then runs it, and the [highlight-reel worked example](/ai-native-course/on-device-media/m14/highlight-reel/) checks the output with `ffprobe` and `ebur128` against the plan. Agents claim success easily; files don't lie.
+
+## Things the tests taught us
+
+- **Scene detection is luma-heavy.** A cut from pure red to pure green (nearly equal luma) was *not* detected at the default threshold; the fixtures use colours with distinct brightness. Check detectors against fixtures you understand.
+- **Shot boundaries land on frames.** A 1.52 s shot at 25 fps ends at 38 frames; cut points in the tests are compared with a 1-frame tolerance.
+- **Measure, then normalise.** Two-pass `loudnorm` (measure `input_i/tp/lra/thresh` on the edited audio, then apply with `linear=true`) landed within 1 LU of −16 LUFS on every test run.
+- **Encode once.** The first version of `render` encoded a draft, then re-encoded it with loudnorm; the output grew from 3.52 s to 3.60 s. Measuring loudness on the filter graph's output with the null muxer, then encoding once, fixed it.
+
+<Aside type="tip" title="PyAV for frame-accurate work">
+When you need exact frames (not ffmpeg's seek semantics), decode with PyAV (`av` 19.0.2) and work on frame timestamps. Not used in the tests here (*untested*).
+</Aside>
+
+## C++/Rust notes
+- In-process libav* (C API, or Rust bindings) avoids process spawn cost and gives you frame-level control, but you inherit memory safety risks from parsing untrusted media: fuzz your demux path, and run decoders in a sandboxed process anyway.
+- The same allowlist idea applies to filter graphs you build in code: construct `AVFilterGraph` nodes from typed parameters instead of parsing model-written graph strings.
+
+## Kotlin notes
+- On Android, `MediaExtractor` / `MediaMetadataRetriever` give you the `probe` observation without ffmpeg (Ex 14.4, *untested*), and **Media3 Transformer** does trims, concatenation and audio processing on-device. Drive it from an agent the same way: typed edit requests, never strings.
+- ML Kit GenAI inference is foreground-only, while long Transformer exports want a foreground service: plan the UX so the model call happens while the app is visible and the export continues in the service.
+
+## Sources
+- ffmpeg filters: https://ffmpeg.org/ffmpeg-filters.html · ffprobe: https://ffmpeg.org/ffprobe.html
+- FFmpeg releases (9.0.2 is the newest listed): https://ffmpeg.org/download.html
+- Media3: https://developer.android.com/media/media3

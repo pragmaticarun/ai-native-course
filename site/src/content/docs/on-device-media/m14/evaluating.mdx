@@ -1,0 +1,43 @@
+---
+title: "L14.6 Evaluating media agents"
+description: "Golden fixtures, objective metrics (duration and stream invariants, LUFS, WER, frame-accurate cut points), LLM-judge rubrics for captions, and privacy checks for faces, voices and screen recordings."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Media outputs are files, so most of their evaluation can be objective. Use a judge only for what can't be measured.
+
+## Objective first
+
+| Metric | Tool | Where |
+|---|---|---|
+| duration within tolerance of the plan | `ffprobe` | `highlight_reel.verify` |
+| exactly one video + one audio stream | `ffprobe` | `highlight_reel.verify` |
+| integrated loudness within 1 LU of target | `ebur128` | `highlight_reel.verify`, M6 `media_eval` |
+| cut points within one frame | scene detection on the output | `highlight_reel.verify` |
+| WER on fixed transcripts | word edit distance | `speech_pipeline.corpus_wer` |
+
+**Golden fixtures:** the syllabus plans short CC-licensed clips in `media-fixtures/`. The course currently generates its fixtures with `lavfi` instead (no licensing questions, byte-for-byte reproducible, but less realistic). Real clips are still a to-do.
+
+## Judges for the rest
+
+<Snippet path="examples/python/m14/media_judge.py" />
+
+The rubric asks for JSON: `faithful`, `specific`, `invented_entities`. The mock judge flags capitalised names in the caption that aren't in the reference facts ("Messi scores a goal" fails when the facts only say "striker"). Unparseable judge output fails closed. Calibrate a real judge against human labels before you trust it (M6).
+
+## Privacy
+
+`privacy_findings` checks an output manifest: unblurred faces, identifiable voices without consent, sensitive text visible in screen recordings (passwords, tokens, OTPs), and cloud uploads of data classed on-device-only. These checks need upstream detectors (faces, OCR) that are not run here.
+
+<Aside type="note">
+The objective checks run on real ffmpeg output in CI. The judge and the privacy detectors are mocks or manifest-level rules (*untested against real models*).
+</Aside>
+
+## C++/Rust notes
+- Put the objective checks in a small native CLI (Rust is a good fit) that your CI and your agent both call, so "verify" means the same thing everywhere.
+
+## Sources
+- EBU R 128 loudness: https://tech.ebu.ch/publications/r128 · ffmpeg `ebur128`: https://ffmpeg.org/ffmpeg-filters.html#ebur128-1

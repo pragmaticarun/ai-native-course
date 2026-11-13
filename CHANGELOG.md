@@ -2,6 +2,40 @@
 
 All notable changes to the course. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] - 2026-11-14
+
+### Content
+- Modules **M13–M15** built: 28 pages (M13 on-device & Android agents: 10; M14 multimedia & multimodal agents: 9; M15 computer-use & mobile-use agents: 9), Python, TypeScript and Kotlin/JVM examples, 9 CI-checked exercises (solution passes, starter fails; one in TypeScript) plus 2 reading exercises marked untested (Ex 13.4, Ex 14.4), and 3 quizzes (M13 9, M14 8, M15 8 questions). New site groups: *On-device & Media* (M13–M14) and *GUI Agents* (M15).
+- M13 (**host side only**): a decision matrix with hard vetoes; the ML Kit GenAI availability → UI state machine in Python and KMP commonMain, with the Galaxy A73's expected answers taken from the docs; a KMP voice-notes agent (tools defined once and also exposed over the MCP Kotlin SDK, HITL-gated delete, single-thread engine owner, golden evals in commonMain; 8 new jvmTests); a PII-first hybrid router (Python and Kotlin) with Firebase AI Logic's modes mapped; a runtime comparison with versions and licences checked on GitHub; **real llama.cpp v1.0.0 (build b12359) runs on x86 CPU** — `llama-quantize` Q8_0/Q4_K_M/Q4_0 of `stories15M`, perplexity, KL divergence vs F32 and `llama-bench`; and ONNX Runtime 1.32.0 dynamic int8 quantization of a small MLP.
+- M14: ffmpeg/ffprobe as sandboxed agent tools (path checks, probe, scene cuts, silences, EBU R128 loudness, thumbnails, frame-accurate cuts with two-pass loudnorm); a GStreamer pipeline validator (element allowlist, relative paths, required `num-buffers`) that also runs real `gst-launch-1.0` pipelines and parses `level` messages; a speech pipeline (VAD, toy diarization, scripted ASR, streaming vs batch latency, WER); a budgeted vision cascade; a media judge that fails closed; and the **highlight-reel worked example** (Python and TS): plan an EDL from transcript + scene cuts, render with real ffmpeg, verify duration, streams, loudness and cut points.
+- M15: a local sandbox mail + calendar web app with a seeded prompt-injection email, driven with **Playwright 1.65.1 + Chromium** by three agents (pixels with simulated vision noise, accessibility tree + set-of-marks, direct API) with a guard (injection scan, confirmation for consequential actions, egress allowlist, audit log with screenshot hashes) and replay; a mobile agent against a fake `adb`/uiautomator device (idle detection, recovery); and a mini benchmark with pass@k.
+
+### CI
+- `python` job installs GStreamer (tools, base, good plugins) and Playwright Chromium; `M15_REQUIRE_BROWSER=1` makes a missing browser a failure.
+- `typescript` job installs ffmpeg for the M14 highlight-reel test.
+- New `llamacpp` job: downloads the llama.cpp b12359 Ubuntu x64 release and `stories15M.gguf`, runs the M13 quantization test with `M13_REQUIRE_LLAMA=1` and prints the table.
+
+### Measured on the course box (x86 CPU; not a phone)
+- llama.cpp b12359, stories15M, 4 threads, 128-token context: F32 98.4 MB / PPL 5.282; Q8_0 26.7 MB / PPL 5.289 / mean KLD 0.0011 / 97.4% same top-1; Q4_K_M 21.0 MB / 5.429 / 0.0269 / 90.7%; Q4_0 19.1 MB / 6.02 / 0.1242 / 82.9%. Q4_K_M generated more slowly than Q4_0 and Q8_0 on this CPU. Repeated runs moved Q4_0's perplexity between 5.94 and 6.02.
+- ONNX Runtime int8: 68.2 KB → 19.0 KB, accuracy 0.996 → 0.996, 100% agreement.
+- M15 three ways (3 seeds): pixels 9.7 steps / 0.7 invalid actions / 0.90 s; accessibility tree 6.0 / 0 / 0.65 s; API 4.0 / 0 / 0.01 s; all succeeded. Mini benchmark (10 instances, slip 0.15): pass@1 0.77, pass@3 1.00.
+
+### Findings worth knowing (observed in this repo)
+- The llama.cpp `v1.0.0` GitHub release carries no binaries (only `nightly-tag.txt`); the matching build is `b12359`, whose tools report `1.0.0-dev (build 12359)`.
+- `-ctk q8_0` fails on stories15M: "K cache type q8_0 with block size 32 does not divide n_embd_head_k=48".
+- ffmpeg's `select='gt(scene,…)'` missed a cut between red and green shots (similar luma); the fixture uses colours that differ in brightness and the lesson says why.
+- Measuring loudness and encoding in two encodes stretched a 3.52 s cut to 3.60 s; measuring into the null muxer and encoding once fixed it.
+- `gst-launch-1.0 -q` hides bus messages; GStreamer 1.28 prints `level` values as `(double){ … }` rather than `< … >` (the parser accepts both).
+
+### Deviations from the syllabus
+- CI uses the Ubuntu ffmpeg and GStreamer packages, not a pinned FFmpeg 9.0.2 container; media fixtures are generated with lavfi rather than CC-licensed clips in `media-fixtures/`.
+- Ex 13.2 checks the decision half against the measured box table; the real llama.cpp run lives in the example and the `llamacpp` CI job. Ex 14.1 covers the host half only; Ex 14.3 uses synthetic data; Ex 15.3 uses the course sandbox instead of AndroidWorld. Koog is described, not used.
+
+### Known gaps / untested
+- **Android / Galaxy A73**: nothing ran on Android, an emulator or the A73 — LiteRT-LM, Gemini Nano / ML Kit GenAI, `AgentRunner`, AppFunctions, the ORT QNN EP, ExecuTorch, the MediaPipe → LiteRT-LM migration (Ex 13.4), `MediaExtractor` (Ex 14.4), the KMP Android target and the A73 benchmark table. The Android SDK is **not installed** (awaiting approval).
+- **Real models**: no real ASR, VLM or LLM in M14/M15 (scripted/simulated); silero-vad, faster-whisper, whisper.cpp, pyannote, PySceneDetect, MediaPipe, PyAV, PyGObject and GStreamer `onnxinference` are described, not run.
+- **GUI**: provider computer-use APIs, browser-use, Playwright MCP, E2B/cua, real devices or emulators, uiautomator2, mobile-mcp, and AndroidWorld/OSWorld/WebArena were not run.
+
 ## [0.4.0] - 2026-11-13
 
 ### Content

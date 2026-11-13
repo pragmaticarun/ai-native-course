@@ -27,14 +27,17 @@ jobs:
     env:
       COURSE_LLM_PROVIDER: mock
       UV_PYTHON: ${{ matrix.python }}
+      M15_REQUIRE_BROWSER: "1"
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "0.13.8"
-      - name: Install ffmpeg (M2 frame grab, M8 chunk transcode, M9 media-probe contract)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Install ffmpeg and GStreamer (M2 frame grab, M8/M9 media, M14 tools and pipeline validator)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good
       - run: uv sync --locked
+      - name: Playwright Chromium (M15 sandbox agents and Ex 15.4)
+        run: uv run playwright install --with-deps chromium
       - name: Lint
         run: uv run ruff check ../examples/python ../exercises ../scripts src && uv run ruff format --check ../examples/python ../exercises ../scripts src
       - name: Type-check
@@ -58,6 +61,8 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - name: Install ffmpeg (M14 highlight-reel test)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
@@ -153,6 +158,32 @@ jobs:
           SPECKIT_DIR: /tmp/sk
           SPECKIT_REQUIRE: "1"
         run: uv sync --locked && uv run pytest -q -rs ../examples/python/m10
+
+  llamacpp:
+    name: llama.cpp v1.0.0 quantization (M13, real binaries, x86 CPU)
+    runs-on: ubuntu-latest
+    env:
+      COURSE_LLM_PROVIDER: mock
+      M13_REQUIRE_LLAMA: "1"
+      LLAMA_CPP_DIR: /tmp/llama/llama-b12359
+      LLAMA_MODEL: /tmp/llama/stories15M.gguf
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.13.8"
+      - name: Download llama.cpp b12359 (the v1.0.0 build) and stories15M
+        run: |
+          mkdir -p /tmp/llama && cd /tmp/llama
+          curl -fsSL -o llama.tgz https://github.com/ggml-org/llama.cpp/releases/download/b12359/llama-b12359-bin-ubuntu-x64.tar.gz
+          tar xzf llama.tgz && ls
+          curl -fsSL -o stories15M.gguf https://huggingface.co/ggml-org/models/resolve/main/tinyllamas/stories15M.gguf
+      - name: Quantize, perplexity, KL divergence, bench (skips become failures)
+        working-directory: python
+        run: uv sync --locked && uv run pytest -q -rs ../examples/python/m13 -k llama
+      - name: Print the measured table (runner CPU; numbers vary by machine)
+        working-directory: examples/python
+        run: uv run --project ../../python python -m m13.llama_quant
 
   site:
     name: Site build + internal link validation

@@ -1,0 +1,23 @@
+{
+  "_note": "Synthetic match clip: each shot is a solid colour + tone (or silence) generated with lavfi. Transcript and captions are fixed mock-model outputs, not real ASR/VLM results.",
+  "shots": [
+    {"color": "red", "seconds": 2.0, "tone_hz": 440},
+    {"color": "black", "seconds": 1.52, "tone_hz": null},
+    {"color": "white", "seconds": 2.52, "tone_hz": 880},
+    {"color": "blue", "seconds": 2.0, "tone_hz": 660},
+    {"color": "orange", "seconds": 2.48, "tone_hz": 550}
+  ],
+  "transcript": [
+    {"start": 0.1, "end": 1.9, "text": "teams walk out for kickoff"},
+    {"start": 3.6, "end": 5.9, "text": "what a goal from distance the crowd erupts"},
+    {"start": 6.1, "end": 7.9, "text": "slow build up in midfield"},
+    {"start": 8.1, "end": 10.4, "text": "penalty saved incredible save by the keeper"}
+  ],
+  "captions": [
+    "players lining up in the tunnel",
+    "black frame, no content",
+    "striker celebrating with arms raised",
+    "midfielders passing in the centre circle",
+    "goalkeeper diving to the left"
+  ]
+}

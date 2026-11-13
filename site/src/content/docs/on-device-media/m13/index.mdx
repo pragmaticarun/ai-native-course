@@ -1,0 +1,30 @@
+---
+title: "M13 · On-device & Android agents"
+description: "When to run models on the device, Gemini Nano and ML Kit GenAI as a documented path, on-device tool calling in KMP, a hybrid router, bring-your-own-model runtimes, quantization measured with llama.cpp, and measuring and shipping on a Galaxy A73."
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**Time:** ~7 hours · **Prerequisites:** M2 (the KMP `OnDeviceLlm` interface), M4 (small context windows), M5 (on-device HITL).
+
+| Lesson | Worked example |
+|---|---|
+| [L13.1 Why (and when not) on-device](/ai-native-course/on-device-media/m13/when-on-device/) | a decision matrix with hard vetoes |
+| [L13.2 Gemini Nano via ML Kit GenAI](/ai-native-course/on-device-media/m13/gemini-nano/) | availability → UI state machine, Python and Kotlin (*documented path; A73 answers from docs*) |
+| [L13.3 On-device tool calling](/ai-native-course/on-device-media/m13/tool-calling/) | KMP commonMain tool loop, the same tools as MCP; `AgentRunner` + AppFunctions documented (*untested*) |
+| [L13.4 Hybrid inference](/ai-native-course/on-device-media/m13/hybrid/) | our own PII-first router; Firebase AI Logic modes mapped |
+| [L13.5 Bring-your-own-model runtimes](/ai-native-course/on-device-media/m13/runtimes/) | LiteRT-LM, llama.cpp v1.0, ExecuTorch, ORT GenAI compared |
+| [L13.6 Quantization & acceleration](/ai-native-course/on-device-media/m13/quantization/) | **real** llama.cpp Q8_0/Q4_K_M/Q4_0 with perplexity, KL divergence and tokens/s; ORT int8 |
+| [L13.7 Measuring and shipping](/ai-native-course/on-device-media/m13/measuring/) | metrics, device-tier matrix, privacy review |
+| [Worked example: offline voice notes](/ai-native-course/on-device-media/m13/voice-notes/) | KMP agent, tools, HITL delete, evals on the JVM (*Android backends untested*) |
+| [Exercises](/ai-native-course/on-device-media/m13/exercises/) | availability machine, quantization trade-offs, PII router, MediaPipe → LiteRT-LM migration (*untested*) |
+
+<Aside type="caution" title="Android parts are untested">
+The course box has **no Android SDK** (by decision, pending approval), so nothing in this module ran on Android, an emulator or the Galaxy A73. What ran: Python host-side code, ONNX Runtime 1.32.0 on x86 CPU, **llama.cpp b12359 (the v1.0.0 build) on x86 CPU** with a 15M-parameter model, and the KMP commonMain code on the JVM (8 new jvmTests). Every A73-specific statement comes from documentation or is marked as an inference.
+</Aside>
+
+<Quiz src="m13" />

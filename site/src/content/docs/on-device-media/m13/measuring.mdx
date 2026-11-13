@@ -1,0 +1,45 @@
+---
+title: "L13.7 Measuring and shipping"
+description: "TTFT, tokens/s, peak RSS, thermal throttling and energy; device-tier test matrices with the Galaxy A73 as the physical reference; measuring RAM headroom per model; and a privacy review."
+sidebar:
+  order: 7
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Nothing measured on the device yet">
+The course box has no Android SDK and no device attached. This lesson is the measurement plan; the A73 benchmark table in the voice-notes worked example stays empty until someone runs it on the phone.
+</Aside>
+
+## What to measure
+
+| Metric | How | Why |
+|---|---|---|
+| TTFT (time to first token) | timestamp the request and the first `Flow` emission | what users feel |
+| tokens/s (prefill and decode separately) | count emissions over time; `llama-bench` reports both | decode speed sets reading pace |
+| peak RSS | `dumpsys meminfo <pkg>`, Android Studio profiler | the OOM killer doesn't negotiate |
+| thermal throttling | run 10 minutes; plot tokens/s over time; `dumpsys thermalservice` | first-minute numbers lie |
+| energy | Perfetto power rails where available, battery stats otherwise | on-device isn't free for the user |
+
+Run each model on the A73 model ladder (FunctionGemma 270M, Gemma 3 1B, Gemma 4 E2B on 8 GB) × runtime (LiteRT-LM CPU, llama.cpp CPU, LiteRT-LM GPU if it works) and record quality on the golden prompts too, as in M6's on-device eval.
+
+## Device-tier test matrix
+
+- **JVM** (CI): commonMain logic with fakes; this module's 8 KMP tests run here.
+- **Emulator**: UI flows and the "Nano unavailable" fallback; not for performance.
+- **Galaxy A73** (physical reference): CPU/GPU numbers, RAM headroom per model.
+- **Android Device Streaming**: to try the Gemini Nano path on a supported device you don't own.
+
+## Privacy review checklist
+
+- What leaves the device, when, and with what consent (the router's `CLOUD` decisions, logged without content).
+- What gets logged locally (no prompt text in Logcat in release builds), and for how long.
+- Retention for notes, audio and model outputs; delete paths that actually delete.
+- Model download integrity (checksum) and where models are stored.
+
+## Kotlin notes
+- Use `Trace.beginSection` / Perfetto custom slices around prefill and decode so traces line up with your metrics.
+
+## Sources
+- Perfetto: https://perfetto.dev/docs/ · Android memory overview: https://developer.android.com/topic/performance/memory-overview
+- Android Device Streaming: https://developer.android.com/studio/run/android-device-streaming

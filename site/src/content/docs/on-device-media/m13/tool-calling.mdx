@@ -1,0 +1,42 @@
+---
+title: "L13.3 On-device tool calling, two ways"
+description: "(a) a KMP commonMain tool-calling loop over a local model, with tools defined once and also exposed as MCP tools; (b) ML Kit genai-agent AgentRunner with AppFunctions, documented with fakes."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## (a) Our own loop in KMP commonMain
+
+The voice-notes agent's loop, tools and evals live in commonMain and run on the JVM in CI with a scripted model. The model is an interface (`LocalModel`); androidMain would implement it with LiteRT-LM on CPU (FunctionGemma 270M / Gemma 3 1B), llama.cpp via JNI, or ExecuTorch.
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m13/VoiceNotes.kt" lang="kotlin" />
+
+- **Tools defined once** (`NoteTool`: name, description, string params, destructive flag) and used two ways: by the local loop, and as MCP tools through the MCP Kotlin SDK 0.16.0 (`voiceNotesMcpServer`). The test lists the tools over an in-memory transport and checks `delete_note` is annotated destructive and refused when the user says no.
+- **HITL** reuses M5's confirmation decorator: `delete_note` asks first, on both paths.
+- **One owner thread** for the native engine (`limitedParallelism(1)`), a turn budget, unknown tools and missing arguments returned to the model as errors, not exceptions.
+- **Koog** (1.3.0) offers graph strategies, tools and persistence for exactly this loop. The course hand-writes the loop so it needs no extra dependency; mapping it onto a Koog graph strategy is conceptual here (*not run*).
+
+<Aside type="caution" title="Untested">
+No androidMain backend exists yet (it needs the Android SDK), so no real local model has driven this loop, and nothing ran on the A73. FunctionGemma's and LiteRT-LM's own tool-call formats would be translated into `Turn` by an adapter; the JSON format in `parseToolCall` is ours.
+</Aside>
+
+## (b) `AgentRunner` + AppFunctions (documented, with fakes)
+
+ML Kit's `genai-agent` (`1.0.0-alpha1`) adds `AgentRunner`, a loop described as observe → reason → act → evaluate with `maxTurns`. Tools are **AppFunctions** (`@AppFunctionDeclaration`, KDoc as tool descriptions), restricted to the app with `ACCESS_LEVEL_SELF`, scoped with `addAppFunctionIds`, with structured error maps and a decorator for human confirmation. AppFunctions need Android 16+ and are experimental; they can also be OS-level tools for system agents, tested with `adb shell cmd app_function list-app-functions`.
+
+On the A73, `AgentRunner` is unavailable (not a listed device), and whether AppFunctions can be hosted depends on its Android version, which still has to be checked on the phone. M5's `RequiresConfirmation` mirrors the decorator idea with our own types; it is **not the ML Kit API**.
+
+## Kotlin notes
+- `expect`/`actual` or constructor-injected backends: the course uses an interface (`LocalModel`) injected into the agent, which keeps commonMain free of platform code and makes fakes trivial.
+- `Flow<String>` for token streams; tie the engine's `AutoCloseable` to a `ViewModel`'s `onCleared` or a `Lifecycle` observer.
+
+## C++/Rust notes
+- If the inference core is Rust, expose a C ABI (`extern "C"` functions taking opaque handles) and call it through JNI from androidMain; keep all calls on the owning thread, matching `limitedParallelism(1)` on the Kotlin side.
+
+## Sources
+- ML Kit agent API: https://developers.google.com/ml-kit/genai/agent/android · tools: https://developers.google.com/ml-kit/genai/agent/android/define-tools
+- AppFunctions: https://developer.android.com/ai/appfunctions · Koog: https://docs.koog.ai/
+- MCP Kotlin SDK: https://github.com/modelcontextprotocol/kotlin-sdk

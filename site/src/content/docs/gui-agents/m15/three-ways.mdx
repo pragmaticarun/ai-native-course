@@ -1,0 +1,40 @@
+---
+title: "Worked example: one task, three ways"
+description: "Create a calendar event from an email with (a) a pure computer-use loop on screenshots, (b) a hybrid of accessibility tree and screenshot, and (c) an API call, run with real Playwright and compared on success, steps, invalid actions, time and bytes sent to the model."
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**Task:** an email asks to put "Hiring panel" in the calendar on 2026-12-25 at 15:00 (title, date and time vary by seed). Create the event.
+
+<Snippet path="examples/python/m15/gui_agents.py" />
+
+1. **Pixels:** observe a screenshot (downscaled to 640 px wide). `SimulatedVision` finds the target's box and returns its centre in model pixels plus Gaussian jitter (`sigma_px`, default 4). Act with `click(x, y)` and `type`. The policy checks the focus (what the screenshot would show) before typing, and re-clicks if it missed.
+2. **Hybrid:** observe interactive elements with set-of-marks IDs plus the screenshot. Act with `click_mark` / `fill_mark`.
+3. **API:** `GET /api/mail`, extract the invite, `POST /api/events`, `GET /api/events` to verify.
+
+## Results (`uv run --project ../../python python -m m15.gui_agents`, 3 seeds, on the box)
+
+```text
+mode      success  steps  invalid  seconds  model_kb
+pixels       1.00    9.7      0.7    0.898     219.3
+hybrid       1.00    6.0      0.0    0.650     136.4
+api          1.00    4.0      0.0    0.012       0.8
+```
+
+The test (`test_three_ways_compare`) asserts the shape, not the exact numbers: all succeed, steps API < hybrid < pixels, the API path sends under 5 KB, the hybrid path makes no invalid actions.
+
+<Aside type="note" title="Read these numbers carefully">
+The policies are scripted and `sigma_px` is a simulation knob, so "invalid 0.7" says nothing about any real model's grounding. What transfers: the API path needs no screenshots, can't misclick, and has no screen for an injection to sit on. With a real VLM, the gap in steps, bytes and failure modes is the point, not the decimals.
+</Aside>
+
+The hybrid path still sends screenshots in this example (136 KB). If the element list is enough for the task, drop the screenshot and the cost falls to a few KB.
+
+## Kotlin notes
+- On Android, the (c) path is an **AppFunction** (`@AppFunctionDeclaration`, Android 16+, experimental) or your own MCP/tool layer; the (b) path is the accessibility tree via UI Automator or an `AccessibilityService`. Same rule: if the app exposes a function, call it.
+
+## Sources
+- Playwright Python: https://playwright.dev/python/ · AppFunctions: https://developer.android.com/ai/appfunctions

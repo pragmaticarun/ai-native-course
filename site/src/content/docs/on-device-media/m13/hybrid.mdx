@@ -1,0 +1,48 @@
+---
+title: "L13.4 Hybrid inference"
+description: "Our own router first (local LiteRT-LM vs a cloud model): privacy class and PII, connectivity, availability, context fit, difficulty and battery; then Firebase AI Logic's four inference modes and why PREFER_ON_DEVICE goes to the cloud on an A73."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+On the A73, Firebase's on-device half isn't available (it needs Gemini Nano), so the course builds its own router first.
+
+<Snippet path="examples/python/m13/privacy_router.py" />
+
+Order of checks:
+
+1. **Privacy first.** A prompt with PII (email, phone, card, 12-digit grouped IDs) or a `SENSITIVE` class stays local if the local model can take it, and is otherwise **refused**: ask the user, never "fall back" to the cloud with private data.
+2. **Offline:** local if it fits, else refuse.
+3. **Availability and fit:** cloud if the local model is missing or the prompt is too long.
+4. **Difficulty:** hard tasks (long summaries, multi-step reasoning) go to the cloud.
+5. **Battery:** below 20% and not charging, prefer the cloud.
+6. Otherwise local: faster and free.
+
+The voice-notes app uses a smaller Kotlin version (`Router.kt`) before sending long summaries to a cloud model.
+
+## Firebase AI Logic's modes
+
+| Mode | Nano available | Nano unavailable (A73) |
+|---|---|---|
+| `PREFER_ON_DEVICE` | on-device | cloud |
+| `ONLY_ON_DEVICE` | on-device | fails |
+| `PREFER_IN_CLOUD` | cloud (on-device when offline) | cloud |
+| `ONLY_IN_CLOUD` | cloud | cloud |
+
+The on-device side is documented as single-turn (text, text plus one image, or structured output), validated for English and Korean, with output under about 256 tokens recommended. The cloud side uses App Check; set spend caps.
+
+<Aside type="caution">
+The A73 column is **inferred** from the Nano device list, not observed. Check the fallback on the phone.
+</Aside>
+
+## Kotlin notes
+- Make the router a pure function in commonMain with a sealed result (`Local`, `Cloud`, `Refuse(reason)`), so the UI must handle refusal explicitly.
+
+## C++/Rust notes
+- PII detection on device is a good fit for a small native library shared by Android and iOS; keep its rules versioned and tested like the Python ones.
+
+## Sources
+- Firebase AI Logic hybrid: https://firebase.google.com/docs/ai-logic/hybrid/android/get-started · Android hybrid guide: https://developer.android.com/ai/hybrid

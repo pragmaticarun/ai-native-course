@@ -1,0 +1,42 @@
+---
+title: "L14.1 Multimodal inputs & frame budgets"
+description: "Image, audio and video inputs for multimodal models, frame sampling strategies, and token and cost accounting per frame or second, with on-device (Gemma 4 E2B/E4B via LiteRT-LM) and cloud options."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Most "video understanding" is image understanding on frames you chose. The choice of frames is the biggest lever on cost, latency and quality, and it's yours, not the model's.
+
+## Three sampling strategies
+
+| Strategy | Frames for the 10.5 s test clip | Good for | Misses |
+|---|---|---|---|
+| uniform every 0.5 s | 22 | short clips, no structure | budget grows with duration |
+| one keyframe per shot (scene cuts + 0.2 s) | 5 | edited video, highlights | events inside a long shot |
+| budgeted (thin any list to N) | ≤ N | hard cost caps | whatever falls between picks |
+
+<Snippet path="examples/python/m14/vision_cascade.py" />
+
+`cost(frames, tokens_per_frame, usd_per_mtok, s_per_call)` makes the arithmetic explicit. **Plug in your provider's current numbers**: per-image token counts depend on resolution and the vendor's tiling rules, and they change. The course doesn't quote them.
+
+## Audio and video as inputs
+
+- **Cloud multimodal models** take images and often audio directly; for video, many APIs also accept sampled frames or a file. Read the current limits (duration, resolution, file size) in your provider's docs before you design around them.
+- **On-device:** Gemma 4 E2B / E4B take text, image and audio through LiteRT-LM; video goes in **as sampled frames**, which is a design choice we make in the course, not a claim about native video support.
+- Downscale before you send. Lower resolution means fewer tokens, but small text (scoreboards, UI labels) can become unreadable. M15 maps model coordinates back to full resolution for exactly this reason.
+
+<Aside type="note" title="Untested here">
+No real multimodal model call is made in M14. The captions and transcripts in the examples are fixed mock outputs. The LiteRT-LM Gemma 4 path needs an Android device (and the A73 RAM check from M13).
+</Aside>
+
+## C++/Rust notes
+- Decode once, sample many: a C++/Rust frame sampler should seek by keyframe (`AVSEEK_FLAG_BACKWARD`) and decode forward, not decode the whole file. PyAV gives you the same in Python for frame-accurate work.
+- Keep frames in GPU or shared memory between decoder and encoder if you can; copy only the few frames that go to the model (see the zero-copy note in [L14.3](/ai-native-course/on-device-media/m14/gstreamer/)).
+
+## Sources
+- Gemma 4 E2B model card: https://huggingface.co/google/gemma-4-E2B-it
+- LiteRT-LM on Android: https://developers.google.com/edge/litert-lm/android
+- ffmpeg filters (`select`, `signalstats`): https://ffmpeg.org/ffmpeg-filters.html

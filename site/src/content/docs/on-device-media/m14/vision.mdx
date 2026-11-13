@@ -1,0 +1,35 @@
+---
+title: "L14.5 Vision & video understanding pipelines"
+description: "Shot detection, keyframe selection, cheap detectors and OCR before expensive VLM calls: the cheap-filter-first cascade, measured on a generated clip."
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Sending every frame to a VLM is the most expensive way to watch a video. Put cheap, deterministic stages first and let them decide what deserves the expensive call.
+
+## The cascade
+
+1. **Shot/scene detection** (ffmpeg `select=gt(scene,…)` here; PySceneDetect 0.7.3 as the dedicated library).
+2. **Keyframe per shot**, slightly after the cut to avoid transition frames.
+3. **Cheap filters**: drop near-black or near-white frames (ffmpeg `signalstats` YAVG), duplicates, frames without faces/objects (a MediaPipe Tasks detector), frames whose OCR text is empty when you need text.
+4. **VLM** only on what survives: captioning, question answering, scoring.
+
+<Snippet path="examples/python/m14/vision_cascade.py" />
+
+On the 10.5 s highlight fixture, scene detection gives 5 keyframes; the luma filter drops the black shot; **4 frames** go to the (mock) VLM. Uniform sampling every 0.5 s would have sent 22.
+
+<Aside type="caution" title="Cheap filters have false negatives">
+A dark scene that matters (a night goal) dies at a luma threshold. Log what each stage dropped, and sample a few dropped frames into your eval set (L14.6).
+</Aside>
+
+MediaPipe Tasks (1.2.3) object/face detection and OCR are **not run** in the tests (*untested*); the luma filter stands in for "a cheap stage".
+
+## C++/Rust notes
+- Run detectors on downscaled frames in the decoder's pixel format (NV12/YUV) to skip a colour conversion; compute luma stats directly on the Y plane.
+
+## Sources
+- PySceneDetect: https://www.scenedetect.com/ · MediaPipe Tasks: https://ai.google.dev/edge/mediapipe/solutions/guide
+- ffmpeg `signalstats`, `select`: https://ffmpeg.org/ffmpeg-filters.html

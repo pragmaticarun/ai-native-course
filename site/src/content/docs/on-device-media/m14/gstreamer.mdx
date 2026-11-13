@@ -1,0 +1,48 @@
+---
+title: "L14.3 GStreamer pipelines as tools"
+description: "The agent proposes a pipeline description; a validator parses it, checks elements and file properties against an allowlist, and runs it without a shell under a timeout. Bus messages become observations. GStreamer 1.28 ML elements and Android equivalents."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+GStreamer is the right tool for live and streaming media (cameras, RTSP, long-running analysis). Its `gst-launch-1.0` syntax is compact enough for a model to write, and that's exactly why you must parse it before you run it.
+
+## Parse → validate → run
+
+<Snippet path="examples/python/m14/gst_validate.py" />
+
+1. **Parse** with `shlex`: elements, `key=value` properties, caps filters (`video/x-raw,width=320`), and pad references (`t.` starts a new branch from tee `t`). Anything else (`;`, `$(…)`, stray tokens) is a parse error.
+2. **Validate**: every element on the allowlist (no `souphttpsrc`, `udpsink`, `playbin`…); `location=` must be a relative path that stays inside the sandbox root; `uri`/`command`-style properties are refused; test sources must set `num-buffers` so the pipeline ends.
+3. **Run** the parsed argv (no shell) with `-e` (send EOS on interrupt) and `-m` (print bus messages), `cwd` = sandbox root, under a timeout.
+
+The tests run real pipelines with **GStreamer 1.28.9** on the box (conda-forge build) and Ubuntu's GStreamer in CI: an `audiotestsrc ! level` pipeline whose `level` messages become the agent's observation (peak dB values), a PNG written inside the sandbox, and a live source killed by the timeout.
+
+<Aside type="note" title="A format difference we hit">
+GStreamer 1.28 prints `level` arrays as `peak=(GValueArray)< -6.02 >`; older releases print `peak=(double){ -6.02 }`. The parser accepts both. Bus-message text is for humans; with PyGObject you read structured fields instead.
+</Aside>
+
+## PyGObject: bus messages as observations
+
+With PyGObject (3.58.1) you build the pipeline with `Gst.parse_launch` (after validating the same string), add a bus watch, and turn `ERROR`, `EOS`, `STATE_CHANGED` and element messages (like `level` or detector metadata) into compact observations for the agent. The validator stays the same. *Not exercised in the tests: they drive `gst-launch-1.0` (untested).*
+
+## GStreamer 1.28 ML inference
+
+The 1.28 series adds ML elements such as `onnxinference` (run an ONNX model on buffers) and `tensordecodebin` (decode output tensors into analytics metadata), so detection can happen inline. They're on the allowlist and the validator accepts a pipeline using them, but the box's GStreamer build doesn't include the ONNX plugin, so **inline inference is untested**. That's also why Ex 14.1 tests the recording logic on its own.
+
+## Android equivalents
+
+Media3 **ExoPlayer** (playback) and **Transformer** (edits), and **CameraX** `ImageAnalysis` analysers for per-frame work, are the Android counterparts. An on-device agent should talk to them through typed functions (AppFunctions or your own tool layer), never pipeline strings.
+
+## C++/Rust notes
+- A custom GStreamer element (C, or the Rust `gstreamer-rs` bindings) can attach analytics metadata (`GstAnalyticsRelationMeta` and friends) to buffers. Agents should consume that **metadata**, not raw frames: it's small, structured and safe to log.
+- Zero-copy: keep buffers in DMA-BUF/GPU memory through decode → inference → encode; copy only the metadata out to the agent process.
+
+## Sources
+- GStreamer 1.28 release notes: https://gstreamer.freedesktop.org/releases/1.28/
+- ONNX plugin docs: https://gstreamer.freedesktop.org/documentation/onnx/index.html
+- Collabora on 1.28 inference: https://www.collabora.com/news-and-blog/news-and-events/gstreamer-128-brings-ai-inference-to-your-media-pipeline.html
+- `level` element: https://gstreamer.freedesktop.org/documentation/level/index.html
+- Media3: https://developer.android.com/media/media3 · CameraX: https://developer.android.com/media/camera/camerax

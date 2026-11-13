@@ -5,7 +5,7 @@ AI maturity models, agent loops, graphs, MCP, on-device and GUI agents.
 
 - **Site:** https://pragmaticarun.github.io/ai-native-course/
 - **Syllabus (v0.3):** [SYLLABUS.md](SYLLABUS.md)
-- **Status:** modules **M0–M12** built and tested (Python, TypeScript, Kotlin/JVM, Rust); M13–M15 and projects P1–P8 are planned (see the syllabus).
+- **Status:** modules **M0–M15** built and tested (Python, TypeScript, Kotlin/JVM, Rust; M13 only up to the host side, its Android parts untested); projects P1–P8 are planned (see the syllabus).
 
 ## Run everything locally (offline, mock models)
 
@@ -60,3 +60,6 @@ Live mode: set `COURSE_LLM_PROVIDER` (`openai` | `anthropic`), `COURSE_LLM_MODEL
 - M10: Kiro (comparison from its docs; fixture files hand-written), live coding agents on the agent-friendly benchmark (the measured agent is a script), Android CLI / `android skills add` / the Android CLI plugin, Gradle Android tasks and screenshot tests (no Android SDK).
 - M11: no live coding agent, cloud agent (Copilot coding agent, Codex cloud, Cursor cloud agents) or GitHub API call; the issue-to-PR workflow template's live path is untested; Android Studio Agent Mode, Android CLI, emulator and Journeys are untested.
 - M12: the team journey and its numbers are fictional; the entry criteria are the course's own synthesis.
+- M13: host side only. Android, emulators and the Galaxy A73 are untested (LiteRT-LM, Gemini Nano / ML Kit GenAI, `AgentRunner`, AppFunctions, ExecuTorch, ORT QNN EP, the KMP Android target). llama.cpp and ONNX Runtime ran on x86 CPU only.
+- M14: no real ASR/VLM models (scripted); silero-vad, faster-whisper, whisper.cpp, pyannote, PySceneDetect, MediaPipe, PyAV, PyGObject and GStreamer `onnxinference` not run; `MediaExtractor` (Ex 14.4) untested.
+- M15: provider computer-use APIs, browser-use, Playwright MCP, E2B/cua, real devices/emulators, uiautomator2, mobile-mcp and AndroidWorld/OSWorld/WebArena not run; agents use simulated vision and scripted policies against the local sandbox.

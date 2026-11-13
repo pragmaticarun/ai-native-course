@@ -1,0 +1,57 @@
+---
+title: "Worked example: the highlight-reel agent"
+description: "probe, scene detect, transcribe, score segments, plan an edit decision list, concat with two-pass loudness normalisation, and verify against the plan with ffprobe. Python and TypeScript, real ffmpeg, mock models."
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+The agent turns a 10.5 s match clip into a 3.2 s reel of the two most exciting shots, at −16 LUFS, and proves it did.
+
+## The fixture
+
+Five shots generated with `lavfi` (solid colours with distinct luma, each with a tone or silence), plus a fixed transcript and frame captions that stand in for ASR and a VLM:
+
+<Snippet path="examples/python/m14/fixtures/highlight.json" lang="json" />
+
+## Python
+
+<Snippet path="examples/python/m14/highlight_reel.py" />
+
+Run it: `cd examples/python && uv run --project ../../python python -m m14.highlight_reel`. The trace:
+
+```text
+probe: 10.52s 320x240 @ 25.0fps
+scene_cuts: [2.0, 3.52, 6.04, 8.04] -> 5 shots
+transcribe: 4 segments
+score: [0.0, 0.0, 1.0, 0.0, 1.0]
+plan: [(2, 3.72, 5.32), (4, 8.24, 9.84)]
+verify: ok
+```
+
+Design points:
+
+- **The plan is data.** `EdlEntry(shot, src_in, src_out, score, reason)` can be shown to a human, stored, and diffed. Entries are frame-snapped and start 0.2 s after the cut so a late detector never leaks the previous shot.
+- **Greedy under a budget, then story order.** Pick by score until the duration budget is spent, then sort by time.
+- **Verify against the plan, not the agent.** Duration ±0.1 s, one video and one audio stream, loudness ±1 LU, and cut points at the cumulative entry lengths ±1 frame. A wrong render (one entry, −23 LUFS) fails on duration and loudness in the tests.
+
+## TypeScript
+
+<Snippet path="examples/ts/m14/highlightReel.ts" />
+
+Same fixture, same plan (`[[2, 3.72, 5.32], [4, 8.24, 9.84]]`), same checks; `execFileSync`/`spawnSync` with argv arrays, never a shell string.
+
+<Aside type="note" title="What's mocked">
+The transcript and captions are fixed; `KeywordScorer` counts excitement words. Swapping in real ASR and a real multimodal scorer doesn't change the plan/verify contract, but **no real model was run** here.
+</Aside>
+
+## C++/Rust notes
+- The verify step is a good first Rust component: a CLI that takes the EDL JSON and the output file, and exits non-zero with reasons. The M9 Rust `rmcp` media-probe server already has `probe` and `loudness`.
+
+## Kotlin notes
+- On Android, a Media3 Transformer `Composition` of `EditedMediaItem`s with clipping configurations is the counterpart of the concat graph; run the export in a foreground service and the scoring model while the app is visible (*untested*).
+
+## Sources
+- ffmpeg `concat`, `trim`, `loudnorm`: https://ffmpeg.org/ffmpeg-filters.html

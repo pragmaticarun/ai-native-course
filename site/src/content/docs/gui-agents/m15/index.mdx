@@ -1,0 +1,26 @@
+---
+title: "M15 · Computer-use & mobile-use agents"
+description: "GUI agents from first principles, computer-use APIs, Playwright against a local sandbox app, adb/uiautomator mobile-use, reliability engineering, safety, and private benchmarks with state checkers."
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3 (the computer-use loop and adapters), M5 (HITL), M6 (the GUI eval harness, pass@k).
+
+| Lesson | Worked example |
+|---|---|
+| [L15.1 GUI agents from first principles](/ai-native-course/gui-agents/m15/first-principles/) | observation and action spaces; the API-first rule |
+| [L15.2 Computer-use APIs in practice](/ai-native-course/gui-agents/m15/computer-use-apis/) | Anthropic and OpenAI computer-use tools, Playwright, sandboxes (*live providers untested*) |
+| [L15.3 Mobile-use](/ai-native-course/gui-agents/m15/mobile-use/) | adb + uiautomator against a fake device; set-of-marks, scaling, idle, recovery (*no real device*) |
+| [L15.4 Reliability engineering](/ai-native-course/gui-agents/m15/reliability/) | grounding, waiting for idle, verify-after-act, budgets, deterministic replay (real Playwright) |
+| [L15.5 Safety](/ai-native-course/gui-agents/m15/safety/) | injection in an email, a guard, egress allowlist, audit log, and HITL theatre shown in a test |
+| [L15.6 Benchmarks & your own evals](/ai-native-course/gui-agents/m15/benchmarks/) | a 5-template mini-benchmark with state checkers and pass@k (AndroidWorld *untested*) |
+| [Worked example: one task, three ways](/ai-native-course/gui-agents/m15/three-ways/) | create a calendar event from an email: pixels vs accessibility+screenshot vs API, compared |
+| [Exercises](/ai-native-course/gui-agents/m15/exercises/) | set-of-marks, an injection guard, benchmark state checkers, trajectory → regression test |
+
+**What really ran:** headless Chromium (Playwright 1.65.1's build) driving a local stdlib web app on 127.0.0.1, with real clicks, typing, screenshots, routing and replays, in the tests and in CI. **What didn't:** any real model (the policies are scripted; a `SimulatedVision` grounder adds configurable pixel error), the Anthropic/OpenAI computer-use APIs, browser-use, Playwright MCP, E2B/cua sandboxes, any Android device or emulator (mobile code runs against a fake adb), uiautomator2, mobile-mcp, DroidRun, AndroidWorld, OSWorld and WebArena.
+
+<Quiz src="m15" />

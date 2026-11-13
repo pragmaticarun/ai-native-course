@@ -20,7 +20,7 @@ const stripH1 = (md) => md.replace(/^# .*\n+/, "");
 writeFileSync(resolve(docs, "syllabus.md"), page(
   "Syllabus (v0.3)",
   "The full course syllabus and site outline, as approved.",
-  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M12 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
+  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M15 are built (M13 up to the host side; its Android parts are untested); the projects are the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
 ));
 
 writeFileSync(resolve(docs, "changelog.md"), page(
@@ -97,13 +97,17 @@ ${rows(rustDeps)}
 |---|---|---|
 | GitHub Spec Kit (\`specify\`) | v1.4.0 (git tag) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init\` |
 | git | runner's version | M10 hooks, M11 worktrees and sandbox repos |
+| llama.cpp | v1.0.0 (prebuilt release assets of build b12359, \`llama-b12359-bin-ubuntu-x64.tar.gz\`) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
+| Playwright browsers | Chromium bundled with \`playwright\` (Python, locked above) | M15 sandbox agents; CI runs \`playwright install --with-deps chromium\` |
+| ffmpeg / ffprobe | Ubuntu package on the CI runner (7.1.5 on the course box) | M8, M9, M14 |
+| GStreamer | Ubuntu packages on the CI runner (1.28.9 from conda-forge on the course box) | M14 pipeline validator (\`gst-launch-1.0\`, base/good plugins) |
 
 ## Site (\`site/pnpm-lock.yaml\`)
 | Package | Locked version |
 |---|---|
 ${rows(pnpmVersions("site/pnpm-lock.yaml", "site/package.json"))}
 
-Versions for later modules (the Android target, media and on-device runtimes) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when their lessons ship. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
+Android-side versions (AGP, LiteRT-LM, ML Kit GenAI, ExecuTorch, ONNX Runtime GenAI) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when the Android target is built; M13 quotes the versions it checked, unrun. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
 `;
 writeFileSync(resolve(docs, "reference", "versions.md"), page("Versions", "Pinned versions, generated from the lockfiles.", body));
 console.log("generated syllabus.md, changelog.md, reference/versions.md");

@@ -1,0 +1,40 @@
+---
+title: "L15.6 Benchmarks & your own evals"
+description: "AndroidWorld, OSWorld and OSWorld-Verified, WebArena, why leaderboards are self-reported and saturate, and a private mini-benchmark with templates, randomised parameters, state checkers and pass@k."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Public benchmarks
+
+| Benchmark | Environment | Grading |
+|---|---|---|
+| **AndroidWorld** | 116 parameterised tasks across 20 apps on a live emulator (Pixel 6, API 33 AVD, launched with `-grpc 8554`); installed from source | durable state-based rewards |
+| **OSWorld / OSWorld-Verified** | real Ubuntu desktop tasks (`desktop-env` 1.0.3) | execution-based checks |
+| **WebArena** | self-hosted web apps | state and answer checks (the repo's last tagged release is from 2023) |
+
+Leaderboard numbers are mostly self-reported or come from aggregators, and they saturate quickly, so the course doesn't quote them. Use public benchmarks to learn *how* to grade; use your own tasks to decide.
+
+<Aside type="caution" title="AndroidWorld: untested">
+Running AndroidWorld needs an Android emulator, which the course box doesn't have. The syllabus exercise "run 5 AndroidWorld tasks" is replaced by a 5-task mini-benchmark on the sandbox app (Ex 15.3), and the AndroidWorld run is untested.
+</Aside>
+
+## A private mini-benchmark
+
+<Snippet path="examples/python/m15/mini_bench.py" />
+
+- **Templates with seeded parameters:** `create_event` gets a random title/date/time; `read_email` a random subject; each seed is a different inbox order.
+- **State checkers:** they read `app.state` (events, read flags, deleted ids, forwarded addresses), never the agent's claim. `count_inbox` is the one task with an answer, and the checker recomputes it from state.
+- **Safety as a task:** `delete_phish` passes only if exactly the phishing email is deleted *and* nothing was forwarded; it needs confirmation, and with `approve=False` it fails, as it should.
+- **pass@k** uses M6's unbiased estimator. A run with `slip=0.15` (a 15% chance per step of picking a wrong element, standing in for model error) gave, on the box: `pass@1 0.77, pass@3 1.00 over 10 task instances (step budget 12)`. Always state the step budget with the number.
+
+## C++/Rust notes
+- State checkers are the part worth porting to a fast, dependency-free binary: they run after every episode, and in CI they're the only thing that decides pass or fail.
+
+## Sources
+- AndroidWorld: https://github.com/google-research/android_world
+- OSWorld: https://github.com/xlang-ai/OSWorld · OSWorld-Verified: https://xlang.ai/blog/osworld-verified
+- WebArena: https://github.com/web-arena-x/webarena
