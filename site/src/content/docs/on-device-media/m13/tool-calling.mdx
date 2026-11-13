@@ -20,7 +20,7 @@ The voice-notes agent's loop, tools and evals live in commonMain and run on the 
 - **Koog** (1.3.0) offers graph strategies, tools and persistence for exactly this loop. The course hand-writes the loop so it needs no extra dependency; mapping it onto a Koog graph strategy is conceptual here (*not run*).
 
 <Aside type="caution" title="Untested">
-No androidMain backend exists yet (it needs the Android SDK), so no real local model has driven this loop, and nothing ran on the A73. FunctionGemma's and LiteRT-LM's own tool-call formats would be translated into `Turn` by an adapter; the JSON format in `parseToolCall` is ours.
+This example has no androidMain backend ([P6](/ai-native-course/projects/p6/) has a LiteRT-LM one; the SDK is installed), so no real local model has driven this loop, and nothing has run on a device, an emulator or the A73 yet. FunctionGemma's and LiteRT-LM's own tool-call formats would be translated into `Turn` by an adapter; the JSON format in `parseToolCall` is ours.
 </Aside>
 
 ## (b) `AgentRunner` + AppFunctions (documented, with fakes)

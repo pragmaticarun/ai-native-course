@@ -22,7 +22,7 @@ Safety details that matter on a real device:
 The tests run it against `FakeAdb` in-process, and over **real Streamable HTTP on localhost** (uvicorn) on both revisions. Android Studio's MCP client uses that transport. The `--http` entry point with the real `AdbRunner` was started locally and listed its 9 tools to an HTTP client on both revisions. It never ran a device command.
 
 <Aside type="caution" title="Untested: Android Studio, devices, community servers">
-- **Android Studio Agent Mode**: the syllabus says Studio connects to MCP servers over Streamable HTTP and doesn't support stdio. Not verified here: there's no Android Studio or Android SDK on the course machine (the SDK install is waiting on approval). To try: run `adb_server.py --http` and add `http://127.0.0.1:8765/mcp` in Studio's MCP server settings.
+- **Android Studio Agent Mode**: the syllabus says Studio connects to MCP servers over Streamable HTTP and doesn't support stdio. Not verified here: the course machine now has the Android SDK but no Android Studio, and nothing has run on a device or emulator yet. To try: run `adb_server.py --http` and add `http://127.0.0.1:8765/mcp` in Studio's MCP server settings.
 - **Real devices and emulators**: `AdbRunner` has never been run against one in this course.
 - **`@mobilenext/mobile-mcp` and `@playwright/mcp`**: community/vendor MCP servers for driving mobile devices and browsers. They weren't installed or run here. Pin a version and review their tool descriptions (L9.5) before connecting them to an agent.
 </Aside>

@@ -27,6 +27,10 @@ All notable changes to the course. Format: [Keep a Changelog](https://keepachang
 - P6 (JVM, fake router): golden trajectory and state 20/20; keyword baseline trajectory 12/20, state 16/20; debug APK 99.95 MB.
 - P8 (180 recorded runs, scripted planner with 30% simulated mis-grounding): pass@1 0.767 / pass@3 1.0 for both pixel adapters (identical: same planner, same seeds), 0.95 / 1.0 for set-of-marks; 0 unrequested side effects; 6 human interventions per adapter; all failures are grounding (out of steps).
 
+### Fixed
+- CI `kmp` job: the test report now runs before the P6 starter check, so it shows the solution's results (it printed "35 tests, 5 failed" from the starter).
+- Module pages (M9, M10, M11, M13, M14, M15) no longer give "no Android SDK" as the reason Android steps weren't run: the SDK is installed, but nothing has run on a device or emulator yet.
+
 ### Known gaps / untested
 - P1: no LLM backend (the Pydantic AI, Claude Agent SDK and AI SDK variants are not built); no GitHub Actions background run (it would need a sandbox repo the owner creates); no container/network-namespace isolation for test runs.
 - P2: no real LLM or LLM judge, no OTLP export, no LangGraph.js port; parallel wall time not measured (latency is simulated).

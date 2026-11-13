@@ -11,7 +11,7 @@ import { Aside } from "@astrojs/starlight/components";
 On Android the observation is a screenshot plus the accessibility tree, and the actions are `adb shell input …`. M3's `AdbDevice` builds those commands; M15 adds the agent around it.
 
 <Aside type="caution" title="No device, no emulator">
-Everything on this page runs against `FakeAndroid`, a small state machine that answers the same adb argv as a phone, with screens hand-written in `uiautomator dump` format. **Nothing ran on a real device or emulator** (the course box has no Android SDK by design).
+Everything on this page runs against `FakeAndroid`, a small state machine that answers the same adb argv as a phone, with screens hand-written in `uiautomator dump` format. **Nothing ran on a real device or emulator** (the Android SDK is now installed on the course box, but no device or emulator has been used yet).
 </Aside>
 
 <Snippet path="examples/python/m15/mobile_agent.py" />

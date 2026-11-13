@@ -15,4 +15,4 @@ import Exercise from "../../../../components/Exercise.astro";
 
 Port the `probe` tool to Android with the platform `MediaExtractor` (track `MediaFormat`s: `KEY_MIME`, `KEY_DURATION`, `KEY_SAMPLE_RATE`, `KEY_WIDTH`/`KEY_HEIGHT`) and `MediaMetadataRetriever` (`METADATA_KEY_DURATION`). Keep the parsing in KMP commonMain behind the existing seam in `kmp/shared/.../m9/MediaProbeServer.kt`, so the shared contract tests still run on the JVM, and put the Android implementation in androidMain. Compare its output with `ffprobe` on the same files.
 
-**Untested:** this needs the Android SDK (not installed on the course box) and a device or emulator, so there are no automated tests for it. See [the README on GitHub](https://github.com/pragmaticarun/ai-native-course/tree/main/exercises/m14/ex4).
+**Untested:** this needs a device or emulator; the Android SDK is installed, but nothing has run on a device or emulator yet, so there are no automated tests for it. See [the README on GitHub](https://github.com/pragmaticarun/ai-native-course/tree/main/exercises/m14/ex4).

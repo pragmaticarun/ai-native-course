@@ -84,15 +84,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - name: Build and test commonMain on the JVM (shared + P6 agent; fakes only, no device)
         run: ./gradlew :shared:jvmTest :p6-agent:jvmTest --console=plain
+      - name: Test report (solution)
+        if: always()
+        run: python3 ../scripts/junit_summary.py shared/build/test-results/jvmTest ../projects/p6/agent/build/test-results/jvmTest
       - name: P6 starter must fail its tests
+        # Runs after the report: it overwrites P6's jvmTest results with the starter's.
         run: |
           if ./gradlew :p6-agent:jvmTest -Pp6.variant=starter --console=plain -q > starter.log 2>&1; then
             echo "P6 starter passed its tests (exercise is stale)"; exit 1
           fi
           grep -E "tests completed" starter.log || true
-      - name: Test report
-        if: always()
-        run: python3 ../scripts/junit_summary.py shared/build/test-results/jvmTest ../projects/p6/agent/build/test-results/jvmTest
 
   android:
     name: Android (SDK, KMP Android target, P6 app)

@@ -15,4 +15,4 @@ import Exercise from "../../../../components/Exercise.astro";
 
 MediaPipe's LLM Inference API is deprecated in favour of LiteRT-LM. Replace `LlmInference` with a LiteRT-LM `Engine` created off the main thread, a `Conversation` per chat and a token `Flow` collected in a `ViewModel` scope; swap the `.task` model for a `.litertlm` one from the A73 ladder; put the engine behind the `LocalModel` interface so the commonMain tests still pass; then record TTFT, tokens/s and peak RSS for both versions on the A73.
 
-**Untested:** it needs the Android SDK (not installed on the course box) and a device, so there are no automated tests. Steps and links are in [the README on GitHub](https://github.com/pragmaticarun/ai-native-course/tree/main/exercises/m13/ex4).
+**Untested:** it needs a device; the Android SDK is installed, but nothing has run on a device or emulator yet, so there are no automated tests. Steps and links are in [the README on GitHub](https://github.com/pragmaticarun/ai-native-course/tree/main/exercises/m13/ex4).
