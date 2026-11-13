@@ -1,0 +1,54 @@
+---
+title: "L11.2 TDD with agents"
+description: "Humans write or approve the tests, the agent makes them pass, and a gate refuses any run where the tests moved. Hashes, collection counts, skips, conftest edits, and what the gate can't see."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+"Make the tests pass" has two solutions: fix the code, or change the tests. Agents find the second one more often than you'd like, sometimes openly (deleting an assertion), sometimes quietly (a `skip` in a new `conftest.py`). TDD with agents means the tests are the spec and the agent isn't allowed to edit the spec.
+
+## The loop
+
+1. A human writes the failing tests, or reviews agent-written ones *before* any implementation exists.
+2. **Approve**: record what the tests are (file hashes, the number pytest collects) and that they fail now. Red first proves the tests can fail.
+3. The agent implements until green.
+4. **Gate**: refuse the result if any approved test file changed or vanished, a skip/xfail appeared anywhere, `conftest.py` changed, fewer tests are collected, or the suite isn't green.
+
+<Snippet path="examples/python/m11/tdd_gate.py" />
+
+The sandbox is a real git repo with a small `trim()` function and three tests:
+
+<Snippet path="examples/python/m11/sandbox.py" />
+
+## What the tests check
+
+| Agent behaviour | Gate says |
+|---|---|
+| fixes `trim()` | nothing: pass |
+| edits an expected value in an approved test (`== 10` → `== 40`) | `modified approved test tests/test_clip.py`, `tests fail` |
+| adds a new, untracked `tests/conftest.py` whose collection hook marks every test skipped | `adds a skip/xfail`, `touches conftest.py` |
+
+Deleted test files and lower collection counts are also refused by the code, though the tests don't exercise those two rules.
+
+The conftest case needed `git add --intent-to-add .` so untracked files show up in the diff. A gate built only on `git diff` misses new files.
+
+<Aside type="note" title="What the gate can't see">
+A weak test that was weak when approved. If the approved test only asserts `trim(...)` is truthy, the gate faithfully protects a bad spec. Review tests for strength (Ex 11.1 finds weakened assertions), and consider mutation testing (Thoughtworks Radar Vol. 35 has it in Adopt) to check the tests catch injected bugs.
+</Aside>
+
+## In practice
+
+- Claude Code: deny edits under `tests/` with a permission rule or a `PreToolUse` hook during the implement phase.
+- CI: run the gate as a required check on agent PRs (`Agent-Session:` trailer or `agent-authored` label, L11.4).
+- Spec Kit: `/speckit-tasks` can order test tasks before implementation tasks; approve after those land.
+
+## C++/Rust notes
+- Same gate, different collectors: `cargo test -- --list` or `ctest -N` give the test count; hash `tests/` and any `#[ignore]` / `DISABLED_` prefix counts as a skip.
+- Undefined behaviour can make a test pass by accident. Run the approved tests under ASan/UBSan (C++) or Miri (Rust) in the gate, so "green" means green without UB.
+
+## Sources
+- Thoughtworks Radar Vol. 35 (mutation testing, human-in-the-loop theater): https://www.thoughtworks.com/radar
+- Claude Code hooks: https://code.claude.com/docs/en/hooks

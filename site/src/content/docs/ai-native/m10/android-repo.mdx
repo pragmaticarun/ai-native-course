@@ -1,0 +1,74 @@
+---
+title: "Worked example: an agent-friendly Android app repo"
+description: "AGENTS.md for an Android app, Android skills via the Android CLI and its agent plugin, Gradle verify tasks, and screenshot tests as a fast oracle. Documented, not run: no Android SDK on this course's build machine."
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Untested">
+Nothing on this page was run. The course's build machine deliberately has **no Android SDK** (installing it needs a licence acceptance that hasn't been approved), so Android Studio, the Android CLI, Gradle Android tasks and screenshot tests were not executed. Commands come from the official docs linked below. What *is* tested: the AGENTS.md fixture passes the M10 instruction linter.
+</Aside>
+
+## AGENTS.md
+
+Android Studio's agent scans the current directory and its parents for AGENTS.md files and adds them all to the prompt (a `GEMINI.md` in the same directory takes precedence); it supports `@./file.md` imports. Codex, Cursor and Claude Code (via a CLAUDE.md import, or as a fallback) read the same file. One file serves them all:
+
+<Snippet path="examples/python/m10/fixtures/android-app/AGENTS.md" />
+
+Why each line is there:
+
+- **Verify** names Gradle tasks that need no device: unit tests and lint. They're the agent's fast loop.
+- **Screenshot tests** are the next oracle for UI work. The rule "never re-record baselines to make a failure go away" is the Android version of M11's test-tampering guard.
+- **Device steps need a human's OK** because starting emulators costs minutes and memory, and installs touch real hardware.
+
+## Android skills and the Android CLI plugin
+
+Android publishes official skills ([android/skills](https://github.com/android/skills)) and the Android CLI manages them:
+
+```bash
+android init                                   # sets up the android-cli skill for detected agents
+android skills list
+android skills add edge-to-edge --project=.    # into this repo, for all detected agents
+android skills add --agent=claude,codex --all
+android skills update --all
+```
+
+For Claude Code and Codex there's also a plugin that adds the `android-cli` skill, which teaches the agent the CLI itself:
+
+```bash
+claude plugin marketplace add android/android-cli-plugin
+claude plugin install android-cli@android-cli-plugin
+
+codex plugin marketplace add android/android-cli-plugin
+codex plugin add android-cli@android-cli-plugin
+```
+
+Installed skills are files in the repo (with `--project`) or in the agent's home directory: commit project skills, pin them by reviewing updates like dependency bumps, and rename any skill you customise, because `skills add`/`update` overwrite skills with the official name.
+
+## Gradle verify tasks
+
+| Oracle | Command | Needs a device? |
+|---|---|---|
+| Unit tests | `./gradlew :app:testDebugUnitTest` | no |
+| Lint | `./gradlew :app:lintDebug` | no |
+| Compose preview screenshot tests | `./gradlew :app:validateDebugScreenshotTest` (record with `updateDebugScreenshotTest`) | no |
+| Instrumented tests | `./gradlew :app:connectedDebugAndroidTest` | yes |
+
+Put the first three in `verify.sh`, and keep device steps out of the default loop.
+
+## The KMP module in this repo
+
+The course's `kmp/` project shows the device-free half for real: its shared Kotlin code is tested on the JVM (`./gradlew :shared:jvmTest`, run in CI), with no Android SDK. Its `kmp/AGENTS.md` says so, so an agent doesn't try to build the Android target.
+
+## C++/Rust notes
+- For NDK code, add `externalNativeBuild` host tests (or a separate CMake/Cargo host build) to the verify script so native logic gets checked without a device; reserve on-device runs for JNI and ABI checks.
+
+## Sources
+- Android Studio and AGENTS.md: https://developer.android.com/studio/gemini/agent-files
+- Android CLI: https://developer.android.com/tools/agents/android-cli · commands: https://developer.android.com/tools/agents/android-cli/commands
+- `android skills add`: https://developer.android.com/tools/agents/android-cli/commands/skills_add · Android skills: https://developer.android.com/tools/agents/android-skills
+- Android CLI plugin: https://github.com/android/android-cli-plugin
+- Compose preview screenshot testing: https://developer.android.com/studio/preview/compose-screenshot-testing

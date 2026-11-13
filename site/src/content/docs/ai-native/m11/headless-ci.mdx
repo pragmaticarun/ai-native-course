@@ -1,0 +1,57 @@
+---
+title: "L11.5 Headless agents in CI"
+description: "Running coding agents unattended in GitHub Actions — permissions split across jobs, budgets, timeouts, kill switches, draft PRs with provenance — and a linter that checks a workflow for them."
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+An agent in CI has no human watching each step. Everything a human would have stopped has to be stopped by configuration.
+
+## Options
+
+| Route | What you get | Notes |
+|---|---|---|
+| Copilot coding agent | assign an issue; it opens a PR from GitHub's own environment | least setup; GitHub controls the runtime |
+| `anthropics/claude-code-action` | Claude Code in your workflow, triggered by comments, labels or schedules | runs on your runner with your secrets |
+| `openai/codex-action` | Codex in your workflow | its docs recommend a key-holding job with read-only contents that hands a patch to a separate job that can write |
+| A CLI in a plain step | `claude -p`, `codex exec`, `copilot -p`, `gemini -p` | full control; you build every guardrail |
+| Claude Agent SDK / your own agent (M2–M8) | a custom pipeline | most control, most work |
+
+## The guardrails
+
+The course's template (under `examples/`, so it's **not active** in this repo) splits the work in two jobs, following the pattern in the Codex docs: the job holding the model key can only *read* the repository and uploads a patch; a second job, which never sees the key, applies it and opens a **draft** PR labelled `agent-authored`.
+
+<Snippet path="examples/python/m11/workflows/agent-issue-to-pr.yml" />
+
+| Guardrail | In the template |
+|---|---|
+| Least privilege | top-level `contents: read`; only `open-pr` can write |
+| Secret isolation | the key lives in the `agent` job, which has no write permission and doesn't persist the checkout token |
+| Kill switch | the repository variable `AGENT_PIPELINE_ENABLED` must be `'true'` |
+| Trigger gate | only the `agent:ok` label or a manual dispatch |
+| Budget | `--max-budget-usd 2`, `timeout-minutes: 30`, a tool allowlist |
+| One run per issue | a `concurrency` group |
+| Provenance | draft PR, `agent-authored` label |
+
+<Aside type="caution" title="Untested live path">
+The mock step is a placeholder and the live step (Claude Code headless) was **not run**: the course makes no live model calls. The flags come from the Claude Code CLI docs. Pin the CLI version you've tested, and dry-run on a fork first.
+</Aside>
+
+## Lint the workflow
+
+`workflow_lint.py` checks a workflow file for those rules. The tests run it on the template (no findings) and on a "risky" edit that gives the agent job write access, persists the token and drops `--draft` (three findings).
+
+<Snippet path="examples/python/m11/workflow_lint.py" />
+
+## C++/Rust notes
+- Cache the toolchain and build (`Swatinem/rust-cache`, `ccache`) so the agent's test loop is fast, and cap it with `timeout-minutes`: a slow C++ build plus a looping agent burns budget quickly.
+- Give the agent job the sanitizer and Miri steps as its verify command, not just `cargo test`.
+
+## Sources
+- Codex GitHub Action: https://github.com/openai/codex-action
+- Claude Code GitHub Actions: https://code.claude.com/docs/en/github-actions
+- Copilot coding agent: https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent
+- GitHub Actions security hardening: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions

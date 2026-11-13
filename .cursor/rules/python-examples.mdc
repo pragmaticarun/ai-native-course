@@ -1,0 +1,7 @@
+---
+globs: examples/python/**/*.py, exercises/**/*.py
+alwaysApply: false
+---
+
+- Mock models only (`COURSE_LLM_PROVIDER=mock`); tests must run offline.
+- `ruff check`, `ruff format --check` and `scripts/typecheck_python.sh` must pass.

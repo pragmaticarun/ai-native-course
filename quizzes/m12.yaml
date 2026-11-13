@@ -1,0 +1,39 @@
+module: m12
+title: "M12 quiz: team practice by maturity level"
+questions:
+  - id: m12q1
+    type: single
+    prompt: "Where does Dan Shapiro say 'almost everyone tops out'?"
+    choices: ["Level 1", "Level 3: managing agents and reviewing diffs", "Level 5", "Level 0"]
+    answer: 1
+    explanation: "From his January 2026 post. It is one practitioner's framework, not research data."
+  - id: m12q2
+    type: single
+    prompt: "Which statement about the M12 entry criteria is accurate?"
+    choices: ["They are published by DORA", "They are Shapiro's", "They are this course's synthesis: DORA's seven AI capabilities and team artifacts mapped to Shapiro's levels", "They are an ISO standard"]
+    answer: 2
+    explanation: "Shapiro describes levels; DORA describes capabilities that amplify AI's benefits. Pairing them into gates is ours."
+  - id: m12q3
+    type: multi
+    prompt: "Which are among DORA's seven AI capabilities? (Pick all that apply.)"
+    choices: ["Clear and communicated AI stance", "Working in small batches", "AI-accessible internal data", "Percentage of code written by AI"]
+    answer: [0, 1, 2]
+    explanation: "The others are healthy data ecosystems, strong version control practices, user-centric focus and quality internal platforms."
+  - id: m12q4
+    type: single
+    prompt: "Agent PRs would take 125% of reviewer time. What does Thoughtworks Radar Vol. 35 warn this leads to?"
+    choices: ["Faster delivery", "Human-in-the-loop theater: approval as a ritual rather than a real check", "Better test coverage", "Nothing"]
+    answer: 1
+    explanation: "The Radar puts it in Caution and suggests risk-tiered oversight, with mutation and property-based testing for what humans can't realistically judge."
+  - id: m12q5
+    type: single
+    prompt: "Which metric would the M12 plan checker refuse as a vanity metric?"
+    choices: ["Change fail rate", "% of code written by AI", "Change lead time", "Failed deployment recovery time"]
+    answer: 1
+    explanation: "Activity counts reward busywork. The Radar also cautions against coding throughput as a measure of productivity."
+  - id: m12q6
+    type: single
+    prompt: "Why is the audit log in governance.py hash-chained?"
+    choices: ["Compression", "Each entry includes the previous entry's hash, so editing or deleting an entry breaks verification", "Encryption", "MCP requires it"]
+    answer: 1
+    explanation: "Tamper evidence, not tamper proofing: someone with write access can rebuild the whole chain, so keep a copy of the latest hash somewhere they can't write."

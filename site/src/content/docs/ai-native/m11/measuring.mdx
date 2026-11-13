@@ -1,0 +1,54 @@
+---
+title: "L11.6 Measuring impact honestly"
+description: "DORA's five software delivery metrics before and after adopting agents, plus review latency; sample sizes, the amplifier pattern, and the review bottleneck."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+"We ship 2× more PRs since adopting agents" says nothing about whether users get better software sooner. Measure delivery, and measure what can break.
+
+## DORA's five metrics
+
+From [dora.dev](https://dora.dev/guides/dora-metrics/) (last updated 5 January 2026):
+
+| Group | Metric |
+|---|---|
+| Throughput | change lead time · deployment frequency · failed deployment recovery time |
+| Instability | change fail rate · deployment rework rate |
+
+Add one team-level signal DORA doesn't define but agents stress first: **review latency** (PR opened → first review).
+
+DORA's 2025 research describes AI as an **amplifier**: it magnifies a team's existing strengths and weaknesses. Faster throughput with rising instability is the pattern to watch for.
+
+<Snippet path="examples/python/m11/dora.py" />
+
+## Before and after, on a fictional team
+
+The test generates 12 weeks before (3 deploys/week, 10% fail, 4 h review) and 12 weeks after adopting agents (6/week, 25% fail, 9 h review). `compare` reports:
+
+- `amplifier warning: throughput up, instability up`
+- `review is the new bottleneck: latency up more than 50%`
+
+and with only 8 deployments in a window: `too few deployments to compare (need 20 per window)`.
+
+<Aside type="caution" title="Invented data, course rules">
+The team and its numbers are made up to exercise the code. The comparison rules (minimum 20 deployments per window, the 50% latency threshold) are this course's choices, not DORA's.
+</Aside>
+
+## Pitfalls
+
+- **Metrics as goals.** DORA's guide warns against turning them into targets; teams game what they're judged on.
+- **Activity metrics.** PR counts, lines of code, % of code written by AI. Thoughtworks Radar Vol. 35 cautions against coding throughput as a measure of productivity.
+- **Confounders.** A new hire, a release freeze, a big migration. Compare windows of similar work, and say what changed besides agents.
+- **Too little data.** A small team deploying twice a week needs months to see a real change in fail rate.
+
+## C++/Rust notes
+- Add language-specific instability signals next to DORA's: sanitizer findings per week, new `unsafe` blocks, fuzzing crashes. If agent adoption raises them, that's rework you'll pay later.
+
+## Sources
+- DORA metrics guide: https://dora.dev/guides/dora-metrics/
+- DORA AI Capabilities Model: https://dora.dev/ai/capabilities-model/report/
+- Thoughtworks Radar: https://www.thoughtworks.com/radar

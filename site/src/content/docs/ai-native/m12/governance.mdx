@@ -1,0 +1,46 @@
+---
+title: "L12.3 Governance at team scale"
+description: "An AI policy as code — which tools may touch which data classes and actions, which actions need a human — and a tamper-evident audit log of what agents did."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+M1 covered the cloud vendors' adoption frameworks ([L1.3](/ai-native-course/maturity/vendor-capability-maps/)): Microsoft's has a *govern* and *secure* step, AWS's CAF for AI has governance and security perspectives, Google's has a *Secure* theme. At team scale, those become four concrete questions:
+
+1. **Policy:** which AI tools are approved, for what? (DORA's "clear and communicated AI stance".)
+2. **Data access:** which classes of data may each tool see?
+3. **Allowlists:** which actions may an agent take alone, which need a human, which never?
+4. **Auditability:** can you tell, afterwards, what an agent did and who approved it?
+
+## Policy as code
+
+`governance.py` encodes the course's version: tools are granted actions up to a maximum data class (`public < internal < confidential < restricted`), and some actions require approval. Anything not on the allowlist is denied.
+
+<Snippet path="examples/python/m12/governance.py" />
+
+The test grants a coding agent `edit`, `run-tests` and `push` on internal data, with `push` needing approval, and a chat tool only `ask` on public data. Confidential data to the coding agent, internal data to the chat tool, and any unlisted tool are all denied.
+
+## A tamper-evident audit log
+
+Each audit entry stores the hash of the previous one, so editing or deleting an entry breaks `verify()`. The tests check both. It's tamper-*evident*, not tamper-proof: someone who can rewrite the whole file can rebuild the chain, so copy the latest hash somewhere they can't write (another system, a signed commit).
+
+## What to write down
+
+| Item | Example |
+|---|---|
+| Approved tools and versions | "Claude Code and Copilot for code; no unapproved MCP servers" |
+| Data rules | "no customer data in prompts; internal code is fine" |
+| Agent actions needing a human | push, deploy, migrations, dependency additions |
+| Provenance | `agent-authored` label, `Agent-Session:` trailer |
+| Review | who can approve agent PRs (M11 policy) |
+| Incident path | how to stop all agents (kill switch) and who decides |
+
+## C++/Rust notes
+- Add supply-chain rules to the policy: agents may not add crates or vcpkg/Conan packages without review; run `cargo deny` / `cargo audit` (or your C++ equivalent) on every agent PR.
+
+## Sources
+- Microsoft CAF, AI scenario: https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/ai/
+- AWS CAF for AI: https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html
+- DORA, clear and communicated AI stance: https://dora.dev/capabilities/

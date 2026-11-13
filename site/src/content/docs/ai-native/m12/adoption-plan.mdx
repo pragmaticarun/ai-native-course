@@ -1,0 +1,46 @@
+---
+title: "L12.4 A 90-day adoption plan"
+description: "A plan template with stages, owners, metrics with baselines and targets, guardrail metrics and an exit criterion per stage, and a checker that refuses vanity metrics."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+A plan that says "roll out agents to all teams in Q3" has no way to fail, so it has no way to succeed either. The template below (the course's) forces each stage to say what it watches, what must not get worse, and how you'll know it's done.
+
+## Template
+
+Each stage has:
+
+- a **target level** and a name;
+- an **owner** (a person, not a team);
+- **metrics** with a **baseline** and a **target**;
+- at least one **guardrail** metric: an instability or flow metric that must not get worse;
+- an **exit criterion** you can check;
+- an end date; the whole plan fits in 90 days.
+
+`plan90.py` checks those rules and refuses vanity metrics (lines of code, % of code written by AI, prompt counts, accepted suggestions, PRs merged).
+
+<Snippet path="examples/python/m12/plan90.py" />
+
+## An example plan
+
+The fictional team from the [worked example](/ai-native-course/ai-native/m12/team-journey/):
+
+<Snippet path="examples/python/m12/fixtures/team/plan.yaml" />
+
+The test checks it passes, and that a one-stage, five-month "go fast" plan measured by "% of code written by AI" fails with four findings (no exit criterion, no guardrail, a vanity metric, more than 90 days).
+
+## Tips
+
+- One level per stage. Ex 12.1 makes you critique a plan that doesn't.
+- Stage 3 can be "stay here": consolidation is a legitimate outcome.
+- Pick baselines from data you already have (M11's DORA metrics); if you have none, the first stage is "measure".
+
+## C++/Rust notes
+- Good systems-team guardrails: sanitizer findings per week, fuzz crashes, build time. Agents can make all three worse while lead time improves.
+
+## Sources
+- DORA metrics guide (and its pitfalls section): https://dora.dev/guides/dora-metrics/
+- Thoughtworks Radar Vol. 35, coding throughput as a productivity measure (Caution): https://www.thoughtworks.com/radar

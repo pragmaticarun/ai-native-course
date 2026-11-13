@@ -1,0 +1,41 @@
+---
+title: "L11.3 Parallel agents: worktrees, decomposition, conflicts"
+description: "Plan batches of tasks whose files don't overlap, give each agent its own git worktree and branch, merge between batches, and see what happens when you skip the planning."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+Running three agents at once is easy. Merging their work is where it goes wrong. Two agents that edit the same function produce a conflict no agent saw coming.
+
+## Worktrees
+
+`git worktree add ../wt-a -b agent/a` gives a second checkout of the same repository on its own branch, sharing one object store. Each agent works in its own directory, so they can't trample each other's files or builds, and each result is a normal branch.
+
+## Plan, then fan out
+
+`plan_batches` takes each task's expected file set (from a Spec Kit `tasks.md`, or the agent's plan) and greedily puts tasks with disjoint files in the same batch. Each batch runs in parallel, merges into main, and the next batch branches from the result.
+
+<Snippet path="examples/python/m11/worktrees.py" />
+
+The tests run it against the sandbox repo with real git:
+
+- **Planned:** four tasks: `probe` (new `src/probe.py`), `docs` (README), `clamp` and `rename` (both edit `src/clip.py`). The plan is `[[probe, docs, clamp], [rename]]`; everything merges, the rename lands on top of the clamp fix, and all agent worktrees are removed afterwards.
+- **Naive:** all four in parallel. `rename` was written against the original file and changes the same return line differently, so the merge step reports `agent/rename` as conflicting. Nothing is silently lost, but someone (or an agent) has to resolve it.
+
+One implementation detail: `git worktree add` and `remove` change shared repository metadata, so the code runs them one at a time and parallelises only the agent work. The tests were run five times in a row to check for flakiness.
+
+## Decomposition rules of thumb
+
+1. Split by file ownership, not by "frontend/backend" labels.
+2. Shared files (`routes.py`, `package.json`, lockfiles) go to one task, or to a final integration task.
+3. Keep each task's PR under your size limit (L11.4); if it can't be, it's two tasks.
+4. Merge between batches, so later agents start from what earlier ones built.
+
+## C++/Rust notes
+- Separate worktrees mean separate build directories: set `CARGO_TARGET_DIR` per worktree (or share one deliberately, accepting lock contention); for CMake, one build dir per worktree. Shared `ccache`/`sccache` keeps rebuilds cheap.
+- Header files and `mod.rs`/`lib.rs` are conflict magnets; assign them to one task.
+
+## Sources
+- git worktree: https://git-scm.com/docs/git-worktree

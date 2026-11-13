@@ -1,0 +1,73 @@
+---
+title: "L10.3 Rules files: AGENTS.md, Cursor rules, CLAUDE.md"
+description: "Nested AGENTS.md and which file wins, Cursor's four rule modes, CLAUDE.md and path-scoped rules, what belongs in instruction files and what doesn't, and a linter that checks them."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Instruction files are context the agent loads before it reads your request. They're the cheapest way to stop repeating yourself, and the easiest place to waste tokens.
+
+## AGENTS.md
+
+[AGENTS.md](https://agents.md/) is plain Markdown with no required fields, read by many coding agents, and now stewarded by the Agentic AI Foundation (AAIF). In a monorepo, put one per package: **the closest AGENTS.md to the edited file wins**, and an explicit prompt from the user overrides the files.
+
+This repo has four:
+
+| File | Says |
+|---|---|
+| `AGENTS.md` | setup `./verify.sh setup`, verify `./verify.sh`; mock models only; no network in tests except named exceptions; never install the Android SDK |
+| `kmp/AGENTS.md` | verify `./gradlew :shared:jvmTest`; JVM only, no Android SDK |
+| `rust/AGENTS.md` | verify `cargo fmt --check && cargo clippy --all-targets --locked -- -D warnings && cargo test --locked` |
+| `site/AGENTS.md` | verify `pnpm build`; every code block comes from a tested file |
+
+`agents_chain(repo, file)` returns the files that apply to a path, farthest first, and the tests check it on this repo.
+
+## Cursor rules
+
+Project rules live in `.cursor/rules/*.mdc` (a plain `.md` file there is ignored). Frontmatter picks the mode:
+
+| Frontmatter | Mode | This repo |
+|---|---|---|
+| `alwaysApply: true` | Always | `no-android-sdk.mdc` |
+| `globs: …` | Auto-attached when a matching file is in context | `python-examples.mdc` (`examples/python/**/*.py, exercises/**/*.py`) |
+| `description` only | Agent-requested: the agent reads the description and decides | `course-content.mdc` |
+| none | Manual: only when you @-mention it | |
+
+Team rules take precedence over project rules, which take precedence over user rules. Cursor also reads nested AGENTS.md files.
+
+## CLAUDE.md
+
+Claude Code reads `CLAUDE.md` at project, user and organisation level. Anthropic's guidance: keep it under about 200 lines, use `@path` imports for detail, and put file-type rules in `.claude/rules/*.md` with a `paths` frontmatter field. Recent versions read AGENTS.md when there's no CLAUDE.md; with both, a common setup is a CLAUDE.md that imports `@AGENTS.md`.
+
+<Aside type="tip" title="Instructions are not enforcement">
+"Never push to main" in a rules file is a request. If it must never happen, block it: a Claude Code `PreToolUse` hook, a permission deny rule, branch protection on the server (L10.6).
+</Aside>
+
+## What belongs in them
+
+| Put in | Leave out |
+|---|---|
+| The one setup and one verify command | Things a linter or formatter already enforces |
+| Non-obvious conventions ("timecodes are non-drop-frame only") | Generic advice ("write clean code") |
+| Where things live, what's generated | Long tutorials (link them, or make a skill) |
+| What needs a human ("ask before running migrations") | Secrets, tokens, internal URLs with credentials |
+
+`lint_instructions` checks a file against these: line budget (default 200), secret-looking strings, vague phrases, and commands that don't exist (a `make verify` with no Makefile target, a `pnpm` script that isn't in package.json). The tests run it on this repo's own AGENTS.md files.
+
+<Snippet path="examples/python/m10/rules.py" />
+
+The TypeScript version mirrors glob matching, rule modes and context selection:
+
+<Snippet path="examples/ts/m10/rules.ts" />
+
+## C++/Rust notes
+- AGENTS.md for CMake: the configure line with the preset (`cmake --preset dev`), the build dir, `ctest --output-on-failure`, and which sanitizer preset to use (`-fsanitize=address,undefined`).
+- For Cargo: the features the tests need, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`. Let `clippy` and `clang-tidy` be the automatic reviewers; the rules file only has to say "run them".
+
+## Sources
+- AGENTS.md: https://agents.md/
+- Cursor rules: https://cursor.com/docs/context/rules
+- Claude Code memory (CLAUDE.md, rules, imports): https://code.claude.com/docs/en/memory

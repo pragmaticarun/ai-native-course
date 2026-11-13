@@ -1,0 +1,8 @@
+---
+description: Writing or editing course lessons, quizzes or exercises
+alwaysApply: false
+---
+
+- Every claim about a tool, version or maturity model links a primary source; unverified items say so.
+- Anything not actually run is labelled untested on the page and in CHANGELOG.md.
+- Exercises need a starter that fails and a solution that passes `scripts/check_exercises.py`.

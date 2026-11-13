@@ -1,0 +1,65 @@
+---
+title: "Worked example: a 6-person team from L1 to L3"
+description: "A fictional team's quarter replayed through the course's gates — refused at week 1, L2 at week 4, held back at week 9, L3 at week 12 — with its AGENTS.md, PR policy, eval gate and plan."
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note" title="Fictional">
+"Clipline" (six engineers building video tools) and every number below are invented for teaching. The gates are the course's synthesis from L12.2.
+</Aside>
+
+## The quarter
+
+<Snippet path="examples/python/m12/fixtures/team/quarter.yaml" />
+
+`journey.py` replays each snapshot through `ready_for`:
+
+<Snippet path="examples/python/m12/journey.py" />
+
+```text
+W01: L1 -> L3: NOT YET
+   - L2 capability: working in small batches
+   - L2 artifact: agents-md
+   - L2 artifact: fast-tests
+   - L3 capability: AI-accessible internal data
+   - L3 capability: quality internal platforms
+   - L3 artifact: pr-policy
+   - L3 artifact: eval-suite
+   - L3 artifact: verify-command
+   - review load 1.25 > 0.8 of reviewer time
+W04: L1 -> L2: GO
+W09: L2 -> L3: NOT YET
+   - L3 capability: quality internal platforms
+   - L3 artifact: eval-suite
+W12: L2 -> L3: GO
+```
+
+(The test asserts these verdicts and findings.)
+
+## What happened, week by week
+
+- **W01.** Leadership wants agents everywhere. 30 agent PRs a week at half an hour each against 12 reviewer hours is a review load of 1.25: the team would rubber-stamp. Eight prerequisites are missing too.
+- **W04.** The team writes AGENTS.md, gets the test suite under two minutes, and agrees on small PRs. L2.
+- **W09.** PR policy and a verify command exist, but there's no eval suite for the prompt-driven features and no shared platform (each engineer runs agents differently). Not yet.
+- **W12.** An eval suite gates prompt changes, a shared runner config is the platform, and a fourth reviewer rotation brings review load to 0.56. L3.
+
+## The artifacts
+
+<Snippet path="examples/python/m12/fixtures/team/AGENTS.md" />
+
+<Snippet path="examples/python/m12/fixtures/team/pr-policy.yaml" />
+
+The eval suite is M6's material (`uv run pytest evals/` in their AGENTS.md); the PR policy is enforced by a bot like M11's `review.py`. The plan they wrote is in [L12.4](/ai-native-course/ai-native/m12/adoption-plan/).
+
+## Run it
+
+```bash
+cd examples/python && uv run --project ../../python python -m m12.journey
+```
+
+## C++/Rust notes
+- A systems team's W09 blocker is often the platform: shared sanitizer/fuzz CI and a build cache. Without them, agent PRs are slow to verify and reviewers fall back to reading every line.

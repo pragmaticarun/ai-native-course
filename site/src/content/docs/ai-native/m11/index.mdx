@@ -1,0 +1,27 @@
+---
+title: "M11 · Coding & background agents, TDD with agents, review workflows"
+description: "The coding-agent landscape, TDD where humans approve the tests, parallel agents in git worktrees, review policy for agent PRs, headless agents in CI with budgets and kill switches, and measuring impact with DORA metrics."
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M10 (specs, rules, guardrails), M5 (safety, human-in-the-loop).
+
+| Lesson | Worked example |
+|---|---|
+| [L11.1 The coding-agent landscape](/ai-native-course/ai-native/m11/landscape/) | IDE, CLI and cloud agents compared on what actually differs (*reading; no live agent run*) |
+| [L11.2 TDD with agents](/ai-native-course/ai-native/m11/tdd/) | a gate that approves red tests and refuses tampering |
+| [L11.3 Parallel agents](/ai-native-course/ai-native/m11/parallel-agents/) | batches planned from file sets, real `git worktree`s, conflicts surfaced at merge |
+| [L11.4 Review workflows](/ai-native-course/ai-native/m11/review/) | provenance, size limits, AI pre-review, approver rules (Python + TS) |
+| [L11.5 Headless agents in CI](/ai-native-course/ai-native/m11/headless-ci/) | CLI flags for unattended runs; a workflow template and its linter |
+| [L11.6 Measuring impact honestly](/ai-native-course/ai-native/m11/measuring/) | DORA's five metrics plus review latency, before/after on a fictional team |
+| [Worked example: issue → agent → PR](/ai-native-course/ai-native/m11/issue-to-pr/) | a pipeline with a label gate, budget, kill switch and independent test re-run (mock agent; live path *untested*) |
+| [Worked example: Android agentic development](/ai-native-course/ai-native/m11/android-agentic/) | Studio Agent Mode, the Android CLI plugin, a headless emulator loop (*untested: no Android SDK*) |
+| [Exercises](/ai-native-course/ai-native/m11/exercises/) | catch weakened assertions, split an oversized PR into a stack (TS), apply a review checklist |
+
+Everything that runs in this module uses scripted agents and local git repos. No live coding agent, cloud agent or GitHub API call was made.
+
+<Quiz src="m11" />

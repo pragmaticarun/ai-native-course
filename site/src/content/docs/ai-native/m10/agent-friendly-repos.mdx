@@ -1,0 +1,49 @@
+---
+title: "L10.5 Agent-friendly repos"
+description: "One-command setup, fast deterministic tests, clear boundaries, typed interfaces, useful errors, and one verify command. An audit script, run on this course's own repo."
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+An agent has your repo, a shell, and no memory of last week. What helps a new hire on day one helps an agent on every task, except the agent won't ask when it's confused; it guesses.
+
+## The traits
+
+| Trait | Why agents need it | Anti-pattern |
+|---|---|---|
+| One-command setup | it can't read the wiki page you forgot to update | 12 manual steps in a README |
+| One verify command that means "done" | it stops when *something* is green | `cargo test` passes while the real tests sit behind a feature flag |
+| Fast, deterministic tests | it reruns tests constantly; a flaky test sends it chasing ghosts | tests that depend on time, order or the network |
+| Clear module boundaries | smaller context, fewer accidental edits | everything imports everything |
+| Typed interfaces | type errors are cheap, precise feedback | `dict[str, Any]` everywhere |
+| Errors that say what to do | the message is the agent's next prompt | `except: pass`, "something went wrong" |
+| Non-interactive scripts | it can't type `y` | `read -p "Continue?"` |
+| Pinned dependencies | reproducible results between runs | unpinned `latest` |
+
+## An audit
+
+`repo_audit.py` checks the structural ones: an instructions file (AGENTS.md or CLAUDE.md); a verify command (a `Verify:` line, a `verify.sh`, or a Makefile target); a one-command setup (a `Setup:` line, a Makefile target or a devcontainer); a lockfile for every manifest; typed code (Rust, a strict `tsconfig.json`, or `[tool.mypy]`); and CI workflows. The checks are the course's; each weighs 1. It looks for files, so it can't tell whether the commands work; the tests and CI do that.
+
+<Snippet path="examples/python/m10/repo_audit.py" />
+
+The tests run it on this repo (6/6) and on the Rust fixture from the [worked example](/ai-native-course/ai-native/m10/rust-lib/): 1/6 before, 3/6 after. The fixture still has no CI, no setup line and no `Cargo.lock`; the worked example fixes only what it measures.
+
+## This repo's verify command
+
+`make` isn't installed everywhere (it wasn't on the machine this course was built on), so this repo uses a script. Agents and humans run the same thing:
+
+<Snippet path="verify.sh" />
+
+## What a script can't audit
+
+Whether the AGENTS.md is *true*, whether tests check behaviour or just run code, whether module boundaries make sense. Ex 10.3 finds three hostile traits by reading code: an interactive prompt, a flaky test, a swallowed error.
+
+## C++/Rust notes
+- C++: a `CMakePresets.json` with `dev`, `asan` and `release` presets is the one-command setup; `ctest --preset dev` the verify step. Compile with warnings as errors so the compiler reviews too.
+- Rust: `rust-toolchain.toml` pins the compiler; commit `Cargo.lock` for binaries and test fixtures; put the features the tests need in the verify script.
+
+## Sources
+- AGENTS.md: https://agents.md/
+- DORA capabilities (working in small batches, version control): https://dora.dev/capabilities/

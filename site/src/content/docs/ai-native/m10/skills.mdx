@@ -1,0 +1,59 @@
+---
+title: "L10.4 Agent Skills: SKILL.md and progressive disclosure"
+description: "The Agent Skills format, what the spec requires, scripts and references inside skills, how a host loads skills on demand, and ways to share them."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+A rules file is always loaded. A **skill** is loaded only when the task needs it: a folder with a `SKILL.md` (YAML frontmatter plus instructions) and optional `scripts/`, `references/` and `assets/`. The format started at Anthropic and is now an open specification at [agentskills.io](https://agentskills.io/specification), adopted by a growing list of agents (Claude Code and Codex among them; the spec site keeps the list).
+
+## What the spec requires
+
+| Field | Rule |
+|---|---|
+| `name` | required; 1–64 chars; lowercase letters, digits, hyphens; no leading, trailing or double hyphen; **must match the directory name** |
+| `description` | required; 1–1024 chars; what it does *and when to use it* (this is all the model sees until it picks the skill) |
+| `license`, `compatibility` (≤500 chars), `metadata` (string → string) | optional |
+| `allowed-tools` | optional, experimental |
+
+The spec's guidance: keep SKILL.md under 500 lines (body under ~5,000 tokens), and reference other files one level deep. Its `skills-ref validate` tool checks the format; `validate_skill` below implements the same rules so CI runs them with no extra install, and warns about fields outside the spec (Spec Kit's generated skills add `argument-hint`, `user-invocable` and `disable-model-invocation`).
+
+<Snippet path="examples/python/m10/skills.py" />
+
+## Progressive disclosure, measured
+
+`SkillCatalog` does what a host does:
+
+1. **Startup:** put each skill's `name: description` in the prompt (~100 tokens each).
+2. **Activation:** when a task matches (a word-overlap stand-in for the model's judgement), load the SKILL.md body.
+3. **Resources:** read `references/LABELS.md` or run a script only when the body says to.
+
+The test counts characters loaded: the startup catalog stays under 250 characters, "fix the flaky login test" activates nothing, and only "write the release notes for v1.4" loads the body and then the reference file.
+
+<Snippet path="examples/python/m10/fixtures/skills/release-notes/SKILL.md" />
+
+The second fixture skill, `db-migration`, is deliberately broken: its name `DB_Migration` has capitals and an underscore, its body points to a `references/STEPS.md` that doesn't exist, its description doesn't say when to use it, and it carries a non-spec field. The test checks the validator reports exactly those (two errors, two warnings).
+
+## Scripts inside skills
+
+Put deterministic steps in scripts the skill tells the agent to run (the fixture's `scripts/merged_prs.py` lists merged PRs; here it prints a fixed list). The agent spends tokens on judgement, not on re-deriving a git log format, and the script can be tested like any code.
+
+<Aside type="caution" title="Skills are code you run">
+A skill can tell an agent to execute its scripts. Review third-party skills as you'd review a dependency, pin them by commit, and don't install skills whose scripts fetch and run remote code.
+</Aside>
+
+## Sharing skills
+
+- In the repo: `.claude/skills/` for Claude Code; other agents read their own folders (check each agent's docs). This repo ships `.claude/skills/verify-course` and `.claude/skills/add-lesson`, and the tests validate both.
+- As plugins: Claude Code and Codex plugin marketplaces bundle skills (the Android CLI plugin in the [Android worked example](/ai-native-course/ai-native/m10/android-repo/) adds an `android-cli` skill this way).
+- Over MCP: a server can expose the same instructions as MCP prompts or resources, for hosts that don't read skill folders. You lose progressive disclosure unless the host fetches them on demand.
+
+## C++/Rust notes
+- Good skill candidates: "bump the crate version and publish" (`cargo publish --dry-run` first), "add a fuzz target" (`cargo fuzz add`), "run the sanitizer matrix" for CMake presets. Put the exact commands in `scripts/` so they're tested.
+
+## Sources
+- Agent Skills specification: https://agentskills.io/specification
+- Claude Code skills: https://code.claude.com/docs/en/skills

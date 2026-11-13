@@ -1,0 +1,55 @@
+---
+title: "Worked example: making a Rust library agent-friendly, and measuring it"
+description: "A small timecode crate whose plain `cargo test` is green with zero integration tests run. Add AGENTS.md and a verify script, then measure a scripted agent before and after with real cargo builds."
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+The syllabus asks for a Rust or C++ library made agent-friendly, with the agent's success rate measured before and after. This is the Rust version; the C++ notes map each step to CMake.
+
+## The crate and its trap
+
+`timecode` converts `HH:MM:SS:FF` timecodes to and from frame counts. Its integration tests start with `#![cfg(feature = "full")]`, so **plain `cargo test` compiles none of them and still prints a green result.** Real repos hide the same trap in feature flags, test profiles, or "run `make check`, not `make test`" lore.
+
+<Snippet path="examples/python/m10/fixtures/rustlib/tests/timecode.rs" />
+
+## The change
+
+Two files: an AGENTS.md with one `Verify:` line and the reason for it, and the script it names.
+
+<Snippet path="examples/python/m10/fixtures/rustlib_after/AGENTS.md" />
+
+<Snippet path="examples/python/m10/fixtures/rustlib_after/verify.sh" />
+
+## The measurement
+
+`agent_friendly_bench.py` has five seeded tasks (`to_frames`, `from_frames`, `parse`, `format`, `between`), each a function stub in `src/lib.rs`. For each, the scripted "agent" tries candidate patches in order (plausible wrong ones first) and keeps the first that its verify command accepts. It uses the repo's documented `Verify:` command, or guesses `cargo test` if there isn't one. Success is judged by the ground truth, `cargo test --features full`. Every step is a real cargo build and test run.
+
+<Snippet path="examples/python/m10/agent_friendly_bench.py" />
+
+Result (asserted in the tests; CI runs them with cargo):
+
+| Repo | Verify command used | Tasks really solved | Verify runs |
+|---|---|---|---|
+| before | `cargo test --quiet --offline` (guessed) | 2/5 (40%): only those whose first patch was already right | 5 |
+| after | `./verify.sh` (from AGENTS.md) | 5/5 (100%) | 8 |
+
+The friendly repo costs three extra verify runs. That's the point: the agent was told "no" three times, by the right oracle, and fixed its patches.
+
+<Aside type="caution" title="A mock, not a benchmark">
+The agent is a deterministic script, so these numbers describe the fixture, not any real agent. They show *how* to measure: seeded tasks, a ground-truth check separate from what the agent sees, success rate and cost per task. Pointing the same harness at a live coding agent (several runs per task, since agents aren't deterministic) is the real experiment. That was **not done** for this course: untested.
+</Aside>
+
+## Run it
+
+```bash
+cd examples/python && uv run --project ../../python python -m m10.agent_friendly_bench
+```
+
+## C++/Rust notes
+- The C++ version of the trap: tests registered only when `-DBUILD_TESTING=ON` or a preset turns them on, so `ctest` in the default build finds nothing. Whether that counts as a failure depends on your CMake version and settings, so say it explicitly with `--no-tests=error` in `verify.sh`.
+- Add `cargo clippy --all-targets --features full -- -D warnings` (or `clang-tidy` with `WarningsAsErrors`) to verify once the tests are reliable; agents fix lints well when they fail loudly.
+- For `unsafe` code, `cargo +nightly miri test` belongs in the definition of done; M11 covers sanitizers, Miri and fuzzing as agent oracles.

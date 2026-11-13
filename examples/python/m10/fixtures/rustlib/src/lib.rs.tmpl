@@ -1,0 +1,29 @@
+//! SMPTE-style non-drop-frame timecodes (fixture crate for the M10 worked example).
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Timecode {
+    pub h: u32,
+    pub m: u32,
+    pub s: u32,
+    pub f: u32,
+}
+
+pub fn to_frames(tc: Timecode, fps: u32) -> u64 {
+    // TASK:to_frames
+}
+
+pub fn from_frames(frames: u64, fps: u32) -> Timecode {
+    // TASK:from_frames
+}
+
+pub fn parse(text: &str) -> Result<Timecode, String> {
+    // TASK:parse
+}
+
+pub fn format(tc: Timecode) -> String {
+    // TASK:format
+}
+
+pub fn between(a: Timecode, b: Timecode, fps: u32) -> Option<u64> {
+    // TASK:between
+}

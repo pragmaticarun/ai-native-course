@@ -1,0 +1,82 @@
+---
+title: "L10.1 Spec-driven development: Spec Kit, with Kiro side by side"
+description: "Specs as the source of truth. GitHub Spec Kit v1.4.0's constitution → specify → plan → tasks → implement, what `specify init` actually writes, and how Kiro's requirements → design → tasks compares."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+When an agent writes most of the code, the durable artifact is the description of what the code must do. Spec-driven development makes that description a file in the repo, reviewed like code, that the agent plans and implements from. If the code and the spec disagree, you fix one of them on purpose.
+
+## Spec Kit (the primary tool in this course)
+
+GitHub's [Spec Kit](https://github.com/github/spec-kit) is a CLI (`specify`) that scaffolds templates, scripts and agent commands into a repo. This module used **v1.4.0**, run for real:
+
+```bash
+uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init demo \
+    --integration claude --script sh --ignore-agent-tools --non-interactive
+```
+
+That wrote:
+
+- `.claude/skills/speckit-{constitution,specify,clarify,plan,tasks,analyze,checklist,implement,converge}/SKILL.md`: the workflow as agent skills for Claude Code. Other integrations get their own formats; `specify check` lists 40+ agents and editors, Kiro CLI among them.
+- `.specify/memory/constitution.md`: the project's non-negotiable principles.
+- `.specify/templates/`: spec, plan, tasks, checklist and constitution templates.
+- `.specify/scripts/bash/`: helpers such as `create-new-feature.sh`, which creates `specs/NNN-short-name/spec.md`.
+
+The workflow, as slash skills in the agent:
+
+| Step | Skill | Output |
+|---|---|---|
+| Principles | `/speckit-constitution` | `.specify/memory/constitution.md` |
+| What and why | `/speckit-specify` | `specs/001-…/spec.md`: user stories with priorities, Given/When/Then scenarios, `FR-###` requirements, `SC-###` success criteria, `[NEEDS CLARIFICATION: …]` markers |
+| Optional checks | `/speckit-clarify`, `/speckit-checklist`, `/speckit-analyze` | questions answered into the spec; consistency report |
+| How | `/speckit-plan` | `plan.md` (tech choices, structure), research and contracts |
+| Steps | `/speckit-tasks` | `tasks.md`: `- [ ] T001 [P] [US1] …` where `[P]` = can run in parallel |
+| Build | `/speckit-implement`, then `/speckit-converge` | code, tasks ticked off |
+
+<Aside type="note" title="Observed, not assumed">
+- In a fresh repo with no commits, `create-new-feature.sh` created the spec directory but did not switch branches. Don't count on it creating a branch until your repo has history.
+- Spec Kit's generated SKILL.md files carry frontmatter fields that aren't in the Agent Skills spec (`argument-hint`, `user-invocable`, `disable-model-invocation`). Claude Code reads them; a strict validator (L10.4) warns about them.
+- CI runs the same `specify init` and checks that the course's spec parser still understands the real template (`test_real_speckit_template_matches_the_parser`).
+</Aside>
+
+The feature used throughout M10: *accept durations like `1h30m` in a clip-trim CLI.* Its spec, written to the Spec Kit template:
+
+<Snippet path="examples/python/m10/fixtures/speckit/001-duration-parse/spec.md" />
+
+## Kiro: the same feature, the other way round
+
+<Aside type="caution" title="Kiro was not run">
+This comparison comes from Kiro's documentation ([specs](https://kiro.dev/docs/specs/), [feature specs](https://kiro.dev/docs/specs/feature-specs/)). The Kiro files in this repo are hand-written in that shape for the comparison; the exact headings are ours.
+</Aside>
+
+Kiro (an agentic IDE and CLI) produces three files per feature: `requirements.md` (or `bugfix.md` for bugs), `design.md`, `tasks.md`. It offers a Requirements-First or Design-First workflow, plus a Quick Spec mode. Acceptance criteria are written in **EARS** notation (`WHEN … THE SYSTEM SHALL …`), and tasks run in parallel "waves".
+
+<Snippet path="examples/python/m10/fixtures/kiro/duration-parse/requirements.md" />
+
+| | Spec Kit | Kiro |
+|---|---|---|
+| Where it runs | CLI that installs templates/skills for 40+ agents and editors (`specify check`, v1.4.0) | its own IDE / CLI |
+| Files | constitution, spec, plan, tasks (+ research, contracts) | requirements, design, tasks |
+| Acceptance criteria | Given / When / Then scenarios per user story | EARS: WHEN … THE SYSTEM SHALL … |
+| Project-wide rules | `constitution.md` | steering files ([docs](https://kiro.dev/docs/steering/)) |
+| Parallel work | `[P]` marker per task | task waves |
+| Licence | open source (MIT) | commercial product |
+
+Both reduce to **examples a test can check**. In L10.2 one function reads acceptance criteria from either format, and both give the same oracle.
+
+## When not to
+
+Spec-first costs time. For a one-line fix or an exploratory spike, a clear issue and a failing test are enough. Write a spec when the feature spans files, someone else will implement it (an agent counts), or you need to agree on scope before code exists.
+
+## C++/Rust notes
+- The constitution is a good home for language rules agents forget: "no raw `new`/`delete`", "every `unsafe` block has a `// SAFETY:` comment", "public APIs return `Result`, not panics".
+- In `plan.md`, name the build and the oracle explicitly (`cmake --build build && ctest`, `cargo test --all-features`): a plain `cargo test` may skip feature-gated tests (see the [Rust worked example](/ai-native-course/ai-native/m10/rust-lib/)).
+
+## Sources
+- GitHub Spec Kit: https://github.com/github/spec-kit (tag v1.4.0)
+- Kiro specs: https://kiro.dev/docs/specs/ · https://kiro.dev/docs/specs/feature-specs/
+- EARS: https://alistairmavin.com/ears/ · https://ears.org.uk/

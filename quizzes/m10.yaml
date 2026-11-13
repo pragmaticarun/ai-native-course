@@ -1,0 +1,51 @@
+module: m10
+title: "M10 quiz: spec-driven development & agent-friendly repos"
+questions:
+  - id: m10q1
+    type: single
+    prompt: "In Spec Kit v1.4.0, which command order matches the core workflow?"
+    choices: ["/speckit-plan → /speckit-specify → /speckit-implement", "/speckit-constitution → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement", "specify build → specify test → specify ship", "/speckit-tasks → /speckit-constitution → /speckit-plan"]
+    answer: 1
+    explanation: "Principles first, then what and why (spec), how (plan), an ordered task list, then implementation. /speckit-clarify, -analyze and -checklist are optional checks in between."
+  - id: m10q2
+    type: single
+    prompt: "Kiro's requirements.md writes acceptance criteria in EARS. Which line is EARS?"
+    choices: ["Given 90s When parsed Then 90", "WHEN the input is \"90s\" THE SYSTEM SHALL return 90", "As a user I want durations so that I can trim", "MUST parse durations (RFC 2119)"]
+    answer: 1
+    explanation: "EARS (Easy Approach to Requirements Syntax) uses WHEN/WHILE/IF … THE SYSTEM SHALL …. Spec Kit's template uses Given/When/Then scenarios instead."
+  - id: m10q3
+    type: single
+    prompt: "A file .cursor/rules/style.md exists with frontmatter globs: \"**/*.py\". What does Cursor do with it?"
+    choices: ["Attaches it when a .py file is in context", "Always applies it", "Ignores it: project rules must be .mdc files", "Merges it into AGENTS.md"]
+    answer: 2
+    explanation: "Project rules are .cursor/rules/*.mdc. The mode comes from frontmatter: alwaysApply, globs (auto-attached), description only (agent-requested), or none (manual)."
+  - id: m10q4
+    type: multi
+    prompt: "Which make a SKILL.md invalid under the Agent Skills specification? (Pick all that apply.)"
+    choices: ["name: DB-Migration (capital letters)", "name differs from the skill's directory name", "a description longer than 1024 characters", "a body that links to references/schema.md"]
+    answer: [0, 1, 2]
+    explanation: "name is 1–64 lowercase letters, digits and hyphens and must match the directory; description is 1–1024 chars. Linking one level deep to reference files is encouraged (progressive disclosure)."
+  - id: m10q5
+    type: single
+    prompt: "A repo has AGENTS.md at the root and kmp/AGENTS.md. An agent edits kmp/shared/src/X.kt. Which instructions win where they conflict?"
+    choices: ["The root file", "kmp/AGENTS.md: the closest file to the edited file takes precedence", "Whichever was edited most recently", "Neither; agents read only the root"]
+    answer: 1
+    explanation: "Per agents.md, the closest AGENTS.md wins, and an explicit prompt from the user overrides the files."
+  - id: m10q6
+    type: single
+    prompt: "Your AGENTS.md says \"never push to main\". What actually enforces it in Claude Code?"
+    choices: ["Writing it in capitals", "A PreToolUse hook (or a permission deny rule) that blocks the command", "Repeating it in CLAUDE.md", "Nothing can"]
+    answer: 1
+    explanation: "Instruction files are context, not enforcement. Hooks and permission rules run deterministically; branch protection on the server is the final backstop."
+  - id: m10q7
+    type: single
+    prompt: "In M10's Rust worked example, why did the 'after' repo score higher?"
+    choices: ["It used a better model", "AGENTS.md named one verify command (./verify.sh) that enables the feature-gated tests, so the agent stopped trusting a misleadingly green `cargo test`", "The tests were deleted", "The benchmark measured real agents"]
+    answer: 1
+    explanation: "The scripted agent and fixture show the mechanism only. It is a mock, not evidence about real agents' success rates."
+  - id: m10q8
+    type: multi
+    prompt: "Which repo traits trip up coding agents? (Pick all that apply.)"
+    choices: ["Scripts that wait for interactive input", "Tests that pass or fail at random", "except: pass that hides failures", "A one-command setup documented in AGENTS.md"]
+    answer: [0, 1, 2]
+    explanation: "Agents hang on prompts, chase flaky tests, and read swallowed errors as success (Ex 10.3 finds all three). A documented one-command setup helps."

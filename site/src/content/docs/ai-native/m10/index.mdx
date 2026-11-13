@@ -1,0 +1,29 @@
+---
+title: "M10 · Spec-driven development, rules & skills, agent-friendly repos"
+description: "GitHub Spec Kit (run for real) with a Kiro comparison, executable acceptance criteria, AGENTS.md / Cursor rules / CLAUDE.md, Agent Skills, agent-friendly repos and dev-loop guardrails."
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3 (tool design), M4 (context & progressive disclosure), M5 (safety).
+
+| Lesson | Worked example |
+|---|---|
+| [L10.1 Spec-driven development](/ai-native-course/ai-native/m10/spec-driven/) | Spec Kit v1.4.0 `specify init`, its templates and skills; Kiro side by side (*Kiro not run*) |
+| [L10.2 Specs agents can execute](/ai-native-course/ai-native/m10/executable-specs/) | a spec linter, acceptance scenarios as a test oracle, task waves |
+| [L10.3 Rules files](/ai-native-course/ai-native/m10/rules-files/) | nested AGENTS.md, Cursor `.mdc` modes, CLAUDE.md, an instruction-file linter (Python + TS) |
+| [L10.4 Agent Skills](/ai-native-course/ai-native/m10/skills/) | a SKILL.md validator and a progressive-disclosure catalog |
+| [L10.5 Agent-friendly repos](/ai-native-course/ai-native/m10/agent-friendly-repos/) | a repo audit, run on this course's own repo |
+| [L10.6 Hooks and guardrails](/ai-native-course/ai-native/m10/hooks-guardrails/) | a pre-commit secret scan, a command allowlist (Python + TS), an env-scrubbed runner |
+| [Worked example: an agent-friendly Rust library](/ai-native-course/ai-native/m10/rust-lib/) | before/after with a scripted (mock) agent and real `cargo test` |
+| [Worked example: an agent-friendly Android repo](/ai-native-course/ai-native/m10/android-repo/) | AGENTS.md, the Android CLI plugin, Gradle verify tasks (*untested: no Android SDK*) |
+| [Exercises](/ai-native-course/ai-native/m10/exercises/) | write a spec that catches bugs, a release-process skill, find agent-hostile traits |
+
+Versions used: GitHub Spec Kit **v1.4.0** (installed with `uvx` from the tagged git repo, in CI too), Rust 1.100.0 for the worked example. Kiro, Android Studio and the Android CLI were **not run**.
+
+This repo follows its own advice: a root [AGENTS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/AGENTS.md) plus nested ones in `kmp/`, `rust/` and `site/`, three Cursor rules in `.cursor/rules/`, two skills in `.claude/skills/`, and one verify command (`./verify.sh`). The M10 tests check all of them.
+
+<Quiz src="m10" />

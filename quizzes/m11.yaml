@@ -1,0 +1,51 @@
+module: m11
+title: "M11 quiz: coding & background agents, TDD, review"
+questions:
+  - id: m11q1
+    type: single
+    prompt: "In M11's TDD gate, what must be true before the agent may write implementation code?"
+    choices: ["Nothing; tests come after", "A human approved the new tests and they fail (red); the gate then refuses changes to them", "Coverage is above 80%", "The agent wrote the tests itself"]
+    answer: 1
+    explanation: "Approved, red tests are the specification. The gate hashes the approved test files and rejects runs where they changed, were deleted, or collect fewer tests (including skips added in a new conftest.py)."
+  - id: m11q2
+    type: multi
+    prompt: "Which edits to a test should a reviewer treat as weakening it? (Pick all that apply.)"
+    choices: ["assert x == 3 → assert x", "pytest.raises(ValueError) → pytest.raises(Exception)", "abs=1e-6 → abs=0.1", "adding a new assertion"]
+    answer: [0, 1, 2]
+    explanation: "Equality to truthiness, broader exceptions and wider tolerances all let more wrong code pass (Ex 11.1). Adding assertions strengthens."
+  - id: m11q3
+    type: single
+    prompt: "Why does M11 run parallel agents in separate git worktrees?"
+    choices: ["Worktrees are faster to clone", "Each agent gets its own working directory and branch on one repository, so edits don't collide until merge, where conflicts surface explicitly", "Git requires it for agents", "To avoid running tests"]
+    answer: 1
+    explanation: "git worktree adds linked working trees sharing one object store. Two agents editing the same lines still conflict; plan batches so they touch different files."
+  - id: m11q4
+    type: single
+    prompt: "Codex CLI's codex exec runs with which sandbox by default?"
+    choices: ["danger-full-access", "read-only", "workspace-write", "None"]
+    answer: 1
+    explanation: "codex exec defaults to read-only; pass --sandbox workspace-write to allow edits."
+  - id: m11q5
+    type: single
+    prompt: "A headless Claude Code step uses --allowedTools \"Bash(git diff *)\". What does the space before * do?"
+    choices: ["Nothing", "Makes it a prefix match on `git diff ` (word boundary), so `git diff-index` is not allowed", "Allows all Bash", "It is a syntax error"]
+    answer: 1
+    explanation: "Per the Claude Code docs, `git diff*` without the space would also match `git diff-index`."
+  - id: m11q6
+    type: multi
+    prompt: "Which rules does M11's example PR policy enforce for agent-authored PRs? (Pick all that apply.)"
+    choices: ["At most 400 changed lines excluding generated files", "The requester cannot be the only approver", "Two reviewers for migrations/ or .github/workflows/", "Agent PRs merge without review if CI is green"]
+    answer: [0, 1, 2]
+    explanation: "These are this course's example policy, not a standard. Green CI does not replace a human who can judge the change."
+  - id: m11q7
+    type: single
+    prompt: "After adopting agents, deployment frequency doubles and change fail rate rises. How should you read it?"
+    choices: ["A clear win", "DORA's amplifier pattern: throughput rose but instability did too, so look at batch size, tests and review before scaling further", "Ignore change fail rate", "Revert all agent use"]
+    answer: 1
+    explanation: "DORA groups the metrics into throughput and instability and describes AI as an amplifier of what's already there. Also check sample size: M11 refuses comparisons under 20 deployments per window."
+  - id: m11q8
+    type: single
+    prompt: "In M11's issue-to-PR pipeline, what stops a runaway agent?"
+    choices: ["Nothing", "A required agent:ok label, a step budget, a kill switch (AGENT_PIPELINE_DISABLED=1 or a .agent-stop file), and an independent re-run of the tests before the PR", "The model's judgement", "A longer prompt"]
+    answer: 1
+    explanation: "Deterministic limits around the agent. The live path in the workflow template is untested; the mock path runs in the tests."

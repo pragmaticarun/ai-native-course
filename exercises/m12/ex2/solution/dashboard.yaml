@@ -1,0 +1,23 @@
+# Baselines: dora.metrics on fictional_team(seed=12, weeks=8, per_week=5, fail_p=0.12, rework_p=0.06, review_h=4)
+panels:
+  - metric: deployment_frequency_per_week
+    kind: throughput
+    baseline: 5.0
+    guarded_by: change_fail_rate
+  - metric: change_lead_time_h
+    kind: throughput
+    baseline: 30.7
+    guarded_by: review_latency_h
+  - metric: failed_deployment_recovery_time_h
+    kind: throughput
+    baseline: 4.3
+    guarded_by: deployment_rework_rate
+  - metric: change_fail_rate
+    kind: instability
+    baseline: 0.125
+  - metric: deployment_rework_rate
+    kind: instability
+    baseline: 0.0
+  - metric: review_latency_h
+    kind: flow
+    baseline: 4.4

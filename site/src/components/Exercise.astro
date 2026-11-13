@@ -12,12 +12,14 @@ const file = fileProp ?? (lang === "py" ? "impl.py" : "loop.ts");
 const base = lang === "py" ? dir : `${dir}/ts`;
 const starter = readRepoFile(`${base}/starter/${file}`).trimEnd();
 const html = marked(readme.replace(/^# .*\n/, ""));
+const ext = file.split(".").pop() ?? "";
+const codeLang = ({ md: "md", yaml: "yaml", yml: "yaml", py: "python", ts: "ts" } as Record<string, string>)[ext] ?? ext;
 const heading = readme.match(/^# (.*)$/m)?.[1] ?? dir;
 ---
 <section class="exercise">
   <h3>{heading}</h3>
   <Fragment set:html={html} />
-  <Code code={starter} lang={lang === "py" ? "python" : "ts"} title={`${base}/starter/${file} (starter)`} />
+  <Code code={starter} lang={codeLang} title={`${base}/starter/${file} (starter)`} />
   <p style="font-size:0.85em">Run the tests: {lang === "py"
     ? <code>cd python && EXERCISE_VARIANT=starter uv run pytest ../{dir}/tests</code>
     : <code>EXERCISE_VARIANT=starter pnpm vitest run {dir}/ts</code>} (they fail until you finish), or

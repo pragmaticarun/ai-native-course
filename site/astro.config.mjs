@@ -38,7 +38,12 @@ export default defineConfig({
         },
         {
           label: "AI-Native Development",
-          items: [{ label: "M9 · MCP servers & clients", items: [{ autogenerate: { directory: "ai-native/m9" } }] }],
+          items: [
+            { label: "M9 · MCP servers & clients", items: [{ autogenerate: { directory: "ai-native/m9" } }] },
+            { label: "M10 · Specs, rules & skills", items: [{ autogenerate: { directory: "ai-native/m10" } }] },
+            { label: "M11 · Coding agents & review", items: [{ autogenerate: { directory: "ai-native/m11" } }] },
+            { label: "M12 · Team practice by level", items: [{ autogenerate: { directory: "ai-native/m12" } }] },
+          ],
         },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         { label: "Syllabus", link: "/syllabus/" },

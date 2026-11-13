@@ -3,7 +3,7 @@ name = "aincourse"
 version = "0.1.0"
 description = "Shared helpers and runnable examples for the AI-native software development course"
 requires-python = ">=3.13"
-# Pinned per SYLLABUS.md v0.3 section 2.4. Only what M0-M9 need is installed for now;
+# Pinned per SYLLABUS.md v0.3 section 2.4. Only what M0-M12 need is installed for now;
 # later modules add their dependencies when their lessons land.
 dependencies = [
   "inspect-ai==0.3.289",

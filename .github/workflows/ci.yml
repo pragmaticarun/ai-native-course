@@ -129,6 +129,30 @@ jobs:
         run: uv sync --locked && uv run pytest -q -rs ../examples/python/m9
       - name: TypeScript client vs Rust server
         run: pnpm vitest run examples/ts/m9
+      - name: M10 agent-friendly Rust benchmark (real cargo builds; skips become failures)
+        working-directory: python
+        env:
+          M10_REQUIRE_CARGO: "1"
+        run: uv run pytest -q -rs ../examples/python/m10 -k "bench or audit"
+
+  speckit:
+    name: Spec Kit v1.4.0 template check (M10)
+    runs-on: ubuntu-latest
+    env:
+      COURSE_LLM_PROVIDER: mock
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.13.8"
+      - name: specify init (from the tagged GitHub release; no agent CLI needed)
+        run: uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init /tmp/sk --integration claude --script sh --ignore-agent-tools --non-interactive
+      - name: Course spec parser vs the real template (skips become failures)
+        working-directory: python
+        env:
+          SPECKIT_DIR: /tmp/sk
+          SPECKIT_REQUIRE: "1"
+        run: uv sync --locked && uv run pytest -q -rs ../examples/python/m10
 
   site:
     name: Site build + internal link validation

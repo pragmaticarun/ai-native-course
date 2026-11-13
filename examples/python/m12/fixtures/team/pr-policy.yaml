@@ -1,0 +1,7 @@
+# Clipline's PR policy (fictional), checked in CI by a bot like M11's review.py.
+max_changed_lines: 400
+generated: ["generated/**", "**/*.lock"]
+agent_provenance: [label:agent-authored, trailer:Agent-Session]
+requester_cannot_be_sole_approver: true
+two_reviewers_for: ["migrations/**", ".github/workflows/**"]
+ai_prereview: required-before-human-review

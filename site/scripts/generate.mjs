@@ -20,7 +20,7 @@ const stripH1 = (md) => md.replace(/^# .*\n+/, "");
 writeFileSync(resolve(docs, "syllabus.md"), page(
   "Syllabus (v0.3)",
   "The full course syllabus and site outline, as approved.",
-  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M9 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
+  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M12 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
 ));
 
 writeFileSync(resolve(docs, "changelog.md"), page(
@@ -91,6 +91,12 @@ Only the JVM target is built and tested so far. Android-only entries (AGP, LiteR
 |---|---|
 | Rust toolchain (\`rust-toolchain.toml\`) | ${rustChannel} |
 ${rows(rustDeps)}
+
+## Tools run by the tests (not lockfile-managed)
+| Tool | Version | Where |
+|---|---|---|
+| GitHub Spec Kit (\`specify\`) | v1.4.0 (git tag) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init\` |
+| git | runner's version | M10 hooks, M11 worktrees and sandbox repos |
 
 ## Site (\`site/pnpm-lock.yaml\`)
 | Package | Locked version |

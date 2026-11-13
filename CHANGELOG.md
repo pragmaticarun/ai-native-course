@@ -2,6 +2,33 @@
 
 All notable changes to the course. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-11-13
+
+### Content
+- Modules **M10–M12** built: 16 lessons (M10 spec-driven development, rules & skills, agent-friendly repos: 6; M11 coding & background agents, TDD with agents, review workflows: 6; M12 team practice by maturity level: 4), 5 worked-example pages, Python and TypeScript examples (mock agents, real git and cargo), 8 exercises with CI-checked solutions (solution passes, starter fails; one in TypeScript) and 3 quizzes (22 questions).
+- M10: **GitHub Spec Kit v1.4.0** run for real (`specify init --integration claude`); a spec parser/linter, acceptance scenarios (Spec Kit Given/When/Then and Kiro-style EARS) turned into one executable oracle, task waves; nested AGENTS.md, Cursor `.mdc` rule modes and Claude path rules modelled in Python and TS; an Agent Skills validator and progressive-disclosure catalog; a repo audit; a pre-commit secret scan and a command allowlist (Python + TS). Worked example: a Rust crate whose plain `cargo test` runs none of its feature-gated tests, measured before/after with a **scripted** agent and real cargo builds (40% → 100% of tasks really solved, 5 → 8 verify runs).
+- M11: a TDD gate (approved red tests, hashes, collection counts, skips, untracked conftest), parallel agents in real `git worktree`s with conflict-aware batch planning, an agent-PR review policy (Python + TS), an issue → agent → PR pipeline with label gate, budgets, kill switch and independent test re-run, a GitHub Actions template (two jobs: key holder read-only, writer never sees the key) with a linter, and DORA's five metrics plus review latency before/after on a fictional team.
+- M12: Shapiro's L0–L5 with DORA's seven AI capabilities as entry criteria and a review-load check — **labelled as this course's own synthesis** — plus policy-as-code governance with a hash-chained audit log, a 90-day plan template and checker, and a fictional six-person team's L1→L3 quarter replayed through the gates.
+- The repo now practises M10: root `AGENTS.md` (setup/verify lines) plus nested `kmp/`, `rust/`, `site/` files, three `.cursor/rules/*.mdc` rules (always / auto-attached / agent-requested), two `.claude/skills/`, and `verify.sh` as the one verify command (`make` isn't assumed). Tests check all of them.
+- Site: M10–M12 sidebar groups; `Exercise`/`Solution` infer the code language from the file extension (Markdown, YAML, Python, TS answers).
+
+### CI
+- New `speckit` job: installs Spec Kit v1.4.0 from its git tag with `uvx`, runs `specify init`, and checks the course parser against the real templates (skips become failures).
+- `rust` job also runs the M10 agent-friendly benchmark with real cargo builds (`M10_REQUIRE_CARGO=1`).
+- Exercise loader registers modules in `sys.modules` (needed for dataclasses in exercise code) with names unique per module.
+
+### Findings worth knowing (observed in this repo)
+- Spec Kit v1.4.0's generated skills use frontmatter fields outside the Agent Skills spec (`argument-hint`, `user-invocable`, `disable-model-invocation`); a strict validator flags them as warnings.
+- In a fresh repo with no commits, Spec Kit's `create-new-feature.sh` created the spec directory but did not switch branches.
+- `android skills add` (named in the syllabus) **is documented** in the Android CLI command reference (with `--agent`, `--all`, `--project`); it was not run. The Android CLI plugin for Claude Code/Codex is a separate route that adds the `android-cli` skill.
+- `specify check` (v1.4.0) lists 40+ agent integrations, including Kiro CLI.
+
+### Known gaps / untested
+- **Kiro** was not run; its files here are hand-written in the shape its docs describe.
+- **No live coding agent** (Claude Code, Codex, Copilot CLI/coding agent, Gemini CLI, Cursor cloud agents, Codex cloud) was run; the agent-friendly benchmark and issue-to-PR pipeline use scripted agents, and the workflow template's live path is untested. Real agent success rates were not measured.
+- **Android**: Android Studio Agent Mode, the Android CLI and its plugin, `android skills add`, emulators, `android layout`, Journeys, Gradle Android tasks and screenshot tests — documented, not run. The Android SDK is **not installed** (awaiting approval).
+- M12's team, numbers and plan are fictional.
+
 ## [0.3.0] - 2026-11-13
 
 ### Content

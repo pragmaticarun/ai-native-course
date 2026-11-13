@@ -1,0 +1,44 @@
+---
+title: "L12.1 What changes at each Shapiro level"
+description: "Roles, rituals and review load from L0 (manual) to L5 (dark factory), and why so many teams plateau at L3."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+M1 compared maturity models; this module uses one of them, [Dan Shapiro's five levels](https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/) (L0–L5, modelled on driving automation), because it describes the **engineering workflow**, which is what a team actually changes. It's one practitioner's framework from talking to companies, not research data.
+
+| Level | Shapiro's description (paraphrased) | What changes for the team |
+|---|---|---|
+| L0 | AI as a search engine, the odd tab-completion; every character is yours | nothing yet; maybe an AI policy |
+| L1 | offload discrete tasks to an "AI intern" (a unit test, a docstring); your job is unchanged | individual speed-ups; shared prompt tips |
+| L2 | pair with an AI-native tool in flow; he estimates 90% of "AI-native" developers are here; it *feels* done but isn't | AGENTS.md, fast tests, small batches matter now |
+| L3 | you manage agents and review diffs all day: "your life is diffs"; "almost everyone tops out here" | review becomes the bottleneck; PR policy, evals, provenance |
+| L4 | you write specs and skills, review plans, leave for hours, check the tests passed (where he puts himself) | spec-driven work (M10), sandboxes, budgets, background agents (M11) |
+| L5 | "a black box that turns specs into software"; a handful of small teams | not covered as a target in this course |
+
+## Why L3 is where teams stall
+
+At L3, output is limited by how fast humans can read diffs. Adding agents makes it worse: more PRs, the same reviewers. Teams either rubber-stamp (what Thoughtworks Radar Vol. 35 calls *human-in-the-loop theater*) or drown. Getting past L3 means moving human attention **up**: to specs, tests and plans that agents work against (L4), with review triaged by risk.
+
+## Roles and rituals
+
+| | L1–L2 | L3 | L4 |
+|---|---|---|---|
+| Engineer's day | coding, with help | reviewing agent output | writing specs, skills, evals; reviewing plans |
+| Code review | human PRs | agent PRs dominate; size limits, pre-review | spot checks by risk; tests and evals carry more weight |
+| Planning | tickets | tasks small enough for one agent PR | specs with acceptance criteria an oracle can check |
+| Retro asks | "what did AI help with?" | "where did review lag?" | "which specs were ambiguous?" |
+
+The level descriptions are encoded in `ladder.py` (L12.2) so the tests and exercises can use them:
+
+<Snippet path="examples/python/m12/ladder.py" />
+
+## C++/Rust notes
+- Moving past L3 in systems code depends on oracles more than anywhere else: sanitizers, Miri, fuzzing and property tests are what let you review less line by line without trusting UB-prone code blindly.
+
+## Sources
+- Dan Shapiro, "The Five Levels: from Spicy Autocomplete to the Dark Factory" (23 Jan 2026): https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/
+- Thoughtworks Radar, human-in-the-loop theater: https://www.thoughtworks.com/radar/techniques/human-in-the-loop-theater
+- M1 comparison of autonomy levels: [L1.5](/ai-native-course/maturity/autonomy-levels/)

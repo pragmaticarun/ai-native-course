@@ -1,0 +1,12 @@
+[package]
+name = "timecode"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+# The integration tests only compile with this feature on. A newcomer (or an agent)
+# running plain `cargo test` gets a green run with zero of them executed.
+full = []
+
+[dependencies]

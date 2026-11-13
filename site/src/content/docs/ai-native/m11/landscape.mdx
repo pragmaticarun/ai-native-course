@@ -1,0 +1,57 @@
+---
+title: "L11.1 The coding-agent landscape"
+description: "IDE agents, CLI agents (Claude Code, Codex CLI, Copilot CLI, Gemini CLI) and cloud/background agents (Copilot coding agent, Codex cloud, Cursor cloud agents), compared on the things that change how you work."
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Reading only">
+This lesson summarises vendor documentation checked in November 2026. None of these agents was run for the course; the flags below come from their docs. Products in this space change monthly: check the linked pages before you rely on a detail.
+</Aside>
+
+Most coding agents share the same loop (M2): a model, tools to read and edit files and run commands, and a context window. They differ in **where they run, who approves actions, and what they hand back.**
+
+| | IDE agents | CLI agents | Cloud / background agents |
+|---|---|---|---|
+| Examples | Cursor, Android Studio Agent Mode, Copilot in VS Code | Claude Code, Codex CLI, Copilot CLI, Gemini CLI | Copilot coding agent, Codex cloud, Cursor cloud agents |
+| Runs on | your machine, in the editor | your machine or a CI runner | the vendor's VMs or GitHub Actions |
+| You approve | each edit/command, or per-session allowlists | per-tool rules, permission modes | the PR at the end |
+| Hands back | edits in your working tree | edits, or JSON in headless mode | a branch and a pull request |
+| Good for | interactive work where you watch | scripting, CI, unattended runs on a runner you control | well-specified tasks you'd otherwise queue |
+
+## Headless modes (the CLI agents)
+
+| Agent | Non-interactive run | Permissions / sandbox | Machine-readable output |
+|---|---|---|---|
+| Claude Code | `claude -p "…"` (`--bare` skips local config) | `--allowedTools "Bash(git diff *)"`, `--permission-mode` (e.g. `dontAsk`, `acceptEdits`), `--max-budget-usd` | `--output-format json`, `--json-schema` |
+| Codex CLI | `codex exec "…"` | read-only sandbox by default; `--sandbox workspace-write` to edit | `--json`, `--output-schema`, `-o` |
+| Copilot CLI | `copilot -p "…"` (`-s` for script-friendly output) | `--allow-tool`, `--deny-tool` (deny wins), `--no-ask-user` | |
+| Gemini CLI | `gemini -p "…"` | | `--output-format json` / `stream-json`; distinct exit codes for failure kinds |
+
+## Background agents
+
+- **Copilot coding agent**: assign an issue to Copilot; it works in a GitHub Actions-powered environment, pushes to one branch and opens one PR per task, and you review it like any PR. Sessions have a time limit (59 minutes per the docs at the time of writing).
+- **Codex cloud**: delegate tasks from ChatGPT, the IDE extension or the CLI; each runs in its own cloud container and returns a diff or PR.
+- **Cursor cloud agents**: run in remote VMs from the editor, web or Slack, on their own branch.
+
+The trade-off is the same for all three: you give up watching each step and get back a PR. That only works if the repo is agent-friendly (M10) and review is set up for it (L11.4).
+
+## What actually differs
+
+1. **Approval model.** Per action (IDE), per rule (CLI), or per PR (cloud). The later the approval, the more your tests and review must catch.
+2. **Environment.** Your laptop has your credentials; a CI runner has what you give it; a vendor VM has what its setup script installs.
+3. **Context sources.** All read AGENTS.md or their own rules file; check which, and whether nested files work (L10.3).
+4. **Cost control.** Budget flags (`--max-budget-usd`), session time limits, or plan quotas.
+
+## C++/Rust notes
+- For any of them, "done" should include the oracles a model can't eyeball: sanitizers (`-fsanitize=address,undefined`), Miri for `unsafe` Rust (`cargo +nightly miri test`), and a short fuzz run (`cargo fuzz run target -- -max_total_time=60`). Put them in the verify script so CLI and cloud agents both run them.
+
+## Sources
+- Claude Code headless / CLI reference: https://code.claude.com/docs/en/headless · https://code.claude.com/docs/en/cli-reference
+- Codex non-interactive mode: https://developers.openai.com/codex/noninteractive · Codex cloud: https://developers.openai.com/codex/cloud
+- Copilot CLI reference: https://docs.github.com/en/copilot/reference/copilot-cli-reference
+- Copilot coding agent: https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent
+- Gemini CLI headless: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/headless.md
+- Cursor cloud agents: https://cursor.com/docs/cloud-agent

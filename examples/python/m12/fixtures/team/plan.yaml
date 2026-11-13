@@ -1,0 +1,26 @@
+# Clipline's 90-day plan (fictional), written with the course template.
+team: Clipline
+start: 2026-07-06
+stages:
+  - name: Foundations (L1 -> L2)
+    ends: 2026-08-02
+    owner: Priya (tech lead)
+    exit_criterion: AGENTS.md + fast test suite (< 2 min) merged; 3 people pairing with agents daily
+    metrics:
+      - {name: change lead time, baseline: 3.1d, target: 2.5d}
+      - {name: change fail rate, baseline: 9%, target: "<= 9%", guardrail: true}
+  - name: Agents with a safety net (L2 -> L3)
+    ends: 2026-09-06
+    owner: Priya (tech lead)
+    exit_criterion: PR policy enforced in CI; eval suite gates prompt changes; review load <= 0.8
+    metrics:
+      - {name: deployment frequency, baseline: 4/wk, target: 8/wk}
+      - {name: deployment rework rate, baseline: 6%, target: "<= 6%", guardrail: true}
+      - {name: review latency, baseline: 7h, target: "<= 8h", guardrail: true}
+  - name: Consolidate (stay at L3)
+    ends: 2026-10-04
+    owner: Sam (EM)
+    exit_criterion: two consecutive months at targets; retro decides whether to pilot L4 on one service
+    metrics:
+      - {name: failed deployment recovery time, baseline: 2h, target: "<= 2h", guardrail: true}
+      - {name: change lead time, baseline: 2.5d, target: 2d}

@@ -1,0 +1,80 @@
+# TEMPLATE (not active in this repo; it lives under examples/, not .github/workflows/).
+# Issue -> coding agent -> draft PR. Mock mode runs the course's scripted pipeline; live mode
+# calls Claude Code headless. The live path was NOT run for this course: untested.
+# Shape follows the Codex docs' pattern: the job that holds the model key can only read the
+# repo and hands a patch to a second job that can write but never sees the key.
+name: agent issue-to-PR
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number
+        required: true
+      mode:
+        type: choice
+        options: [mock, live]
+        default: mock
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-issue-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  agent:
+    # Kill switch: set the repository variable AGENT_PIPELINE_ENABLED to anything but 'true'.
+    if: vars.AGENT_PIPELINE_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || github.event.label.name == 'agent:ok')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Mock agent (deterministic)
+        if: inputs.mode != 'live'
+        run: echo "run the scripted pipeline here and write agent.patch"
+      - name: Live agent (UNTESTED)
+        if: inputs.mode == 'live'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.323
+          claude --bare -p "Fix issue #${{ inputs.issue }}. Run the tests until they pass. Do not edit tests/." \
+            --allowedTools "Read,Edit,Bash(pytest *)" --permission-mode dontAsk --max-budget-usd 2
+          git diff > agent.patch
+      - uses: actions/upload-artifact@v7
+        with:
+          name: agent-patch
+          path: agent.patch
+          if-no-files-found: error
+
+  open-pr:
+    needs: agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: agent-patch
+      - name: Open a draft PR labelled agent-authored
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git apply --index agent.patch
+          git switch -c "agent/issue-${{ inputs.issue || github.event.issue.number }}"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Agent fix for #${{ inputs.issue || github.event.issue.number }}"
+          git push origin HEAD
+          gh pr create --draft --label agent-authored --fill

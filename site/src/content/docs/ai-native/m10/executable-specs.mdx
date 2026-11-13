@@ -1,0 +1,52 @@
+---
+title: "L10.2 Writing specs agents can execute"
+description: "Acceptance criteria, non-goals, interfaces and test oracles. A spec linter, Given/When/Then and EARS turned into the same executable examples, and task waves from tasks.md."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+An agent reads "should be fast and handle edge cases" and picks its own meaning. A spec is executable when a third party (a test, a reviewer, another agent) can decide whether code meets it without asking you.
+
+## What makes a spec executable
+
+1. **Acceptance criteria with concrete values.** `Given 1h30m … Then 5400`, not "parses durations".
+2. **Error cases spelled out.** `90x` is rejected; units out of order (`1m1h`) are rejected, not reordered. Agents are optimists; tell them what failure looks like.
+3. **Non-goals.** "Out of scope: fractional values (`1.5h`), days, and frame counts." Otherwise an eager agent builds them.
+4. **Interfaces.** Name the function or CLI flag and its type, so the tests and the code meet in the middle.
+5. **No unresolved `[NEEDS CLARIFICATION: …]`.** Spec Kit's template uses that marker; `/speckit-clarify` exists to clear them.
+
+## A linter for the course's spec rules
+
+`speckit.py` parses a Spec Kit `spec.md` (stories, scenarios, `FR-`/`SC-` ids, clarifications) and lints it. The rules are this course's, not Spec Kit's: vague words ("fast", "robust", "user-friendly", …) without a number, leftover template placeholders, open clarifications, stories without scenarios, no measurable success criteria, no out-of-scope line in Assumptions.
+
+<Snippet path="examples/python/m10/speckit.py" />
+
+## Scenarios as a test oracle
+
+The course convention: each scenario has one backticked input in **Given** and one backticked expected value in **Then**; `` `error` `` means "rejected". With that, `examples_from_spec` turns the spec into a test table, and `check(examples, fn)` runs any implementation against it. `examples_from_ears` does the same for Kiro-style `WHEN the input is … THE SYSTEM SHALL return …` lines.
+
+The tests confirm three things:
+
+- the correct `parse_duration` passes every example from the Spec Kit spec **and** from the Kiro requirements (same oracle, two formats);
+- `parse_duration_buggy` fails, so the spec has teeth;
+- a vague draft spec trips the linter.
+
+<Snippet path="examples/python/m10/duration.py" />
+
+This is the idea behind Ex 10.1: you write the spec, and the tests check it against a reference implementation and four plausible wrong ones. A spec that can't tell them apart is too loose for an agent.
+
+## Tasks: dependencies and waves
+
+`parse_tasks` reads Spec Kit's `- [ ] T003 [P] [US1] … (depends on T001)` lines. `lint_tasks` flags two `[P]` tasks touching the same file (they'd conflict if run in parallel) and tasks for stories that aren't in the spec. `waves` (Python's `graphlib`) groups tasks that can run together, like Kiro's waves. M11's parallel agents start from this.
+
+<Snippet path="examples/python/m10/fixtures/speckit/001-duration-parse/tasks.md" />
+
+## C++/Rust notes
+- In Rust the scenario table maps onto a test over an array of `(&str, Result<u64, _>)` pairs, or onto `proptest` once you have properties ("parse(format(n)) == n").
+- In C++, GoogleTest's `INSTANTIATE_TEST_SUITE_P` is the natural home for spec examples; generate the parameter list from the spec at build time so they can't drift apart.
+
+## Sources
+- Spec Kit templates (v1.4.0): https://github.com/github/spec-kit/tree/v1.4.0/templates
+- EARS: https://ears.org.uk/

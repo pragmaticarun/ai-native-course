@@ -1,0 +1,6 @@
+panels:
+  - metric: lines_of_code_per_week
+    kind: throughput
+    baseline: 12000
+  - metric: deployment_frequency_per_week
+    kind: throughput

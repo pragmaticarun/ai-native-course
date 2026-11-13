@@ -1,0 +1,57 @@
+---
+title: "L12.2 DORA's capabilities as entry criteria (course synthesis)"
+description: "The seven DORA AI capabilities and team artifacts as gates for each move up Shapiro's levels, a review-capacity check, and Thoughtworks Radar Vol. 35's cautions. Labelled as this course's synthesis."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## DORA's seven AI capabilities
+
+DORA's [AI Capabilities Model](https://dora.dev/ai/capabilities-model/report/) (2025) names seven capabilities that amplify the benefits of AI:
+
+1. Clear and communicated AI stance
+2. Healthy data ecosystems
+3. AI-accessible internal data
+4. Strong version control practices
+5. Working in small batches
+6. User-centric focus
+7. Quality internal platforms
+
+DORA doesn't map them to levels. That mapping is ours.
+
+## The course's entry criteria
+
+<Aside type="caution" title="This is our synthesis">
+Neither Shapiro nor DORA nor Thoughtworks publishes this table. It's the course's judgement of what should be true *before* a team moves up, so the move pays off instead of amplifying problems. Change it for your context; keep the habit of writing gates down.
+</Aside>
+
+| Move to | DORA capabilities first | Team artifacts first |
+|---|---|---|
+| L1 | clear and communicated AI stance | an AI policy (what tools, what data) |
+| L2 | strong version control practices; working in small batches | AGENTS.md; a fast test suite |
+| L3 | AI-accessible internal data; quality internal platforms | a PR policy (L11.4); an eval suite; one verify command |
+| L4 | healthy data ecosystems; user-centric focus | specs; skills; sandboxes; agent budgets |
+| L5 | — | not a target here |
+
+Plus one check from L3 up: **review load**, agent PRs × review hours per PR ÷ reviewer hours, must stay at or below 0.8. Thoughtworks Radar Vol. 35 advises assessing review capacity before scaling agent use; the 0.8 number is ours.
+
+<Snippet path="examples/python/m12/ladder.py" />
+
+`gaps(team, target)` lists everything missing level by level, so skipping a level shows every prerequisite you'd skip. `ready_for` adds the review-load check.
+
+## Thoughtworks Radar Vol. 35 cautions (November 2026)
+
+- **Human-in-the-loop theater** (Caution): approvals humans can't realistically evaluate. Use risk-tiered oversight, mutation and property-based testing.
+- **Coding throughput as a measure of productivity** (Caution): it rewards busywork.
+- Keep human judgement as agents multiply; review and delivery pipelines become bottlenecks.
+
+## C++/Rust notes
+- For systems teams, add "sanitizer and fuzzing jobs in CI" to the L3 artifacts: they're the platform capability that makes agent PRs reviewable.
+
+## Sources
+- DORA AI Capabilities Model: https://dora.dev/ai/capabilities-model/report/ · capabilities: https://dora.dev/capabilities/
+- Shapiro's levels: https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/
+- Thoughtworks Radar Vol. 35: https://www.thoughtworks.com/radar · press summary: https://www.thoughtworks.com/en-us/about-us/news/2026/thoughtworks-technology-radar-highlights-stronger-controls

@@ -1,0 +1,41 @@
+---
+title: "Worked example: issue → agent → PR"
+description: "A pipeline that takes a labelled issue, runs an agent under a step and cost budget with a kill switch, re-runs the tests itself, and opens a PR with provenance. Mock agent in the tests; the live path is a template."
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Issue #12 in the sandbox repo: *"trim() doesn't clamp the end to the clip duration."* The pipeline:
+
+1. **Gate on a label.** No `agent:ok`, no run.
+2. **Branch** `agent/issue-12`.
+3. **Run the agent** one action at a time (edit a file, run tests, declare done), checking before each action: kill switch (`AGENT_PIPELINE_DISABLED=1` or a `.agent-stop` file), step budget, cost budget.
+4. **On "done", re-run the tests itself.** The agent saying "All fixed!" counts for nothing.
+5. **Commit** with `Closes #12` and an `Agent-Session:` trailer; write a PR body listing the steps, cost and the test result line.
+6. **On any failure**, reset and delete the branch, so nothing half-done is left behind.
+
+<Snippet path="examples/python/m11/issue_to_pr.py" />
+
+## What the tests check
+
+| Scenario | Result |
+|---|---|
+| scripted agent: run tests (fail) → edit `src/clip.py` → run tests (pass) → done | `ready`, 4 steps, $0.07, branch `agent/issue-12`; PR body has `Closes #12` and `3 passed`; commit has `Agent-Session: mock-12` |
+| issue without `agent:ok` | `skipped` |
+| budget of $0.05 | `stopped: budget` |
+| `AGENT_PIPELINE_DISABLED=1` | `stopped: kill switch`, and the repo is back on a clean `main` |
+| agent edits the wrong thing and claims done | `failed: tests` |
+
+## Through GitHub Actions
+
+The same shape, wired to GitHub, is the workflow template in [L11.5](/ai-native-course/ai-native/m11/headless-ci/): mock by default, a live agent behind a manual `workflow_dispatch` with `mode: live`.
+
+<Aside type="caution" title="Untested">
+The pipeline above runs in the tests against a local git repo with a scripted agent. The GitHub Actions template's live path (Claude Code headless with a real key), the GitHub API calls and the PR it would open were **not run** for this course.
+</Aside>
+
+## C++/Rust notes
+- In the re-check step, run the full verify script (with sanitizers or Miri), not only the tests the agent ran. A pipeline that trusts `cargo test` alone inherits the [feature-flag trap](/ai-native-course/ai-native/m10/rust-lib/) from M10.

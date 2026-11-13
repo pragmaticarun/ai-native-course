@@ -1,0 +1,48 @@
+---
+title: "L11.4 Review workflows for agent PRs"
+description: "Provenance labels, PR size limits that ignore generated files, an AI pre-review before humans, approver rules, review checklists, and stacked PRs."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Agents make code cheap and review expensive. The review workflow decides whether that turns into faster delivery or a queue of rubber-stamped PRs.
+
+## The policy in code
+
+These conventions are the course's example; write your own in CONTRIBUTING.md or AGENTS.md, and enforce them with a bot or a required check.
+
+| Rule | Why |
+|---|---|
+| Provenance: an `agent-authored` label or an `Agent-Session:` commit trailer | reviewers and metrics need to know what an agent wrote |
+| Size: ≤ 400 changed lines, not counting lockfiles and generated files | big PRs get skimmed; the number is a team choice, not a researched threshold |
+| AI pre-review runs before a human is asked | the human starts from a list of concerns, not a blank diff |
+| The person who prompted the agent can't be the only approver | otherwise nobody independent read it |
+| Two reviewers for `migrations/` and `.github/workflows/` | high blast radius: data and CI permissions |
+
+<Snippet path="examples/python/m11/review.py" />
+
+The same policy in TypeScript, with a `canMerge` check a bot could call:
+
+<Snippet path="examples/ts/m11/prPolicy.ts" />
+
+<Aside type="caution" title="AI pre-review is a filter, not a reviewer">
+`mock_prereview` stands in for an AI reviewer (Copilot code review, a `claude -p` or `codex exec` step). It catches mechanical problems: code without tests, removed assertions, TODOs without issues. Thoughtworks Radar Vol. 35 cautions against "human-in-the-loop theater", where a human approves what they can't realistically evaluate. Route PRs by risk, and keep review load within what people can actually read (M12).
+</Aside>
+
+## Checklists
+
+A short checklist turns "looks fine" into specific questions: tests changed with code? dependencies pinned? TODOs linked to issues? migrations reversible? tests deleted? Ex 11.3 implements five such checks and applies them to three agent PRs.
+
+## Stacked PRs
+
+When an agent produces one 960-line change, split it into a stack: each PR builds on the one below and is reviewable alone. Ex 11.2 does the splitting in TypeScript (dependency order, greedy packing under the limit). Thoughtworks Radar Vol. 35 puts stacked PRs in Caution when used as a workaround for poor upfront decomposition, so prefer planning small tasks (L11.3) and use stacks for the occasional big one.
+
+## C++/Rust notes
+- Add language checks to the pre-review: new `unsafe` blocks without `// SAFETY:` comments, `unwrap()` in library code, raw `new`/`delete`, `reinterpret_cast`. Run `cargo clippy` / `clang-tidy` as required checks so humans don't spend time on what tools catch.
+
+## Sources
+- Thoughtworks Radar Vol. 35: https://www.thoughtworks.com/radar · human-in-the-loop theater: https://www.thoughtworks.com/radar/techniques/human-in-the-loop-theater
+- GitHub Copilot code review: https://docs.github.com/en/copilot/concepts/agents/code-review
