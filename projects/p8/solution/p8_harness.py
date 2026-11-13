@@ -236,7 +236,8 @@ def markdown(rows: list[dict[str, Any]]) -> str:
     return "\n".join(out)
 
 
-if __name__ == "__main__":  # re-record: cd python && uv run python ../projects/p8/solution/p8_harness.py
+# Re-record: cd python && uv run python ../projects/p8/solution/p8_harness.py
+if __name__ == "__main__":
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as pw:
