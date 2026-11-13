@@ -20,13 +20,17 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def run(cmd: list[str], variant: str, cwd: Path) -> int:
+    """Exit code; a failing *solution* also prints the tail of its output for the CI log."""
     env = {
         **os.environ,
         "EXERCISE_VARIANT": variant,
         "PROJECT_VARIANT": variant,
         "COURSE_LLM_PROVIDER": "mock",
     }
-    return subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True).returncode
+    p = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True)
+    if p.returncode and variant == "solution":
+        print("\n".join((p.stdout + p.stderr).splitlines()[-60:]))
+    return p.returncode
 
 
 def main() -> int:
