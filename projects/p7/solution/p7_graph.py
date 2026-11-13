@@ -35,6 +35,7 @@ from p7_kit import (
 
 SILENT_DB = -60.0
 MIN_SEGMENT_S = 0.3
+EDGE_S = 0.1  # slack at segment edges when matching silences
 REEL_SHOT_S = 1.2
 TARGET_LUFS = -16.0
 
@@ -92,7 +93,10 @@ def build(asr: MockASR, checkpointer: Any = None) -> Any:
         path, a, b = Path(job["path"]), job["start"], job["end"]
         color = keyframe_color(path, (a + b) / 2)
         level = segment_level_db(path, a, b)
-        event = "silence" if level < SILENT_DB else "sound"
+        # A pause is silent by level, or because silencedetect covers it (encoders differ in how
+        # much of the neighbouring tone bleeds into the edges of a short pause).
+        covered = any(x <= a + EDGE_S and y >= b - EDGE_S for x, y in mt.silences(path))
+        event = "silence" if level < SILENT_DB or covered else "sound"
         pause = color == "black" and event == "silence"
         text = "" if pause else asr.transcribe(job["rec_id"], a, b)
         return {

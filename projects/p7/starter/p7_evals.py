@@ -9,7 +9,7 @@ from the profiles' placeholder figures.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -62,6 +62,8 @@ class Row:
     peak: int
     problems: list[str]
     published: bool
+    # Diagnostics for failure messages: segments as start-end:event:color.
+    segments: list[str] = field(default_factory=list)
 
 
 def score_one(
@@ -103,6 +105,10 @@ def score_one(
         asr.peak,
         out["problems"],
         bool(out.get("published")),
+        [
+            f"{r['start']}-{r['end']}:{r.get('event')}:{r.get('color')}:{r.get('level_db')}"
+            for r in sorted(out.get("results", []), key=lambda r: r["start"])
+        ],
     )
 
 

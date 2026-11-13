@@ -45,7 +45,7 @@ def test_boundary_f1_unit() -> None:
 
 
 def test_chapters_found_on_every_recording(rows: list[Row]) -> None:
-    misses = [(r.profile, r.rec_id, r.f1) for r in rows if r.f1 < 1.0]
+    misses = [(r.profile, r.rec_id, r.f1, r.segments) for r in rows if r.f1 < 1.0]
     assert not misses, f"chapter boundaries missed (pauses need the audio track too): {misses}"
 
 
