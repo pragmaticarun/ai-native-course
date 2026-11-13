@@ -61,7 +61,7 @@ Put the first three in `verify.sh`, and keep device steps out of the default loo
 
 ## The KMP module in this repo
 
-The course's `kmp/` project shows the device-free half for real: its shared Kotlin code is tested on the JVM (`./gradlew :shared:jvmTest`, run in CI), with no Android SDK. Its `kmp/AGENTS.md` says so, so an agent doesn't try to build the Android target.
+The course's `kmp/` project shows the device-free half for real: its shared Kotlin code is tested on the JVM (`./gradlew :shared:jvmTest`, run in CI) without the Android SDK. Since 14 Nov 2026 (owner-approved SDK install) a separate CI job also builds the Android target and P6's app; `kmp/AGENTS.md` lists both sets of verify tasks and says instrumentation tests are compiled only.
 
 ## C++/Rust notes
 - For NDK code, add `externalNativeBuild` host tests (or a separate CMake/Cargo host build) to the verify script so native logic gets checked without a device; reserve on-device runs for JNI and ABI checks.

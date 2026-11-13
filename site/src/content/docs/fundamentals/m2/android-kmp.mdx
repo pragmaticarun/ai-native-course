@@ -17,7 +17,7 @@ It's the [L2.3](/ai-native-course/fundamentals/m2/structured-output/) loop again
 
 <Aside type="caution" title="What was actually run">
 **Tested:** `commonMain` + `commonTest` on the **JVM target** (Kotlin 2.4.21, Temurin 21, Gradle 9.9.1), locally and in CI (`./gradlew :shared:jvmTest`, 6 tests in this file).
-**Not built or run yet:** the Android target (no Android SDK on the build machine), the real LiteRT-LM and ML Kit backends, and anything on the Galaxy A73. The error-code names mirror ML Kit's documented codes, but `ErrorCode` is our own type, not the ML Kit API.
+**Not built or run yet:** the real LiteRT-LM and ML Kit backends for this example, and anything on the Galaxy A73. (Since 14 Nov 2026 `kmp/shared` also builds as an Android library in CI and runs these tests as Android host tests; [P6](/ai-native-course/projects/p6/) has the LiteRT-LM backend.) The error-code names mirror ML Kit's documented codes, but `ErrorCode` is our own type, not the ML Kit API.
 </Aside>
 
 ## The interface

@@ -17,3 +17,7 @@ kmp/.gradle/
 kmp/build/
 kmp/shared/build/
 kmp/.kotlin/
+projects/p6/agent/build/
+projects/p6/app/build/
+kmp/local.properties
+kmp/starter.log

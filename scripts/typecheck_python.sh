@@ -13,6 +13,8 @@ for f in "$ROOT"/exercises/m*/ex*/{starter,solution}/impl.py; do
     || { echo "mypy failed: $f"; MYPYPATH="$EX_PATHS" uv run mypy "$f"; exit 1; }
 done
 for proj in "$ROOT"/projects/p*; do
+  # Kotlin-only projects (P6) have no Python to check.
+  [ -n "$(find "$proj" -name '*.py' -not -path '*/build/*' -print -quit)" ] || continue
   for v in starter solution; do
     [ -d "$proj/$v" ] || continue
     MYPYPATH="$proj/common:$proj/$v:$EX_PATHS" uv run mypy --exclude "(legacy_repo|overlay)/" "$proj/common" "$proj/$v" "$proj/evals" >/dev/null \

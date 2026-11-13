@@ -82,21 +82,52 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v6
-      - name: Build and test commonMain on the JVM (fakes only; no Android SDK, no device)
-        run: ./gradlew :shared:jvmTest --console=plain
+      - name: Build and test commonMain on the JVM (shared + P6 agent; fakes only, no device)
+        run: ./gradlew :shared:jvmTest :p6-agent:jvmTest --console=plain
+      - name: P6 starter must fail its tests
+        run: |
+          if ./gradlew :p6-agent:jvmTest -Pp6.variant=starter --console=plain -q > starter.log 2>&1; then
+            echo "P6 starter passed its tests (exercise is stale)"; exit 1
+          fi
+          grep -E "tests completed" starter.log || true
       - name: Test report
         if: always()
+        run: python3 ../scripts/junit_summary.py shared/build/test-results/jvmTest ../projects/p6/agent/build/test-results/jvmTest
+
+  android:
+    name: Android (SDK, KMP Android target, P6 app)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kmp
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v6
+      # Android SDK licence accepted with the owner's approval (14 Nov 2026). The runner image ships
+      # an SDK; pin the platform and build tools this build uses.
+      - name: Install pinned SDK packages and accept licences
         run: |
-          python3 - <<'PY'
-          import glob, re
-          total = fails = 0
-          for f in glob.glob("shared/build/test-results/jvmTest/*.xml"):
-              head = open(f).read(600)
-              t = int(re.search(r'tests="(\d+)"', head).group(1)); x = int(re.search(r'failures="(\d+)"', head).group(1)) + int(re.search(r'errors="(\d+)"', head).group(1))
-              total += t; fails += x
-              print(f, "tests", t, "failed", x)
-          print(f"KMP jvmTest: {total} tests, {fails} failed")
-          PY
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null
+          "$SDKM" --install "platforms;android-37.0" "build-tools;36.0.0" "platform-tools" > /dev/null
+          "$SDKM" --list_installed | grep -E "platforms;android-37.0|build-tools;36.0.0"
+      - name: assembleDebug, unit/host tests, instrumentation APK (compiled only, not run on a device)
+        run: >
+          ./gradlew --console=plain
+          :shared:testAndroidHostTest :p6-agent:testAndroidHostTest
+          :p6-app:assembleDebug :p6-app:testDebugUnitTest :p6-app:assembleDebugAndroidTest
+      - name: Test report
+        if: always()
+        run: >
+          python3 ../scripts/junit_summary.py shared/build/test-results/testAndroidHostTest
+          ../projects/p6/agent/build/test-results/testAndroidHostTest
+          ../projects/p6/app/build/test-results/testDebugUnitTest
+      - name: APK sizes
+        run: ls -l ../projects/p6/app/build/outputs/apk/debug/*.apk ../projects/p6/app/build/outputs/apk/androidTest/debug/*.apk
 
   rust:
     name: Rust (rmcp media-probe) + cross-language MCP contract

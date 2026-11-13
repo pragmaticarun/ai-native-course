@@ -24,7 +24,7 @@ import { Aside } from "@astrojs/starlight/components";
 | [Exercises](/ai-native-course/on-device-media/m13/exercises/) | availability machine, quantization trade-offs, PII router, MediaPipe → LiteRT-LM migration (*untested*) |
 
 <Aside type="caution" title="Android parts are untested">
-The course box has **no Android SDK** (by decision, pending approval), so nothing in this module ran on Android, an emulator or the Galaxy A73. What ran: Python host-side code, ONNX Runtime 1.32.0 on x86 CPU, **llama.cpp b12359 (the v1.0.0 build) on x86 CPU** with a 15M-parameter model, and the KMP commonMain code on the JVM (8 new jvmTests). Every A73-specific statement comes from documentation or is marked as an inference.
+When this module was built the course box had **no Android SDK** (it was installed later, with the owner's approval, for [P6](/ai-native-course/projects/p6/)), so nothing in this module ran on Android, an emulator or the Galaxy A73. What ran: Python host-side code, ONNX Runtime 1.32.0 on x86 CPU, **llama.cpp b12359 (the v1.0.0 build) on x86 CPU** with a 15M-parameter model, and the KMP commonMain code on the JVM (8 new jvmTests). Every A73-specific statement comes from documentation or is marked as an inference.
 </Aside>
 
 <Quiz src="m13" />

@@ -18,8 +18,8 @@ This repo has four:
 
 | File | Says |
 |---|---|
-| `AGENTS.md` | setup `./verify.sh setup`, verify `./verify.sh`; mock models only; no network in tests except named exceptions; never install the Android SDK |
-| `kmp/AGENTS.md` | verify `./gradlew :shared:jvmTest`; JVM only, no Android SDK |
+| `AGENTS.md` | setup `./verify.sh setup`, verify `./verify.sh`; mock models only; no network in tests except named exceptions; Android SDK only as approved by the owner, with device tests marked untested |
+| `kmp/AGENTS.md` | verify `./gradlew :shared:jvmTest :p6-agent:jvmTest` (plus the Android tasks with the SDK); instrumentation tests compiled only |
 | `rust/AGENTS.md` | verify `cargo fmt --check && cargo clippy --all-targets --locked -- -D warnings && cargo test --locked` |
 | `site/AGENTS.md` | verify `pnpm build`; every code block comes from a tested file |
 

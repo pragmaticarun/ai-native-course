@@ -1,0 +1,99 @@
+---
+title: "P6 · On-device Android agent app"
+description: "Field Notes: a Koog agent in Kotlin Multiplatform commonMain with six tools, human approval on delete and share, a privacy router and process-death-safe sessions; LiteRT-LM on the CPU on Android, a fake router model on the JVM in CI."
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M13 · **Suggested time:** ~10 hours · **Code:** [`projects/p6`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p6) · Kotlin 2.4.21, Koog 1.3.0 (LiteRT client 1.3.0-beta, preview), LiteRT-LM 0.19.1, AGP 9.5.1, compileSdk 37, minSdk 29
+
+```
+user turn ─▶ [Koog graph] LLM ─(tool calls)─▶ tools ─▶ LLM … ─(text)─▶ reply
+                              delete_* / share_* ─▶ save PendingAction ─▶ ask the user ─▶ run or decline
+                              summarise_notes ─▶ PrivacyRouter ─▶ on-device summariser | cloud (opt-in)
+             every step ─▶ SessionStore (history, tool trace, pending approval) ─▶ survives process death
+```
+
+<Aside type="caution" title="Built and tested on the JVM and as Android host tests; not run on a phone">
+The Android SDK was installed with the owner's approval and CI now builds the app. Everything below was run on the JVM and as Android **host** tests (the same `commonTest` suite on the Android library). The instrumentation tests are **compiled but have not run on a device or emulator**, and the LiteRT-LM backend has **never loaded a model**. In CI the "model" is `FakeLocalModel`, a deterministic rule-based tool router: it tests the agent plumbing, not model quality.
+</Aside>
+
+## The kit
+
+A notes store (with a `Persist` hook: memory in tests, a file in `filesDir` on Android), the six tools as Koog `SimpleTool`s, sessions, and 20 golden prompts with the expected tool trajectory and a state check, including paraphrases ("jot down", "remove", "send … to"), two-step requests joined by "then", a denied delete, a denied share, and prompts that should call no tool.
+
+<Snippet path="projects/p6/common/src/commonMain/kotlin/course/fieldnotes/Golden.kt" lang="kotlin" />
+
+`FakeLocalModel` subclasses Koog's `PromptExecutor` and returns real `Message.Assistant` tool calls, so Koog runs the actual graph and tools. A weaker `KEYWORD` mode (literal verbs, one step) is the baseline that shows the metric can tell routers apart.
+
+## M1 · Graph and tools
+
+One Koog agent run per user turn, using a graph strategy built with `strategy { }`, `nodeLLMRequest`, `nodeExecuteTools` and `nodeLLMSendToolResults`, and `onToolCalls` / `onTextMessage` edges. Every tool is wrapped so its call lands in the session's tool trace.
+
+## M2 · Human approval on delete and share
+
+The wrapper saves a `PendingAction`, suspends on `ApprovalGate` (a dialog in the app, a scripted answer in tests), clears it and runs the tool only on "yes". On "no" the model gets "the user declined …" back.
+
+<Snippet path="projects/p6/starter/src/commonMain/kotlin/course/fieldnotes/FieldNotesAgent.kt" lang="kotlin" title="starter/FieldNotesAgent.kt" />
+<Solution path="projects/p6/solution/src/commonMain/kotlin/course/fieldnotes/FieldNotesAgent.kt" lang="kotlin" />
+
+## M3 · Privacy router
+
+The cloud is opt-in and only for long summaries. Private notes, emails and phone numbers, offline use, and short text all stay on the device. The app ships with no cloud configured and no `INTERNET` permission (a unit test checks the manifest).
+
+<Solution path="projects/p6/solution/src/commonMain/kotlin/course/fieldnotes/PrivacyRouter.kt" lang="kotlin" label="Show the router" />
+
+## M4 · Persistence and process death
+
+The ViewModel keeps the agent across configuration changes, and the session file covers process death. The test starts a delete, cancels the coroutine while the approval is pending (the "process dies"), builds a fresh agent from the same stores, and checks that the dialog comes back, the delete runs once, and nothing ran before approval.
+
+## M5 · Android
+
+`androidMain` builds a Koog `MultiLLMPromptExecutor` over `LiteRTLLMClient` with `LiteRTLLModels.FunctionGemma` (FunctionGemma 270M, mobile actions) on `Backend.CPU()`. GPU is a flag that stays off until it passes on the Galaxy A73. The Compose app falls back to the fake router, and says so on screen, when no model file is present.
+
+<Snippet path="projects/p6/common/src/androidMain/kotlin/course/fieldnotes/OnDevice.kt" lang="kotlin" />
+
+## Results (measured on the course box, 14 Nov 2026)
+
+| Suite | Where | Result |
+|---|---|---|
+| P6 evals, solution | JVM (`:p6-agent:jvmTest`) | 9/9 pass |
+| P6 evals, starter | JVM | 5 of 9 fail (HITL, persistence, router, golden) |
+| P6 evals, solution | Android host tests (`:p6-agent:testAndroidHostTest`) | 9/9 pass |
+| `:shared` commonTest | JVM and Android host tests | 26/26 pass on each |
+| App unit test (no `INTERNET` permission) | `:p6-app:testDebugUnitTest` | 1/1 pass |
+| Golden suite, `FakeLocalModel` ROUTER | JVM | trajectory 20/20, state 20/20 |
+| Golden suite, `FakeLocalModel` KEYWORD baseline | JVM | trajectory 12/20 (0.6), state 16/20 (0.8) |
+| Debug APK | `:p6-app:assembleDebug` | builds, 99.95 MB (LiteRT-LM native libs dominate) |
+| Instrumentation APK (UI test, golden-on-LiteRT, offline check) | `:p6-app:assembleDebugAndroidTest` | compiles; **not run** |
+
+The JVM suite takes under 1 s. The 1.0 router score shows that the plumbing works with a perfect router, not that FunctionGemma reaches it; the on-device number is the open item.
+
+The evals: [`projects/p6/evals/src/commonTest/kotlin/course/fieldnotes/P6Test.kt`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p6/evals/src/commonTest/kotlin/course/fieldnotes/P6Test.kt) (9 tests: golden trajectories and state with the baseline comparison, approval on delete and share, safe tools don't ask, pending approval across process death, history across instances, router cases, default settings never use the cloud, Koog's `getMockExecutor`, step budget).
+
+## C++/Rust notes
+
+- `commonMain` + `expect`/platform source sets is the same split as a portable core plus `#ifdef` or `cfg(target_os)` backends, but checked by the compiler on every target.
+- The approval wrapper is a decorator over a trait object: same descriptor, extra policy, one place to audit.
+- Persisting the pending action before blocking is write-ahead logging: record the intent, then wait, so recovery can replay or drop it.
+
+## Untested and not built
+
+- **Not run on any device or emulator:** the Compose UI tests, the golden suite on LiteRT-LM, and the offline (airplane-mode) check. No TTFT, tokens/s or Perfetto energy numbers. The A73 self-hosted runner job (`device-lab.yml`) doesn't exist yet.
+- The LiteRT-LM backend has never loaded a model file; the GPU option is untested.
+- Not built: ML Kit GenAI speech recognition for voice memos (voice memos are notes with a flag), the Gemma 3 1B / Gemma 4 E2B answer model (only referenced), a cloud summariser (the interface and router are there; the app configures none), the Gemini Nano / AppFunctions / Firebase AI Logic flavour, the llama.cpp JNI stretch, and the ORT QNN NPU stretch.
+- The Kotlin starter and solution use a Gradle property (`-Pp6.variant`), not `PROJECT_VARIANT`; `check_exercises.py` doesn't cover P6, and the CI `kmp` job checks it instead.
+
+## Sources
+
+- Koog docs: https://docs.koog.ai/ · testing: https://docs.koog.ai/testing/ · graph strategies: https://docs.koog.ai/custom-strategy-graphs/ · repo: https://github.com/JetBrains/koog
+- Koog LiteRT client (1.3.0-beta): https://repo1.maven.org/maven2/ai/koog/prompt-executor-litert-client/
+- LiteRT-LM on Android: https://ai.google.dev/edge/litert-lm/android · https://github.com/google-ai-edge/LiteRT-LM
+- FunctionGemma mobile actions model: https://huggingface.co/litert-community/functiongemma-270m-ft-mobile-actions
+- Android KMP library plugin: https://developer.android.com/kotlin/multiplatform/plugin · AGP 9.5 notes: https://developer.android.com/build/releases/agp-9-5-0-release-notes
+- Compose testing: https://developer.android.com/develop/ui/compose/testing · saving UI state: https://developer.android.com/topic/libraries/architecture/saving-states
+- sdkmanager: https://developer.android.com/tools/sdkmanager

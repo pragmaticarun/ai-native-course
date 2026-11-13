@@ -13,5 +13,6 @@ Verify: `./verify.sh`
 - Exercises: the solution must pass and the starter must fail (`scripts/check_exercises.py`).
 - Never invent frameworks, levels, statistics, APIs or versions. Link primary sources; label anything unverified.
 - Mark device/emulator steps and anything not actually run as **untested**.
-- Do not install the Android SDK or accept its license without the owner's explicit approval.
+- Android SDK: the owner approved accepting its license and installing it on the box and in CI (14 Nov 2026).
+  Pin SDK packages in CI; instrumentation tests are compiled only until a device run exists (mark them untested).
 - Skills for recurring jobs live in `.claude/skills/` (Agent Skills format); Cursor rules in `.cursor/rules/`.
