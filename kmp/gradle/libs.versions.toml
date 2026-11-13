@@ -1,14 +1,18 @@
-# Pinned per SYLLABUS.md v0.3 section 2.4 (kotlin, coroutines). Android-only entries
+# Pinned per SYLLABUS.md v0.3 section 2.4 (kotlin, coroutines, mcpKotlin). Android-only entries
 # (agp, litertlm, mlkit...) are added when the androidMain target lands.
 [versions]
 kotlin = "2.4.21"
 coroutines = "1.11.0"
 serialization = "1.13.0"
+mcpKotlin = "0.16.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+mcp-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcpKotlin" }
+mcp-testing = { module = "io.modelcontextprotocol:kotlin-sdk-testing", version.ref = "mcpKotlin" }
+mcp-client = { module = "io.modelcontextprotocol:kotlin-sdk-client", version.ref = "mcpKotlin" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

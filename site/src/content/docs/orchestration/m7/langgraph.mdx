@@ -1,0 +1,41 @@
+---
+title: "L7.2 LangGraph in Python and TypeScript"
+description: State, nodes, edges, conditional edges and reducers in LangGraph and LangGraph.js.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+LangGraph's core API is small:
+
+| Concept | Python | TypeScript |
+|---|---|---|
+| State schema | `TypedDict` (+ `Annotated[list, operator.add]` for a reducer) | `Annotation.Root({...})` with `reducer` |
+| Graph | `StateGraph(State)` | `new StateGraph(State)` |
+| Node | `g.add_node("name", fn)` | `.addNode("name", fn)` |
+| Edges | `add_edge`, `add_conditional_edges` | `.addEdge`, `.addConditionalEdges` |
+| Dynamic branches | `Send("node", payload)` | `new Send("node", payload)` |
+| Pause for a human | `interrupt(value)` + `Command(resume=...)` | `interrupt(value)` + `new Command({ resume })` |
+| Persistence | a checkpointer (e.g. `InMemorySaver`) + `thread_id` | `MemorySaver` + `thread_id` |
+
+A node returns a **partial** state update. Keys without a reducer are overwritten; keys with a reducer are merged. Two parallel nodes writing the same reducer-less key in one step is an error, by design.
+
+The TypeScript version of the document-triage graph (the full Python one is a [worked example](/ai-native-course/orchestration/m7/doc-triage/)):
+
+<Snippet path="examples/ts/m7/triage.ts" />
+<Snippet path="examples/ts/m7/m7.test.ts" />
+
+<Aside type="note" title="Version pin">
+`@langchain/langgraph` is pinned to 1.7.3: 1.7.4 was published inside the repo's pnpm minimum-release-age window when this module was written, and the lockfile refuses packages that new.
+</Aside>
+
+## Try it
+1. Remove the reducer from `fields` in `triage.ts`, then run the test. What error do you get when two extractors write in one step?
+2. Draw the Python graph as Mermaid: `doc_triage.build().get_graph().draw_mermaid()`.
+
+## C++/Rust notes
+- `Annotated[list, operator.add]` is a merge function attached to a field, like a `std::accumulate` binary op that the scheduler applies to concurrent writes.

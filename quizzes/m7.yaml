@@ -1,0 +1,56 @@
+module: m7
+title: "M7 quiz: agent graphs & orchestration"
+questions:
+  - id: m7q1
+    type: single
+    prompt: "In the changelog example, the free-form loop made 5 model calls and the graph made 3. Where did the savings come from?"
+    choices: ["The graph uses a cheaper model", "Control flow (what to do next) moved from model calls into code; the model only does the judgement steps", "LangGraph caches every model call", "The graph skips lines it can't classify"]
+    answer: 1
+    explanation: "A graph makes the routing deterministic code. The model is called only where judgement is needed."
+  - id: m7q2
+    type: single
+    prompt: "Two parallel branches both write to the `log` key, declared as Annotated[list, operator.add]. What happens?"
+    choices: ["The last writer wins", "LangGraph raises InvalidUpdateError", "The reducer merges both updates (concatenation)", "Only the first branch's update is kept"]
+    answer: 2
+    explanation: "A reducer defines how concurrent updates merge, like a CRDT merge. Without one, concurrent writes to the same key are an error."
+  - id: m7q3
+    type: spot_bug
+    prompt: "A supervisor runs a worker subgraph as a node. After one task the log has duplicate entries. Why?"
+    code: |
+      class S(TypedDict):
+          log: Annotated[list[str], operator.add]
+      worker = worker_graph.compile()          # also has log: Annotated[list, add]
+      g.add_node("worker", worker)             # subgraph as a node
+    choices: ["operator.add is not allowed in subgraphs", "The subgraph returns its whole log (input + new entries) and the parent's reducer appends all of it again", "Subgraphs can't share keys with the parent", "compile() must be called with a checkpointer"]
+    answer: 1
+    explanation: "The subgraph's output includes the log it was given; the parent reducer adds it again. Put a boundary node in between that returns only the new entries."
+  - id: m7q4
+    type: single
+    prompt: "A GUI agent's process crashes at action 4. With a checkpointer, what resumes it?"
+    choices: ["Re-running the graph from START with the same input", "graph.invoke(None, config) with the same thread_id: it continues from the last checkpoint", "Replaying the screenshots", "Nothing; GUI agents can't be resumed"]
+    answer: 1
+    explanation: "Each super-step is checkpointed per thread. invoke(None, cfg) resumes at the pending node (get_state(cfg).next)."
+  - id: m7q5
+    type: multi
+    prompt: "In the computer-use graph, which belong in the guard node before `act`? (Pick all that apply.)"
+    choices: ["Classify the pending action's risk (e.g. submit, delete, purchase)", "interrupt() for human approval of consequential actions", "Flag screen text that looks like injected instructions", "Retry the action three times"]
+    answer: [0, 1, 2]
+    explanation: "The guard decides whether an action may run. Retries belong on the act node's RetryPolicy."
+  - id: m7q6
+    type: single
+    prompt: "Scene analysis fans out 4 scenes × 3 tasks = 12 model calls with Send. What keeps the provider from being hit with 12 at once?"
+    choices: ["A RetryPolicy", "The `max_concurrency` value in the run config (a semaphore over parallel tasks)", "A smaller model", "Sending scenes sequentially in one node"]
+    answer: 1
+    explanation: "config={'max_concurrency': 3} bounds parallel tasks per super-step, like a thread pool or tokio Semaphore."
+  - id: m7q7
+    type: single
+    prompt: "Why use full jitter (sleep uniform(0, base·2^i)) instead of a fixed exponential ladder?"
+    choices: ["It retries faster on average", "It spreads retries from many clients so they don't hit a recovering provider in lockstep", "Providers require it", "It makes retries deterministic"]
+    answer: 1
+    explanation: "Synchronised retries cause thundering herds; jitter decorrelates them."
+  - id: m7q8
+    type: single
+    prompt: "In the media fan-out, the OCR model fails on one scene. What should the merged result be?"
+    choices: ["Fail the whole job", "Chapters for every scene, with that scene marked incomplete and the error recorded", "Silently drop the scene", "Retry forever"]
+    answer: 1
+    explanation: "Partial results with explicit errors beat all-or-nothing. Downstream code can decide what's acceptable."

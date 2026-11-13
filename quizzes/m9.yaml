@@ -1,0 +1,56 @@
+module: m9
+title: "M9 quiz: MCP servers & clients"
+questions:
+  - id: m9q1
+    type: single
+    prompt: "What replaced the initialize handshake in the 2026-07-28 revision?"
+    choices: ["Nothing; initialize is unchanged", "Stateless requests: each carries protocol version and client info in _meta, and server/discover advertises versions and capabilities", "A WebSocket upgrade", "OAuth discovery"]
+    answer: 1
+    explanation: "2026-07-28 is stateless: no session handshake. Clients probe with server/discover and fall back to initialize for 2025-era servers."
+  - id: m9q2
+    type: single
+    prompt: "On 2026-07-28, how does a tool ask the user to confirm a destructive action?"
+    choices: ["The server sends an elicitation/create request mid-call", "The tool returns an input_required result with inputRequests and opaque requestState; the client asks the user and retries with inputResponses", "The tool returns isError and hopes the model asks", "It can't; confirmation was removed"]
+    answer: 1
+    explanation: "Multi round-trip requests (MRTR). The SDKs serve the same handler to 2025-era clients by sending a classic elicitation request instead."
+  - id: m9q3
+    type: single
+    prompt: "In this course's tests, which client defaults to the legacy 2025-11-25 handshake unless told otherwise?"
+    choices: ["The Python mcp 2.3.0 Client", "The TypeScript @modelcontextprotocol/client 2.4.0 Client", "Both", "Neither"]
+    answer: 1
+    explanation: "The TS client's versionNegotiation.mode defaults to 'legacy'; the Python Client defaults to 'auto'. Always pin the mode in contract tests."
+  - id: m9q4
+    type: single
+    prompt: "tools/list returns ttlMs: 60000 and cacheScope: 'public'. What may a client do?"
+    choices: ["Nothing; these are informational", "Reuse the result for 60 s, and share it across users/authorisation contexts", "Cache it forever", "Cache it only for the current user"]
+    answer: 1
+    explanation: "ttlMs is freshness in ms; 'public' allows sharing across auth contexts, 'private' only within the one that produced it."
+  - id: m9q5
+    type: multi
+    prompt: "Which are real defences against tool poisoning and rug pulls? (Pick all that apply.)"
+    choices: ["Pin tool definitions (hash of name, description, schemas) at review time and refuse to run when they change", "Show users the full tool descriptions", "Per-tool scopes enforced by the server", "Trust any server listed in a registry"]
+    answer: [0, 1, 2]
+    explanation: "Poisoned descriptions target the model; pinning catches later swaps; least privilege limits damage. A registry listing is not a security review."
+  - id: m9q6
+    type: single
+    prompt: "Android Studio's agent needs your adb MCP server. Which transport?"
+    choices: ["stdio", "Streamable HTTP (e.g. http://127.0.0.1:8765/mcp)", "SSE only", "gRPC"]
+    answer: 1
+    explanation: "Per the syllabus research, Android Studio connects to MCP servers over Streamable HTTP and doesn't support stdio. (Not verified against a live Studio in this course: UNTESTED.)"
+  - id: m9q7
+    type: single
+    prompt: "The Kotlin MCP SDK 0.16.0 server in this course negotiates which protocol version?"
+    choices: ["2026-07-28", "2025-11-25 (its latest supported), via the initialize handshake", "2024-11-05 only", "It doesn't negotiate"]
+    answer: 1
+    explanation: "Its LATEST_PROTOCOL_VERSION is 2025-11-25. Clients that speak 2026-07-28 fall back to initialize when talking to it."
+  - id: m9q8
+    type: spot_bug
+    prompt: "This adb MCP tool works in testing. What's the security bug?"
+    code: |
+      @srv.tool()
+      def input_text(serial: str, text: str) -> str:
+          adb.run(serial, "shell", f"input text {text}")
+          return "ok"
+    choices: ["serial should be an int", "The text goes through the device shell unvalidated: `x; rm -rf /sdcard` runs a second command. Allow-list characters (or reject) instead", "input text needs root", "Tools can't return strings"]
+    answer: 1
+    explanation: "adb shell runs a shell on the device. Model-supplied text is untrusted input; validate against an allow-list."

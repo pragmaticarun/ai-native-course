@@ -1,0 +1,31 @@
+---
+title: "Worked example: media fan-out graph"
+description: Split a video into scenes, fan out ASR, captioning and OCR per scene with a concurrency limit, and merge into chapters.
+sidebar:
+  order: 9
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+The core of project P7: turn a long video into chapters.
+
+```
+split ──Send(scene, task) × (4 scenes × 3 tasks)──▶ analyse ──▶ merge ──▶ chapters
+```
+
+- `split` produces scenes (fixed here; ffmpeg scene detection in the real pipeline).
+- `fan_out` sends one branch per **(scene, task)** pair, so ASR, captioning and OCR run independently.
+- `analyse` calls the worker for one pair and records success or an error. A failed OCR call doesn't fail the job.
+- Run with `{"max_concurrency": 3}`: the test measures a **peak of 3** in-flight calls over 12 calls.
+- `merge` builds chapters (`mm:ss title`), marks a scene `complete: false` when one of its tasks failed, and renders YouTube-style chapter lines.
+
+<Snippet path="examples/python/m7/media_fanout.py" />
+
+<Aside type="caution" title="Fake models, fixed scenes">
+Workers are fakes with fixed outputs and an injectable failure. Real ASR/caption/OCR models and real ffmpeg scene detection were not run in this module (UNTESTED). M8's chunked Temporal job shows real ffmpeg on generated clips.
+</Aside>
+
+## Try it
+1. Add a fourth task (e.g. "faces"). How many calls now, and what does the limit do to wall time?
+2. Retry only the OCR task, with `RetryPolicy` on a dedicated node.

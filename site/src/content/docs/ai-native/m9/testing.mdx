@@ -1,0 +1,40 @@
+---
+title: "L9.6 Testing and debugging: contract tests, Inspector, SDK migration"
+description: One contract checked against Python, TypeScript and Rust servers on both spec revisions; MCP Inspector; migrating v1 → v2 SDKs.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Contract tests
+
+`check_contract` is a list of promises any media-probe server must keep: required tools exist, have descriptions, are annotated read-only, declare output schemas and take a `path`; `probe` returns the right duration and stream types; `loudness` returns finite numbers; path escapes are refused; an unknown tool fails.
+
+It runs through the Python client in both modes against **four** server builds:
+
+| Server | Transport | Revisions checked | Media |
+|---|---|---|---|
+| Python, in-process | memory | 2026-07-28, 2025-11-25 | fixture ffprobe JSON |
+| Python | stdio subprocess | both | real ffprobe/ffmpeg on a generated tone |
+| TypeScript (`serveStdio`) | stdio via Node | both | real ffprobe/ffmpeg |
+| Rust (`rmcp`) | stdio binary | both | real ffprobe/ffmpeg |
+
+And the TypeScript test suite checks the TS client against the Rust binary.
+
+<Snippet path="examples/python/m9/contract.py" />
+
+One thing the contract taught: for an unknown tool, the Python server returns an `is_error` result while the Rust server returns a JSON-RPC error. The spec lists unknown tools as a protocol error. The contract accepts either as a refusal; success fails the test.
+
+## MCP Inspector and the TS codemod
+
+<Aside type="caution" title="Reading only, untested">
+**MCP Inspector** is the official interactive debugger: it connects to a server (stdio or HTTP), lists tools, resources and prompts, and lets you call them by hand. It's the first thing to try when a host "doesn't see" your server. **The TypeScript v1 → v2 codemod** is meant to help move code from the single v1 package (`@modelcontextprotocol/sdk`) to the split v2 packages (`@modelcontextprotocol/server`, `/client`). Neither was run for this module. Check the Inspector and SDK READMEs for current commands. What *was* verified: the v2 APIs used here (`McpServer.registerTool`, `serveStdio`, `Client` with `versionNegotiation`).
+</Aside>
+
+## Debugging checklist
+1. Does the server start on its own? Run it in a terminal (stdio servers print nothing to stdout except protocol messages; log to stderr).
+2. Which revision was negotiated? Log `protocol_version` / `getNegotiatedProtocolVersion()`.
+3. Does `tools/list` show what you expect, with schemas? (A contract test catches it before a host does.)
+4. Are errors `ToolError`/`isError` results (the model can recover) or crashes?

@@ -1,0 +1,30 @@
+---
+title: "Worked example: long media jobs"
+description: A Temporal workflow that processes a 2-hour recording in chunks, with idempotent ffmpeg outputs and heartbeats so a killed worker resumes mid-file.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+`LongMediaJob` splits a recording into 10-minute chunks (a 2-hour file gives 12) and runs one activity per chunk. Each chunk activity:
+
+- writes to a **deterministic output path** (`job/chunk_0003.mp4`), and returns early if the file already exists, so a retry after success is a no-op;
+- writes to `.part` and **renames** when done, so a crash never leaves a half-written file that looks finished;
+- processes the chunk in 10 pieces (stand-ins for ffmpeg segments), and **heartbeats** its progress after each;
+- on retry, reads `activity.info().heartbeat_details` and **resumes from the last piece**.
+
+The test injects a crash 240 s into chunk 3 on the local dev server. Result: 12 chunk results, chunk 3 reports `resumed_from=240.0`, and all 120 pieces are processed exactly once.
+
+`FfmpegTranscoder` builds real ffmpeg commands (`-ss` before `-i` for fast seeking). A separate test runs it on a 6-second clip generated with ffmpeg's `testsrc` and checks the output (skipped when ffmpeg isn't installed; it runs in CI).
+
+<Snippet path="examples/python/m8/media_chunks.py" />
+
+<Aside type="caution" title="What was and wasn't run">
+Tested: the workflow, crash and heartbeat resume on the local dev server with a fake transcoder, and the real ffmpeg command on a short generated clip. **Not run: a real 2-hour recording** (UNTESTED at that size). Analysis activities (ASR etc.) would be added the same way, each idempotent per chunk.
+</Aside>
+
+## Try it
+1. Add an analysis activity per chunk that writes `chunk_0003.json`, with the same skip-if-exists rule.
+2. Run the job on a long file of your own and kill the worker by hand (`kill -9`) mid-chunk.

@@ -1,0 +1,34 @@
+---
+title: "L8.3 Durable agents: Pydantic AI on Temporal, and the alternatives"
+description: Pydantic AI's Temporal durability capability, LangGraph checkpointing, and a comparison of Temporal, DBOS, Restate and Inngest.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Pydantic AI on Temporal (tested)
+
+Give the agent the `TemporalDurability()` capability and run it inside a `PydanticAIWorkflow` that lists it in `__pydantic_ai_agents__`. Inside the workflow, every **model request and tool call becomes an activity**: after a crash, finished model calls aren't re-sent (or re-billed) and finished tools aren't re-run. The client and worker need `plugins=[PydanticAIPlugin()]`. (Older docs show a `TemporalAgent` wrapper. In 2.68.0 it's deprecated in favour of the capability.)
+
+The model is a deterministic `FunctionModel`: it asks for `probe`, then answers. The test runs it on the time-skipping server and gets "The recording is 7200 seconds long."
+
+<Snippet path="examples/python/m8/pydantic_temporal.py" />
+
+## Comparing approaches
+
+| | What's durable | Infra | Good fit |
+|---|---|---|---|
+| **LangGraph checkpointer** (M7) | Graph state after each super-step | A database for the checkpointer | Graph agents, HITL pauses, short-to-medium runs |
+| **Temporal** (this module) | Every activity result, timer and signal (full event history) | Temporal server (self-hosted or cloud) | Long, multi-step, multi-day runs; exactly-once effects |
+| **DBOS** | Steps recorded in Postgres | Your Postgres | Teams already on Postgres who want a library, not a server |
+| **Restate** | Journaled handlers | Restate server | Durable RPC handlers / services |
+| **Inngest** | Step functions triggered by events | Inngest service | Event-driven background jobs |
+
+<Aside type="caution" title="DBOS, Restate, Inngest: reading only, untested">
+Only LangGraph checkpointing and Temporal (and Pydantic AI on Temporal) were run in this course. The rows for DBOS, Restate and Inngest are a high-level orientation from their public positioning, not a tested comparison. Pydantic AI also documents a DBOS integration; it wasn't run here. Check each project's current docs before choosing.
+</Aside>
+
+## C++/Rust notes
+- Recording each model call as an activity is memoisation keyed by position in the history: replay hits the memo table instead of the network.

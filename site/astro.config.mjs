@@ -29,6 +29,17 @@ export default defineConfig({
             { label: "M6 · Evals, guardrails & cost", items: [{ autogenerate: { directory: "fundamentals/m6" } }] },
           ],
         },
+        {
+          label: "Orchestration & Production",
+          items: [
+            { label: "M7 · Agent graphs & orchestration", items: [{ autogenerate: { directory: "orchestration/m7" } }] },
+            { label: "M8 · Durable execution & production", items: [{ autogenerate: { directory: "orchestration/m8" } }] },
+          ],
+        },
+        {
+          label: "AI-Native Development",
+          items: [{ label: "M9 · MCP servers & clients", items: [{ autogenerate: { directory: "ai-native/m9" } }] }],
+        },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         { label: "Syllabus", link: "/syllabus/" },
         { label: "Changelog", link: "/changelog/" },

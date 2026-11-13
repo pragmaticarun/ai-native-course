@@ -32,7 +32,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "0.13.8"
-      - name: Install ffmpeg (for the M2 frame-grab test)
+      - name: Install ffmpeg (M2 frame grab, M8 chunk transcode, M9 media-probe contract)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: uv sync --locked
       - name: Lint
@@ -92,6 +92,43 @@ jobs:
               print(f, "tests", t, "failed", x)
           print(f"KMP jvmTest: {total} tests, {fails} failed")
           PY
+
+  rust:
+    name: Rust (rmcp media-probe) + cross-language MCP contract
+    runs-on: ubuntu-latest
+    env:
+      COURSE_LLM_PROVIDER: mock
+      MEDIA_PROBE_RUST_BIN: ${{ github.workspace }}/rust/media-probe/target/debug/media-probe
+      MEDIA_PROBE_REQUIRE_ALL: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100.0"
+          components: rustfmt, clippy
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: fmt, clippy, test
+        working-directory: rust/media-probe
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets --locked -- -D warnings
+          cargo test --locked
+          cargo build --locked
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.13.8"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Python client vs Python, TypeScript and Rust servers (both revisions, real ffmpeg)
+        working-directory: python
+        run: uv sync --locked && uv run pytest -q -rs ../examples/python/m9
+      - name: TypeScript client vs Rust server
+        run: pnpm vitest run examples/ts/m9
 
   site:
     name: Site build + internal link validation

@@ -1,0 +1,37 @@
+---
+title: "L7.1 From loops to graphs"
+description: Explicit state machines for agents, and when determinism beats autonomy.
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+The M3 loop lets the model decide *everything*: which tool, in which order, when to stop. That's right when the path is unknown (exploring a repo). It's wasteful and fragile when the path is known: "classify every changelog line, then group them" doesn't need a model to decide that the next step is "classify the next line".
+
+A **graph** makes the known parts code:
+
+- **State**: a typed dict shared by all nodes.
+- **Nodes**: functions `state → partial update`. Some call a model; many don't.
+- **Edges**: fixed or conditional transitions (conditional = a function of the state).
+- **Reducers**: how concurrent updates to one key merge.
+
+Rule of thumb: put the model where judgement is needed (classify, extract, plan) and put control flow in code. You get fewer calls, deterministic tests, and steps you can retry, checkpoint and interrupt individually.
+
+The example runs the same task both ways on a scripted model: the free-form loop makes **5** model calls (it plans each step), the graph makes **3** (one classification per line). `merge_latest` is a reducer that keeps the newest value by timestamp, so parallel branches can't clobber each other.
+
+<Snippet path="examples/python/m7/graph_basics.py" />
+
+## When *not* to use a graph
+- Open-ended exploration where the steps aren't known in advance (M3's explorer).
+- Prototypes: start free-form, watch the traces, then freeze the path you keep seeing into a graph (Exercise 2 does exactly this).
+
+## Try it
+1. Add a third label to the changelog example. How many lines change in each version?
+2. Count tokens instead of calls (M6 `cost_latency.py`). Does the ratio hold?
+
+## C++/Rust notes
+- A graph with typed state is a state machine (think `boost::sml`, or a Rust `enum` + `match` loop). The framework adds persistence and scheduling.
+- Reducers ≈ CRDT merge functions: commutative, associative updates that make concurrent writes safe.

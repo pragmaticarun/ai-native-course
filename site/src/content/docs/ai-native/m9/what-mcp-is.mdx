@@ -1,0 +1,43 @@
+---
+title: "L9.1 What MCP standardises, and the 2026-07-28 revision"
+description: Tools, resources and prompts; what MCP doesn't cover; the stateless 2026-07-28 revision.
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+M2 and M3 wired tools into one agent by hand. MCP (Model Context Protocol) makes that wiring a protocol: a **server** exposes capabilities once, and any MCP **client** (an IDE agent, a desktop app, your own agent) can use them.
+
+What a server can offer:
+
+| Primitive | Controlled by | Example (media-probe) |
+|---|---|---|
+| **Tools** | the model (it decides to call them) | `probe(path)`, `loudness(path)`, `delete_clip(path)` |
+| **Resources** | the application (it decides what to attach) | `media://index`: the list of files |
+| **Prompts** | the user (picked like slash commands) | `chapterise(path)` |
+
+Plus client-side features a server can ask for: **elicitation** (ask the user something), sampling (ask the client's model), roots.
+
+What MCP does **not** standardise: which model you use, how the host decides when to call tools, your agent loop, or your security policy. A server can describe a tool as read-only (`readOnlyHint`); only the host can decide to trust that.
+
+## The 2026-07-28 revision
+
+Earlier revisions (up to 2025-11-25) open a **session**: the client sends `initialize`, the server answers with its version and capabilities, and later requests rely on that session. The 2026-07-28 revision is **stateless**:
+
+- Each request carries the protocol version and client info in `_meta`. No handshake.
+- Clients discover a server's versions and capabilities with `server/discover`.
+- Questions to the user travel inside results (`input_required`, L9.4) instead of as server-to-client requests mid-call.
+- List and read results can carry caching hints (`ttlMs`, `cacheScope`).
+
+Both eras coexist. The SDKs used here negotiate: the client probes `server/discover`, and falls back to `initialize` when the server is 2025-era. The tests in this module run every server on **both** revisions.
+
+<Aside type="note" title="Measured, not assumed">
+In this repo: the Python `mcp` 2.3.0 client defaults to negotiating (`mode="auto"`); the TypeScript 2.4.0 client defaults to `'legacy'` unless you set `versionNegotiation: { mode: "auto" }`; the Rust `rmcp` 3.10.0 server negotiated 2026-07-28; the Kotlin SDK 0.16.0 tops out at 2025-11-25.
+</Aside>
+
+## C++/Rust notes
+- MCP ≈ **LSP for agents**: JSON-RPC 2.0 messages, capability negotiation, many clients × many servers instead of N×M integrations. If you've written an LSP server, an MCP server will feel familiar.
+- To expose a C++ library: a thin Python/TS MCP server that calls it (via bindings or a subprocess), or a native Rust server with `rmcp` (the [Kotlin and Rust](/ai-native-course/ai-native/m9/kotlin-rust/) example).

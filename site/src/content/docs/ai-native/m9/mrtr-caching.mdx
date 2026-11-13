@@ -1,0 +1,42 @@
+---
+title: "L9.4 input_required, the tasks extension, and caching hints"
+description: Multi round-trip requests for confirmations, long-running tasks, and ttlMs/cacheScope.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Multi round-trip requests (`input_required`)
+
+A destructive tool must ask first. On 2025-era connections, the server sends an `elicitation/create` request to the client in the middle of the tool call. That needs a live, stateful connection. On 2026-07-28 the tool **returns** instead:
+
+1. Client calls `delete_clip`.
+2. Server returns `resultType: "input_required"` with `inputRequests` (what to ask) and an opaque `requestState`.
+3. Client asks the user, then **retries the same call** with `inputResponses` and the `requestState`.
+4. The handler runs again, finds the answer, and acts.
+
+Both SDKs let you write the handler once:
+
+- **Python**: a parameter `answer: Annotated[ElicitationResult[Confirm], Resolve(ask_first)]`, where `ask_first` returns `Elicit(message, Confirm)`. The SDK resolves it with MRTR on 2026-07-28 and a classic elicitation on 2025-11-25.
+- **TypeScript**: `acceptedContent(ctx.mcpReq.inputResponses, "confirm", schema)`; if `undefined`, `return inputRequired({ inputRequests: { confirm: inputRequired.elicit({...}) } })`. On 2025-era connections the SDK's legacy shim turns it into a real elicitation request.
+
+The tests check all four combinations (Python/TS × both revisions), plus the raw result: `call_tool(..., allow_input_required=True)` returns the `InputRequiredResult` itself.
+
+<Snippet path="examples/python/m9/test_m9.py" title="examples/python/m9/test_m9.py (all M9 Python tests)" />
+
+`requestState` comes back from the client, so treat it as untrusted. The TS SDK offers `createRequestStateCodec` to sign it. That isn't exercised here.
+
+## Caching hints
+
+On 2026-07-28, cacheable results (`tools/list`, `resources/read`, …) carry `ttlMs` (freshness in milliseconds) and `cacheScope` (`"public"`: shareable across authorisation contexts; `"private"`: only within the one that produced it). The media-probe server sets `cache_hints={"tools/list": CacheHint(ttl_ms=60_000, scope="public")}`. The test shows the hint arriving on 2026-07-28 and the defaults (`0`, `"private"`) on the legacy revision. The Python client honours the hints in its cache by default.
+
+## The tasks extension
+
+<Aside type="caution" title="Reading only, untested">
+The tasks extension lets a request run as a long-lived task the client can poll or cancel, which fits jobs like M8's 2-hour transcode. The SDKs expose task-related types, but no task flow was built or tested in this module. Read the current spec before using it. For long work today, the pattern in this course is: start a durable workflow (M8) from a tool, return its id, and offer a `status` tool.
+</Aside>
+
+## C++/Rust notes
+- MRTR is a continuation passed through the client: the server's suspended state is serialised into `requestState`, like a stateless HTTP handler that round-trips a signed token instead of keeping a session.

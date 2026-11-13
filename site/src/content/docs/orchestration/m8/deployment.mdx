@@ -1,0 +1,25 @@
+---
+title: "L8.4 Deployment: queues, idempotency, secrets, rate limits, tenants"
+description: The plumbing around a durable agent in production.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+- **Queues**: one Temporal task queue per tenant (or per tier) isolates noisy neighbours and lets you scale workers per queue.
+- **Idempotency keys**: every side-effecting call gets a key derived from the run and step (`runId:step`), never a fresh UUID per attempt. A store maps key → result; the same key with *different* arguments is a bug and should fail loudly.
+- **Rate limits**: a token bucket per provider and per tenant smooths bursts (fan-out from M7 makes bursts easy).
+- **Budgets**: a daily spend cap per tenant, checked before work is admitted.
+- **Secrets**: read from the environment or a secret manager at the edge; fail fast when missing; redact anything key-shaped from logs and traces.
+
+<Snippet path="examples/python/m8/deploy.py" />
+
+## Try it
+1. Make the token bucket per `(tenant, provider)`. What happens to one tenant's fan-out when another is bursting?
+2. Persist `IdempotencyStore` in SQLite (the kill-the-worker ledger shows how), and test it across a process restart.
+
+## C++/Rust notes
+- Token bucket ≈ the classic traffic shaper (`tc tbf`); in Rust, `governor` or a `tower` rate-limit layer.

@@ -1,0 +1,32 @@
+---
+title: "L7.6 Retries, timeouts, checkpoints and interrupts"
+description: Resumable graphs and human approval nodes; the same patterns in Mastra workflows.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Per-node resilience in LangGraph 1.2 (all used and tested in the example):
+
+- `retry_policy=RetryPolicy(max_attempts=..., initial_interval=..., jitter=True, retry_on=...)` retries a flaky node.
+- `timeout=` bounds a node. When it fires, LangGraph raises `NodeTimeoutError`.
+- `error_handler=` turns an exception into a state update (a fallback answer, an error flag) instead of failing the run.
+- **Checkpoints**: compile with a checkpointer, and run with `{"configurable": {"thread_id": ...}}`. After a crash, `graph.invoke(None, cfg)` resumes from the last completed step; `graph.get_state(cfg).next` shows what's pending.
+- **Interrupts**: `interrupt(payload)` inside a node pauses the run; resume with `Command(resume=answer)`.
+
+<Snippet path="examples/python/m7/resilience.py" />
+
+<Aside type="caution" title="Mastra workflows: reading only, untested">
+The syllabus asks for "the same patterns in Mastra workflows". Mastra isn't installed in this repo and its workflow API wasn't verified for this module, so there's no Mastra code here. Conceptually it has the same building blocks (steps, branching, suspend/resume for human input). Check its current docs before relying on any specific API.
+</Aside>
+
+## Try it
+1. Make the flaky node fail 5 times with `max_attempts=3`. Does the error handler see the last exception?
+2. Kill the process between two nodes (raise in the second), then resume with `invoke(None, cfg)`. Which nodes re-run?
+
+## C++/Rust notes
+- Checkpoint + resume ≈ a write-ahead log: each completed step is durable, so recovery replays from the last commit. M8 takes this further with full event histories.

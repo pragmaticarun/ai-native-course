@@ -1,0 +1,30 @@
+---
+title: "L7.4 Parallel fan-out / fan-in"
+description: Map-reduce over documents, Send-style dynamic branches, concurrency limits, and joining partial failures.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+When work splits into independent pieces (pages, scenes, files), run them in parallel and merge:
+
+- **Fan-out**: a conditional edge returns a list of `Send("worker", payload)`: one branch per item, decided at run time.
+- **Fan-in**: workers write to a key with a reducer (`operator.add`), and the next node sees all results.
+- **Limit**: pass `config={"max_concurrency": n}` so 100 items don't become 100 simultaneous model calls.
+- **Partial failure**: catch per item, record the error, and keep going. Merge decides what "complete" means.
+
+The media fan-out graph (a [worked example](/ai-native-course/orchestration/m7/media-fanout/)) runs 12 calls with a limit of 3 and measures a peak of exactly 3 in flight.
+
+Without a framework, the same pattern in TypeScript is a semaphore with ordered, settled results:
+
+<Snippet path="examples/ts/m7/fanout.ts" />
+
+## Try it
+1. Change the limit to 1 and time it. Then to 12. Where does the provider's rate limit belong?
+2. Make a failed item retry once before it counts as failed (Exercise 3 adds a failure budget too).
+
+## C++/Rust notes
+- Bounded fan-out ≈ a thread pool or a `tokio::sync::Semaphore` around spawned tasks; fan-in ≈ `join_all` collecting `Result`s rather than short-circuiting on the first error.

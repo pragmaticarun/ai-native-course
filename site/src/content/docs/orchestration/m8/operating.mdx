@@ -1,0 +1,38 @@
+---
+title: "L8.5 Operating agents: SLOs, replay debugging, versioning, runbooks"
+description: Success-rate and latency SLOs with burn-rate alerts, release fingerprints, and versioning workflows without breaking in-flight runs.
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## SLOs and alerting
+
+Pick SLOs users feel: **success rate** (graded by M6 evals or state checks, not "no exception") and **p95 latency**, plus cost per run. Alert on **burn rate** = observed error rate ÷ allowed error rate. At a burn rate of 15 against a 99% monthly SLO, the budget is gone in about two days: page someone. At 1.2, open a ticket.
+
+A **release fingerprint** hashes everything that changes behaviour: code version, model id, prompt version, tool set. When success drops, diff the fingerprints of the good and bad releases first.
+
+<Snippet path="examples/python/m8/operate.py" />
+
+## Replay debugging and versioning
+
+Temporal keeps the full event history of every run. You can download a history (`handle.fetch_history()`) and **replay** it locally against your code with the `Replayer`: you get the same execution, deterministically, in a debugger.
+
+The same tool protects deployments. Changing workflow code with runs in flight can break replay (a new activity appears where the history has a different one). Gate changes with `workflow.patched("change-id")`: old histories take the old branch, new runs take the new one. Later, `workflow.deprecate_patch` and then removal, once no old runs remain.
+
+The example records a real v1 history, then replays it against an unsafe v2 (a **non-determinism error**) and a patched v2 (replays cleanly):
+
+<Snippet path="examples/python/m8/versioning.py" />
+
+Prompts need versioning too: put the prompt version in the fingerprint, and treat a prompt change like a code change (evals in CI, gradual rollout).
+
+## Incident runbook (template)
+1. **Detect**: burn-rate alert or eval regression. Note the release fingerprint.
+2. **Contain**: route traffic to the previous fingerprint; pause the affected task queue if side effects are wrong.
+3. **Diagnose**: replay a failing history locally; diff fingerprints; read traces (M6).
+4. **Fix and verify**: a regression eval for the failure, the Replayer in CI for workflow changes.
+5. **Review**: blameless write-up; add the case to the eval suite.
+
+## C++/Rust notes
+- `patched()` ≈ a feature flag that's also recorded in the log, so replay makes the same choice: like versioned binary formats that must still decode old records.

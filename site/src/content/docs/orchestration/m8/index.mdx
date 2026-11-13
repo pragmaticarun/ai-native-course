@@ -1,0 +1,26 @@
+---
+title: "M8 · Durable execution & production agents"
+description: Temporal workflows and activities in Python and TypeScript, durable Pydantic AI agents, idempotency, deployment plumbing, SLOs and workflow versioning.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~5 hours · **Prerequisites:** M7 (checkpoints and interrupts).
+
+| Lesson | Worked example |
+|---|---|
+| [L8.1 Why agents need durability](/ai-native-course/orchestration/m8/why-durability/) | workflows vs activities, determinism rules |
+| [L8.2 Temporal in Python and TS](/ai-native-course/orchestration/m8/temporal/) | `agentRun`, an approval signal that waits days (time-skipping test server) |
+| [L8.3 Durable agents](/ai-native-course/orchestration/m8/durable-agents/) | Pydantic AI on Temporal (`TemporalDurability`); comparison with LangGraph checkpoints, DBOS, Restate, Inngest (*reading*) |
+| [L8.4 Deployment](/ai-native-course/orchestration/m8/deployment/) | idempotency keys, rate limits, per-tenant budgets, secrets |
+| [L8.5 Operating agents](/ai-native-course/orchestration/m8/operating/) | SLOs, burn rate, release fingerprints, replay-safe versioning |
+| [Worked example: kill the worker](/ai-native-course/orchestration/m8/kill-the-worker/) | `kill -9` mid-run, resume without repeating side effects (local Temporal dev server) |
+| [Worked example: long media jobs](/ai-native-course/orchestration/m8/long-media-jobs/) | a 2-hour recording in 12 chunks, heartbeats, resume mid-chunk |
+| [Exercises](/ai-native-course/orchestration/m8/exercises/) | a safe non-idempotent tool, an approval days later, versioning |
+
+Versions used: `temporalio` 1.36.0 (Python), `@temporalio/*` 1.25.0 (TS), Pydantic AI 2.68.0. The tests start Temporal's test/dev server binaries, which the SDKs download on first use (no account or keys).
+
+<Quiz src="m8" />

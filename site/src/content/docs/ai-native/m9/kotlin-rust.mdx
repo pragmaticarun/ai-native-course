@@ -1,0 +1,56 @@
+---
+title: "Worked example: media-probe in Kotlin and Rust"
+description: The MCP Kotlin SDK 0.16.0 server in KMP commonMain (JVM tests), a real Rust rmcp 3.10.0 server, and a comparison with Android AppFunctions.
+sidebar:
+  order: 9
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Kotlin: MCP Kotlin SDK 0.16.0 (KMP `commonMain`)
+
+The server lives in `commonMain`, so the same code can target JVM, Android and native. ffprobe is behind a `FfprobeRunner` interface; the tests inject a fake. Path safety and output shaping are shared helpers.
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m9/MediaProbeServer.kt" lang="kotlin" />
+
+The tests link a client and server with the SDK's testing transport (`ChannelTransport.createLinkedPair()`, marked `@ExperimentalMcpApi`) and run on the JVM target in CI:
+
+<Snippet path="kmp/shared/src/commonTest/kotlin/course/m9/MediaProbeServerTest.kt" lang="kotlin" />
+
+<Aside type="note" title="Findings">
+- SDK 0.16.0's `LATEST_PROTOCOL_VERSION` is **2025-11-25**: it speaks the `initialize` handshake, not 2026-07-28. A negotiating client should fall back to `initialize` with it (not run against this server here). This server isn't in the cross-language contract (that needs a JVM launcher). Its own tests check tools, structured output and path refusal.
+- Under `runTest`, virtual time made SDK request timeouts fire instantly. The tests switch to `withContext(Dispatchers.Default)`.
+- Only the JVM target is built and tested. Android/native targets of this code are untested.
+</Aside>
+
+## Rust: `rmcp` 3.10.0
+
+A real Rust server: `#[tool_router]` on an impl block, `#[tool(description = ..., annotations(read_only_hint = true))]` per tool, `Parameters<T>` for input and `Json<T>` for structured output. The schemas come from `schemars` derives. It shells out to ffprobe and ffmpeg and refuses path escapes.
+
+<Snippet path="rust/media-probe/src/lib.rs" lang="rust" />
+<Snippet path="rust/media-probe/src/main.rs" lang="rust" />
+
+Its integration test generates a tone with ffmpeg, connects an `rmcp` client over an in-memory duplex pipe, and checks list → probe → loudness → escape refusal. The Python and TS contract suites then drive the **built binary over stdio**: it negotiated 2026-07-28 in auto mode and 2025-11-25 in legacy mode.
+
+<Snippet path="rust/media-probe/tests/contract.rs" lang="rust" />
+
+CI's `rust` job runs `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`, then the cross-language contract tests against the binary.
+
+## MCP vs Android AppFunctions
+
+<Aside type="caution" title="Reading only, untested">
+**AppFunctions** is Android's mechanism for apps to expose functions that system agents (e.g. an assistant) can discover and call on the device, mediated by the OS. Compared with MCP:
+
+| | MCP | AppFunctions |
+|---|---|---|
+| Where | any process or remote service | inside an installed Android app |
+| Who calls | any MCP host you configure | OS-mediated callers with permission |
+| Transport | JSON-RPC over stdio/HTTP | Android platform IPC |
+| Trust | configured by the user/host | Android permissions and the platform |
+
+Nothing AppFunctions-related was built or run here (no Android SDK on the machine, by design, pending approval). Check the current Jetpack docs for API names and availability before building on it.
+</Aside>
+
+## C++/Rust notes
+- `rmcp`'s macros generate the JSON Schemas and the dispatch table at compile time, the Rust counterpart of Python's decorators. To expose a C++ library, call it from a Rust server through `cxx`/`bindgen`, or keep a thin Python/TS server that calls a CLI.

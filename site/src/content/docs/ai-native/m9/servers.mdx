@@ -1,0 +1,41 @@
+---
+title: "L9.2 Building servers in Python and TypeScript"
+description: The media-probe server with mcp 2.3.0 (MCPServer) and @modelcontextprotocol/server 2.4.0 (McpServer), over stdio and Streamable HTTP.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Python: `MCPServer` (mcp 2.3.0)
+
+In `mcp` 2.x the high-level server class is `MCPServer` (`from mcp.server.mcpserver import MCPServer`); the 1.x `FastMCP` name isn't in 2.3.0. Tools are decorated functions: type hints become the input schema, a `TypedDict`/Pydantic return type becomes the **output schema** (so results carry `structuredContent`).
+
+- Annotations: `ToolAnnotations(read_only_hint=True, open_world_hint=False)`. Destructive tools say so.
+- Expected failures: raise `ToolError`. The client gets an `is_error` result with your message. Any other exception is logged as a crash and the message is hidden from the model.
+- Paths are resolved inside a media root. `..` and absolute paths are refused.
+- Transports: `server.run()` is stdio; `server.run(transport="streamable-http")` or `server.streamable_http_app()` (a Starlette app) is HTTP.
+
+<Snippet path="examples/python/m9/media_probe_server.py" />
+
+<Aside type="caution" title="Resolver functions live at module level">
+With `from __future__ import annotations`, the SDK evaluates a tool's annotations against the module's globals, so a `Resolve(fn)` helper defined inside a factory function isn't found (`InvalidSignature`). That bug came up while writing this module.
+</Aside>
+
+## TypeScript: `McpServer` (@modelcontextprotocol/server 2.4.0)
+
+`registerTool(name, { description, inputSchema, outputSchema, annotations }, handler)` with zod schemas (`import * as z from "zod/v4"`). The destructive tool uses the `inputRequired(...)` / `acceptedContent(...)` pattern from L9.4.
+
+<Snippet path="examples/ts/m9/mediaProbe.ts" />
+
+To serve it over stdio, use `serveStdio(factory)`. It reads the client's opening message, picks the era (2026-07-28 via `server/discover`, or a 2025 `initialize`) and pins one server instance to the connection:
+
+<Snippet path="examples/ts/m9/mediaProbeStdio.ts" />
+
+<Aside type="note" title="A finding from the tests">
+A hand-wired `server.connect(transport)` in SDK 2.4.0 answered `server/discover` with "Method not found" and served only the 2025 era. `serveStdio(factory, { transport })` served both, so the tests use it, even over the in-memory transport. For HTTP the SDK has `createMcpHandler`; it isn't exercised in this repo.
+</Aside>
+
+## C++/Rust notes
+- The decorator-to-schema step is reflection; in Rust, `rmcp` does the same at compile time with `schemars` derives and `#[tool]` macros.

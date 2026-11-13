@@ -8,6 +8,7 @@
 | `course.m2` | M2 | notification → `{title, date, location}` with JSON validation, one repair retry, `BUSY` backoff; fakes for the LiteRT-LM (A73) and Gemini Nano paths |
 | `course.m4` | M4 | fit prompt + history into a 2,048 / ~4,000-token window with a running summary |
 | `course.m5` | M5 | confirmation decorator for destructive tools (on-device HITL) |
+| `course.m9` | M9 | media-probe MCP server on the MCP Kotlin SDK 0.16.0 (`probe` tool, path safety); tested with the SDK's in-memory `ChannelTransport` and client. The SDK speaks protocol 2025-11-25 (not 2026-07-28) |
 
 ```bash
 ./gradlew :shared:jvmTest    # JDK 21; the wrapper downloads Gradle 9.9.1

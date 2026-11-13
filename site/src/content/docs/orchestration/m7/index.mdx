@@ -1,0 +1,28 @@
+---
+title: "M7 · Agent graphs & orchestration"
+description: From free-form loops to explicit graphs with LangGraph — routing, fan-out, supervisors, retries, checkpoints and interrupts — plus a computer-use graph and a media fan-out graph.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3 (the loop), M5 (HITL), M6 (evals).
+
+| Lesson | Worked example |
+|---|---|
+| [L7.1 From loops to graphs](/ai-native-course/orchestration/m7/loops-to-graphs/) | `graph_basics.py`: free-form loop vs graph, CRDT-style reducer |
+| [L7.2 LangGraph in Python and TS](/ai-native-course/orchestration/m7/langgraph/) | state, nodes, edges, reducers; `triage.ts` (LangGraph.js) |
+| [L7.3 Routers and classifiers](/ai-native-course/orchestration/m7/routing/) | rules → model → default; model tiers; fallbacks |
+| [L7.4 Parallel fan-out / fan-in](/ai-native-course/orchestration/m7/fan-out/) | `Send`, `max_concurrency`, partial failures; `fanout.ts` |
+| [L7.5 Supervisors and hierarchical graphs](/ai-native-course/orchestration/m7/supervisors/) | subgraphs, the duplicated-log pitfall |
+| [L7.6 Retries, timeouts, checkpoints, interrupts](/ai-native-course/orchestration/m7/resilience/) | `RetryPolicy`, node timeouts, error handlers, resume |
+| [Worked example: document triage](/ai-native-course/orchestration/m7/doc-triage/) | router → parallel extractors → supervisor → approval interrupt |
+| [Worked example: GUI-agent graph](/ai-native-course/orchestration/m7/gui-graph/) | observe → plan → guard → act → verify, crash + resume (*emulator simulated*) |
+| [Worked example: media fan-out graph](/ai-native-course/orchestration/m7/media-fanout/) | scenes × (ASR, captions, OCR), limit 3, chapters (*fake models*) |
+| [Exercises](/ai-native-course/orchestration/m7/exercises/) | retry with jitter, free-form → graph, bounded fan-out (TS) |
+
+Versions used: LangGraph (Python) 1.2.21, `@langchain/langgraph` 1.7.3. See [Versions](/ai-native-course/reference/versions/).
+
+<Quiz src="m7" />

@@ -1,0 +1,43 @@
+---
+title: "L8.2 Temporal: workflows and activities in Python and TypeScript"
+description: Workflows, activities, signals, queries and durable timers; time-skipping tests; the OpenAI Agents SDK integration.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+The Temporal building blocks you need for agents:
+
+- **Workflow**: `@workflow.defn` class (Python) / an exported async function (TS). Deterministic.
+- **Activity**: `@activity.defn` (Python) / a plain async function (TS), called through `workflow.execute_activity` / `proxyActivities` with a timeout and a retry policy.
+- **Signal**: an inbound message (e.g. a human's approval). **Query**: a read-only peek at workflow state.
+- **Durable timer**: `condition(fn, "7 days")` (TS) / `workflow.wait_condition(fn, timeout=...)` (Python).
+- **Worker**: a process that polls a task queue and runs your workflows and activities.
+
+### TypeScript
+The workflow file is bundled by the worker and may only import `@temporalio/workflow`. `agentRun` executes a 10-step plan; `publishWithApproval` waits up to 7 days for an `approve` signal and exposes a `status` query.
+
+<Snippet path="examples/ts/m8/workflows.ts" />
+<Snippet path="examples/ts/m8/activities.ts" />
+
+The test uses `TestWorkflowEnvironment.createTimeSkipping()`: `env.sleep("3 days")` takes milliseconds. One step fails once after its side effect, and the idempotency key keeps the effect single.
+
+<Snippet path="examples/ts/m8/m8.test.ts" />
+
+### Python
+The same patterns in Python are in the [kill-the-worker](/ai-native-course/orchestration/m8/kill-the-worker/) and [long media jobs](/ai-native-course/orchestration/m8/long-media-jobs/) examples and in Exercise 2 (the approval signal).
+
+Two Python gotchas met while writing this module:
+- A workflow defined in a script needs an `if __name__ == "__main__":` guard, because the workflow sandbox re-imports the module.
+- Return dataclasses, not `dict[str, object]`: the default converter can't rebuild `object`-typed values.
+
+<Aside type="caution" title="OpenAI Agents SDK integration: reading only, untested">
+Temporal publishes an official integration for the OpenAI Agents SDK (agent turns and tool calls as activities). It wasn't installed or run for this module, so there's no code for it here. Read the Temporal and OpenAI Agents SDK docs for the current API. L8.3 shows the same idea, tested, with Pydantic AI.
+</Aside>
+
+## C++/Rust notes
+- A signal is a message into a durable actor's mailbox; a query is a read-only RPC on its state.

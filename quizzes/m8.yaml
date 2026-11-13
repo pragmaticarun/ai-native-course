@@ -1,0 +1,51 @@
+module: m8
+title: "M8 quiz: durable execution & production"
+questions:
+  - id: m8q1
+    type: single
+    prompt: "The worker was killed with SIGKILL right after step 6's side effect. After restart, the ledger shows effect 6 once but attempt 6 twice. Why?"
+    choices: ["Temporal deduplicated the activity", "The activity re-ran (at-least-once), and the idempotency key runId:6 made the second side effect a no-op", "The workflow skipped step 6", "SQLite rolled back the first write"]
+    answer: 1
+    explanation: "Activities are at-least-once. Effectively-once comes from idempotency keys derived from the run and step."
+  - id: m8q2
+    type: spot_bug
+    prompt: "What's wrong with this Temporal workflow code?"
+    code: |
+      @workflow.run
+      async def run(self, clip: str) -> str:
+          if random.random() < 0.1:          # sample 10% for review
+              await workflow.execute_activity(review, clip, start_to_close_timeout=T)
+          return await workflow.execute_activity(publish, clip, start_to_close_timeout=T)
+    choices: ["execute_activity must be called with a string name", "random.random() is non-deterministic, so replay can take a different branch; use workflow.random() or decide in an activity", "Workflows can't return strings", "The timeout is missing"]
+    answer: 1
+    explanation: "Workflow code is replayed from history and must be deterministic. Temporal provides deterministic workflow.random(), workflow.now(), etc."
+  - id: m8q3
+    type: single
+    prompt: "A 2-hour recording is transcoded in 12 chunks. The worker dies 240 s into chunk 3. What does the heartbeat give you?"
+    choices: ["Nothing; the chunk restarts from 0", "The retried activity reads heartbeat_details and resumes at 240 s", "Temporal finishes the chunk on the server", "Chunks 0–2 are redone"]
+    answer: 1
+    explanation: "Heartbeat details are delivered to the next attempt (activity.info().heartbeat_details). Completed chunks are in history and aren't redone."
+  - id: m8q4
+    type: single
+    prompt: "An approval may take days. How does the workflow wait?"
+    choices: ["A worker thread sleeps for days", "await workflow.wait_condition(..., timeout=7 days): the wait is recorded in history and no worker is busy", "A cron job polls a database", "The client holds the connection open"]
+    answer: 1
+    explanation: "Durable timers and signals are events. Workers can restart or scale to zero while the workflow waits."
+  - id: m8q5
+    type: single
+    prompt: "You add a review step to a workflow with runs in flight. How do you deploy it safely?"
+    choices: ["Just deploy; Temporal migrates old runs", "Gate the new step with workflow.patched('add-review') and verify with the Replayer against recorded histories", "Rename the workflow", "Terminate all running workflows first"]
+    answer: 1
+    explanation: "patched() returns False when replaying old histories and True for new runs. The Replayer catches non-determinism in CI."
+  - id: m8q6
+    type: multi
+    prompt: "Which belong in a production release fingerprint for an agent? (Pick all that apply.)"
+    choices: ["Model id", "Prompt version", "Tool set / tool versions", "The developer's laptop hostname"]
+    answer: [0, 1, 2]
+    explanation: "Any of these changing can change behaviour; pin and diff them per release so a regression can be traced."
+  - id: m8q7
+    type: single
+    prompt: "Your SLO is 99% success over 30 days. The last hour failed 15% of runs. What does a burn rate of 15 mean?"
+    choices: ["15 failures happened", "The error budget is being spent 15× faster than the SLO allows; at this rate it's gone in 2 days", "Latency is 15× the target", "15% of the budget is used"]
+    answer: 1
+    explanation: "Burn rate = observed error rate / allowed error rate = 0.15 / 0.01 = 15. Multi-window burn-rate alerts page on this."

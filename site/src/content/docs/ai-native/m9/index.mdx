@@ -1,0 +1,28 @@
+---
+title: "M9 · MCP: servers, clients & tool design"
+description: Model Context Protocol servers and clients in Python, TypeScript, Rust (rmcp) and Kotlin; the 2026-07-28 stateless revision, input_required, caching hints, security and contract tests.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M2 (tool calling), M3 (tool design), M5 (safety).
+
+| Lesson | Worked example |
+|---|---|
+| [L9.1 What MCP standardises](/ai-native-course/ai-native/m9/what-mcp-is/) | tools, resources, prompts; the 2026-07-28 stateless revision |
+| [L9.2 Building servers](/ai-native-course/ai-native/m9/servers/) | media-probe in Python (`MCPServer`) and TS (`McpServer`), stdio and Streamable HTTP |
+| [L9.3 Building clients](/ai-native-course/ai-native/m9/clients/) | an agent using MCP tools; `server/discover`; version negotiation |
+| [L9.4 input_required, tasks, caching](/ai-native-course/ai-native/m9/mrtr-caching/) | confirmations on both revisions; `ttlMs` / `cacheScope` |
+| [L9.5 Security](/ai-native-course/ai-native/m9/security/) | scopes, tool pinning, poisoning scan; OAuth/CIMD (*reading*) |
+| [L9.6 Testing and debugging](/ai-native-course/ai-native/m9/testing/) | one contract, four servers, two revisions; Inspector and the TS codemod (*reading*) |
+| [Worked example: media-probe used by an agent](/ai-native-course/ai-native/m9/media-probe/) | Python, TS and Rust servers, real ffprobe/ffmpeg in CI |
+| [Worked example: Android tooling over MCP](/ai-native-course/ai-native/m9/android-tooling/) | an adb MCP server over Streamable HTTP (*fake adb; Studio, devices untested*) |
+| [Worked example: Kotlin and Rust MCP](/ai-native-course/ai-native/m9/kotlin-rust/) | MCP Kotlin SDK 0.16.0 (JVM tests), `rmcp` 3.10.0; vs AppFunctions |
+| [Exercises](/ai-native-course/ai-native/m9/exercises/) | an input_required confirmation, per-tool scopes (TS), contract tests |
+
+Versions used: Python `mcp` 2.3.0, `@modelcontextprotocol/server` and `/client` 2.4.0, `rmcp` 3.10.0 (Rust 1.100.0), MCP Kotlin SDK 0.16.0.
+
+<Quiz src="m9" />

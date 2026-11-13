@@ -1,0 +1,29 @@
+---
+title: "L7.3 Routers and classifiers"
+description: Routing by intent, model-tier routing, and fallbacks.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+A router sends each request down the right branch. Use the cheapest thing that works, in layers:
+
+1. **Rules** (regex, keywords) for the obvious cases: free, instant, testable.
+2. **A small model** as a classifier for the rest.
+3. **A default** branch when neither is confident. Never drop a request.
+
+**Model tiers** are the same idea for cost: short, simple prompts go to a small model, long or tool-heavy ones to a large one. **Fallbacks** catch provider errors: try the primary, on `ProviderError` try the backup, and record which one answered (your evals need to know).
+
+<Snippet path="examples/python/m7/routing.py" />
+
+The regex is `crash\w*`, not `crash`: an early version missed "crashes" and the test caught it. Rules need tests as much as models do.
+
+## Try it
+1. Add a route for "billing". Write the test first.
+2. Make `with_fallback` give up after the backup also fails, and return a typed error the graph can route to a human.
+
+## C++/Rust notes
+- A router is a dispatch table; rules-then-model is a fast path / slow path split, like a branch predictor with a fallback.

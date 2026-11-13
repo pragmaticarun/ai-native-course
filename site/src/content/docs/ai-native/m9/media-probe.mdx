@@ -1,0 +1,35 @@
+---
+title: "Worked example: the media-probe server, used by an agent"
+description: probe and loudness tools over ffprobe/ffmpeg, a confirmed delete, a resource and a prompt — served from Python, TypeScript and Rust and used by an agent.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+The server ([L9.2](/ai-native-course/ai-native/m9/servers/)) wraps `ffprobe` and ffmpeg's `loudnorm` filter. An agent ([L9.3](/ai-native-course/ai-native/m9/clients/)) asks "How long is talk.mp4?": the scripted model calls `probe`, reads the structured result (`duration_s: 7200.0`) and answers. A second test has the model try `delete_clip`, which the host never exposed: the call is refused, and nothing is deleted.
+
+The same contract runs against the Python, TypeScript and Rust builds ([L9.6](/ai-native-course/ai-native/m9/testing/)), with **real ffprobe and ffmpeg** on a generated 2-second 440 Hz tone (CI installs ffmpeg).
+
+## TypeScript tests (client ↔ server in memory, and TS client → Rust server)
+
+<Snippet path="examples/ts/m9/m9.test.ts" />
+
+## Running it yourself
+
+```bash
+# Python server over stdio, media root = ./media
+cd python && uv run python ../examples/python/m9/media_probe_server.py ../media
+# or Streamable HTTP on http://127.0.0.1:8765/mcp
+cd python && uv run python ../examples/python/m9/media_probe_server.py ../media --http
+# TypeScript server over stdio
+node --experimental-strip-types examples/ts/m9/mediaProbeStdio.ts ./media
+# Rust server over stdio
+cd rust/media-probe && cargo run -- ../../media
+```
+
+Add any of these to an MCP host's configuration as a stdio command (or the URL for HTTP). The stdio commands are what the contract tests launch. The media-probe `--http` mode itself wasn't run (the adb server's was), and no MCP host app was exercised in this course.
+
+## Try it
+1. Add a `thumbnails(path, count)` tool that writes JPEGs with ffmpeg into the media root and returns their paths as resource links.
+2. Make `loudness` accept a target (e.g. −14 LUFS) and report the gain needed. Add the field to all three servers and the contract.

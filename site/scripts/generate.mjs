@@ -20,7 +20,7 @@ const stripH1 = (md) => md.replace(/^# .*\n+/, "");
 writeFileSync(resolve(docs, "syllabus.md"), page(
   "Syllabus (v0.3)",
   "The full course syllabus and site outline, as approved.",
-  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M6 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
+  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M9 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
 ));
 
 writeFileSync(resolve(docs, "changelog.md"), page(
@@ -48,6 +48,14 @@ const catalog = read("kmp/gradle/libs.versions.toml");
 const versionsBlock = catalog.split("[versions]")[1].split("[")[0];
 const kt = [...versionsBlock.matchAll(/^([A-Za-z0-9-]+)\s*=\s*"([^"]+)"/gm)].map((m) => [m[1], m[2]]);
 const gradle = read("kmp/gradle/wrapper/gradle-wrapper.properties").match(/gradle-([0-9.]+)-bin\.zip/)?.[1] ?? "?";
+// Rust: direct dependencies from Cargo.toml, resolved versions from Cargo.lock
+const cargoToml = read("rust/media-probe/Cargo.toml");
+const cargoLock = read("rust/media-probe/Cargo.lock");
+const rustChannel = read("rust/media-probe/rust-toolchain.toml").match(/channel = "([^"]+)"/)?.[1] ?? "?";
+const lockVersion = (name) => cargoLock.match(new RegExp(`\\[\\[package\\]\\]\\nname = "${name}"\\nversion = "([^"]+)"`))?.[1] ?? "?";
+const rustDeps = [...new Set([...cargoToml.matchAll(/^([a-z0-9_-]+)\s*=/gm)].map((m) => m[1]))]
+  .filter((n) => !["name", "version", "edition", "description", "license", "publish"].includes(n))
+  .map((n) => [n, lockVersion(n)]);
 const rows = (pairs) => pairs.map(([n, v]) => `| \`${n}\` | ${v} |`).join("\n");
 
 const body = `Generated at build time (${today}) from the lockfiles, so this always matches what CI tested.
@@ -78,12 +86,18 @@ ${rows(kt)}
 
 Only the JVM target is built and tested so far. Android-only entries (AGP, LiteRT-LM, ML Kit, ...) are added when the Android target lands.
 
+## Rust (\`rust/media-probe/Cargo.lock\`)
+| Crate | Locked version |
+|---|---|
+| Rust toolchain (\`rust-toolchain.toml\`) | ${rustChannel} |
+${rows(rustDeps)}
+
 ## Site (\`site/pnpm-lock.yaml\`)
 | Package | Locked version |
 |---|---|
 ${rows(pnpmVersions("site/pnpm-lock.yaml", "site/package.json"))}
 
-Versions for later modules (MCP SDKs, Temporal, the Android target, media and on-device runtimes) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when their lessons ship.
+Versions for later modules (the Android target, media and on-device runtimes) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when their lessons ship. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
 `;
 writeFileSync(resolve(docs, "reference", "versions.md"), page("Versions", "Pinned versions, generated from the lockfiles.", body));
 console.log("generated syllabus.md, changelog.md, reference/versions.md");

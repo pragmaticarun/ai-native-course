@@ -1,0 +1,28 @@
+---
+title: "Worked example: document triage graph"
+description: Router → parallel extractors → supervisor merge → human approval interrupt.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+Incoming documents (invoices, contracts, bug reports) are routed by kind, each kind's fields are extracted **in parallel** (one `Send` per field), a supervisor checks the merged record, and anything with issues **pauses for a human** before it's filed.
+
+```
+route ──Send×N──▶ extract ──▶ supervise ──▶ approve (interrupt) ──▶ file | END
+```
+
+- `route` picks the extractors for the document kind and fans out with `Send`.
+- `extract` handles one field. Results meet in a reducer key.
+- `supervise` validates the record (missing fields, out-of-range amounts) and lists issues.
+- `approve` files clean records automatically; otherwise `interrupt(...)` returns the issues to the caller, and `Command(resume="approve" | "reject")` continues. Its `destinations=("file", END)` tells LangGraph where the `Command(goto=...)` may go.
+
+The checkpointer keeps the paused run, so the human can answer much later from another process (with the same `thread_id`).
+
+<Snippet path="examples/python/m7/doc_triage.py" />
+<Snippet path="examples/python/m7/test_m7.py" title="examples/python/m7/test_m7.py (all M7 tests)" />
+
+## Try it
+1. Add a "receipt" kind with two fields. Which nodes change?
+2. Make `supervise` call a model judge (M6 L6.1) and route low-confidence records to the human too.

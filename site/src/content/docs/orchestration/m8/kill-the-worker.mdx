@@ -1,0 +1,24 @@
+---
+title: "Worked example: kill the worker halfway through"
+description: kill -9 a Temporal worker mid-run and watch a 10-step agent resume without repeating side effects.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+A 10-step agent plan where every step has a side effect (a row in a SQLite ledger standing in for "email sent", "file uploaded").
+
+1. Worker A runs in a **subprocess**. On step 6 it performs the side effect, then hangs.
+2. The test sends **SIGKILL** to worker A, mid-activity.
+3. Worker B starts in-process. Steps 1–5 are **not** re-run: their results are in the history. Step 6 misses its 2-second heartbeat, times out, and is retried on B. B finds the effect already recorded under its idempotency key `runId:6` and doesn't repeat it.
+
+Measured result (test): **10 results, 10 effects, 11 attempts**, attempt order `1 2 3 4 5 6 6 7 8 9 10`. It runs on Temporal's local dev server (`WorkflowEnvironment.start_local()`), so it's a real server and a real process kill, and takes about 14 seconds.
+
+<Snippet path="examples/python/m8/durable_agent.py" />
+<Snippet path="examples/python/m8/worker_proc.py" />
+<Snippet path="examples/python/m8/test_m8.py" title="examples/python/m8/test_m8.py (all M8 tests)" />
+
+## Try it
+1. Remove the ledger check in `run_step`. How many effects do you get now?
+2. Kill the worker *before* the side effect instead of after. What changes in the attempt order?

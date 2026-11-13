@@ -1,0 +1,36 @@
+---
+title: "L8.1 Why agents need durability"
+description: Long-running, failure-prone, human-paced work; workflows vs activities and the determinism rules.
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Agent runs are long (minutes to days), call flaky things (models, APIs, devices), and wait for humans. A process restart in the middle shouldn't mean "start over and send the email again".
+
+**Durable execution** splits the program in two:
+
+| | Workflow | Activity |
+|---|---|---|
+| What | The orchestration: the plan, branches, waits | One unit of real work: a model call, a tool, ffmpeg |
+| Runs | Many times: replayed from the event history after every restart | At least once: retried on failure |
+| Rules | **Deterministic**: no I/O, no clock, no randomness, no threads | Anything goes, but make side effects **idempotent** |
+| State | Rebuilt by replay | Results stored in the history |
+
+When a worker dies, another worker replays the workflow code against the recorded history: completed activities return their recorded results instantly, and execution continues at the first activity that never finished.
+
+### Determinism rules (Temporal)
+- No direct I/O, network, or file access in workflow code. Do it in activities.
+- Use `workflow.now()` and `workflow.random()` / `workflow.uuid4()` (Python), not `datetime.now()` or `random`.
+- Timers (`asyncio.sleep` in a workflow, `workflow.wait_condition(..., timeout=...)`) are durable: they're events, not sleeping threads.
+- Changing workflow code with runs in flight needs versioning (L8.5).
+
+<Aside type="note">
+LangGraph's checkpointer (M7) is a lighter version of the same idea: it saves state after each step, so a crash resumes from the last step. Temporal records every activity result and timer as an event and replays the code, which is what makes multi-day waits and exactly-once effects practical.
+</Aside>
+
+## C++/Rust notes
+- Durable execution ≈ **event sourcing plus deterministic replay**, as in record/replay debuggers like `rr`: record the nondeterministic inputs (here, activity results), and replaying the deterministic program reproduces the same state.

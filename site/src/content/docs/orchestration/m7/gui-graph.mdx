@@ -1,0 +1,35 @@
+---
+title: "Worked example: the computer-use loop as a graph"
+description: observe → plan → guard → act → verify, with an interrupt for consequential actions, a retry policy on act, and checkpoint/resume after an emulator crash.
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+M3 built a computer-use loop where the model did everything. Here the same job (fill a form, then submit) is an explicit graph:
+
+```
+observe ─▶ plan ─▶ guard ─▶ act ─▶ verify ─▶ observe … ─▶ done
+                     │ interrupt for consequential actions       └─▶ recover (state didn't change as expected)
+```
+
+- **observe**: screenshot + accessibility tree from the (simulated) emulator.
+- **plan**: picks the next action and records what the state *should* look like afterwards (`expect`).
+- **guard**: reuses M5's risk classifier and untrusted-text flags. A consequential action (here: tapping *Submit*) triggers `interrupt(...)`; injected-looking screen text is flagged.
+- **act**: runs the action with a `RetryPolicy` (transient emulator errors are retried).
+- **verify**: diffs the new state against `expect`; a mismatch goes to **recover** (re-observe and re-plan) instead of blindly continuing.
+- The checkpointer saves every step, so a crashed run resumes with `invoke(None, cfg)`.
+
+The test run: the emulator **crashes at action 4**, `get_state(cfg).next` is `('act',)`, the resumed run continues from there, pauses before *Submit*, is approved, and finishes with 6 steps, 1 recovery, 6 actions and 8 attempts (retries included).
+
+<Snippet path="examples/python/m7/gui_graph.py" />
+
+<Aside type="caution" title="Simulated emulator">
+`Emulator` is an in-process simulation with injectable transient errors, a crash and a banner. No real Android emulator, device or model was used in this module (UNTESTED there). M3's adb loop shows the real-device plumbing; swapping it in is the "Try it" below.
+</Aside>
+
+## Try it
+1. Replace `Emulator` with the M3 adb wrapper and run against an emulator (UNTESTED here).
+2. Add a step budget to `plan` and route to `done` with `status="gave_up"` when exceeded. Where does that show up in an eval?

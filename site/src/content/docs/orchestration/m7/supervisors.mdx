@@ -1,0 +1,30 @@
+---
+title: "L7.5 Supervisors and hierarchical graphs"
+description: Subgraphs, handoffs, and shared vs private state.
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+A **supervisor** node decides which worker runs next; each worker can itself be a compiled graph (a **subgraph**) with its own private state. Design the boundary on purpose:
+
+- **Shared state**: keys both graphs declare. Updates flow across.
+- **Private state**: keys only the subgraph has. They stay inside.
+- **Handoffs**: the supervisor returns `Command(goto="worker")`, or routes with a conditional edge.
+
+<Aside type="caution" title="The duplicated-log pitfall (shown in the example)">
+If parent and subgraph both declare `log: Annotated[list, operator.add]` and you add the subgraph directly as a node, the subgraph returns its **whole** log (what it was given plus its new entries) and the parent's reducer appends all of it again. The naive version in the example ends with 9 entries instead of 4. The fix: a boundary node that calls the subgraph and returns only the new entries.
+</Aside>
+
+<Snippet path="examples/python/m7/supervisor.py" />
+
+## Try it
+1. Add a second worker and let the supervisor choose by task type.
+2. Give the worker a private `scratch` key. Check it never shows up in the parent's state.
+
+## C++/Rust notes
+- Subgraph boundaries are module interfaces: decide what crosses (a `pub` API) and what stays private, or you get aliasing bugs like this one.

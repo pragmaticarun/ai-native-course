@@ -1,0 +1,32 @@
+---
+title: "Worked example: Android tooling over MCP"
+description: A minimal adb MCP server over Streamable HTTP for Android Studio's agent, the community mobile and Playwright MCP servers, and destructive commands behind confirmations.
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## A minimal adb MCP server
+
+Tools: `devices`, `screenshot` (base64 PNG), `ui_tree` (uiautomator XML), `logcat_tail`, `list_packages` (read-only), `tap`, `type` (actions), and `uninstall`, `clear_data` (destructive, so each asks first via elicitation / `input_required`).
+
+Safety details that matter on a real device:
+- `type` refuses anything but letters, digits and `@._-`. `adb shell input text` goes through the device shell, and model-supplied text is untrusted.
+- `logcat_tail` bounds its line count; `ui_tree` and logs are marked untrusted (app labels and log lines can carry injected instructions).
+- Destructive commands always confirm. On 2026-07-28 the confirmation travels as `input_required`.
+
+<Snippet path="examples/python/m9/adb_server.py" />
+
+The tests run it against `FakeAdb` in-process, and over **real Streamable HTTP on localhost** (uvicorn) on both revisions. Android Studio's MCP client uses that transport. The `--http` entry point with the real `AdbRunner` was started locally and listed its 9 tools to an HTTP client on both revisions. It never ran a device command.
+
+<Aside type="caution" title="Untested: Android Studio, devices, community servers">
+- **Android Studio Agent Mode**: the syllabus says Studio connects to MCP servers over Streamable HTTP and doesn't support stdio. Not verified here: there's no Android Studio or Android SDK on the course machine (the SDK install is waiting on approval). To try: run `adb_server.py --http` and add `http://127.0.0.1:8765/mcp` in Studio's MCP server settings.
+- **Real devices and emulators**: `AdbRunner` has never been run against one in this course.
+- **`@mobilenext/mobile-mcp` and `@playwright/mcp`**: community/vendor MCP servers for driving mobile devices and browsers. They weren't installed or run here. Pin a version and review their tool descriptions (L9.5) before connecting them to an agent.
+</Aside>
+
+## Try it
+1. Add `ui_tree` parsing: return clickable nodes with their bounds as structured output, so the model taps by element instead of guessing coordinates (M3).
+2. Add a `launch(package)` tool. Is it destructive? What annotation would you give it?

@@ -13,10 +13,13 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.coroutines.core)
             implementation(libs.serialization.json)
+            implementation(libs.mcp.server)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.coroutines.test)
+            implementation(libs.mcp.client)
+            implementation(libs.mcp.testing)
         }
     }
 }

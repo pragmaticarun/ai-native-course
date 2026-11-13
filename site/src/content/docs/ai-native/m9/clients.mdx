@@ -1,0 +1,34 @@
+---
+title: "L9.3 Building clients"
+description: Connecting an agent to MCP servers, server/discover, and capability and version negotiation.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+A host connects to a server, lists its tools, and gives them to the model as ordinary tool specs. The model never sees MCP. Three host responsibilities don't go away:
+
+1. **Choose what to expose.** The example's `allow` set is the host's decision; a server listing `delete_clip` doesn't mean the model gets it.
+2. **Treat results as data.** Tool output goes back wrapped as `<tool_output>`. A third-party server is untrusted input (M5).
+3. **Handle user-facing requests.** Elicitation (confirmations) needs a callback that really asks the user.
+
+<Snippet path="examples/python/m9/agent_client.py" />
+
+## Connecting and negotiating (Python `mcp` 2.3.0)
+
+`Client(target, mode=...)` accepts an in-process server (tests), a URL (Streamable HTTP), or `StdioServerParameters` (subprocess):
+
+- `mode="auto"` (default): probe `server/discover` and use 2026-07-28 if offered, else `initialize`.
+- `mode="legacy"`: always the 2025-11-25 handshake.
+- `client.session.protocol_version` tells you what was negotiated. Contract tests assert it.
+
+In TypeScript (`@modelcontextprotocol/client` 2.4.0), pass `{ versionNegotiation: { mode: "auto" } }` to `new Client(...)`. The default is `'legacy'`. `client.getNegotiatedProtocolVersion()` reports the result.
+
+**Capabilities**: a client that can show forms declares it (Python: pass `elicitation_callback=...`; TS: `capabilities: { elicitation: { form: {} } }` plus a handler for `elicitation/create`). On 2026-07-28, capabilities travel with each request rather than once per session.
+
+## Try it
+1. Point `run_agent` at the Rust server over stdio (`binary_stdio` in `contract.py`). Does anything change for the model?
+2. Connect two servers (media-probe and adb) and prefix tool names per server. Why do hosts do that?
