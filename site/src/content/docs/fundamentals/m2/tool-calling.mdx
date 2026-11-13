@@ -1,0 +1,41 @@
+---
+title: "L2.4 Tool calling end to end"
+description: Schema → model picks a tool → you execute → result goes back → model answers.
+sidebar:
+  order: 4
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+The model **never runs your code**. It returns a *request* ("call `convert` with these arguments"); you execute it, append the result, and call the model again. Errors go back as text so the model can correct itself.
+
+```text
+you:   messages + tool schemas ──▶ model
+model: tool_call(convert, {value: 42.195, from_unit: km, to_unit: mi})
+you:   run convert() ──▶ "26.2187" (tool message)
+model: "That is 26.2187 miles."
+```
+
+## Worked example: the unit converter, three ways
+
+<Tabs syncKey="lang">
+<TabItem label="Python (raw)">
+<Snippet path="examples/python/m2/unit_converter_raw.py" />
+</TabItem>
+<TabItem label="Python (Pydantic AI)">
+<Snippet path="examples/python/m2/unit_converter_pydantic_ai.py" />
+</TabItem>
+<TabItem label="TypeScript (AI SDK)">
+<Snippet path="examples/ts/m2/unitConverter.ts" />
+</TabItem>
+</Tabs>
+
+## Try it
+1. Ask for °C → °F: the tool returns `error: unsupported conversion`. Change the scripted brain to apologise instead of looping.
+2. Remove the `messages.append(turn.as_message())` line in the raw version and read what breaks (the quiz has a question on this).
+
+## C++/Rust notes
+- A tool schema is an IDL; tool execution is an RPC handler. Validate arguments at the edge and return errors as values, not panics.

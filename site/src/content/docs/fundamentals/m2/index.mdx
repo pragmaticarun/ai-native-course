@@ -1,0 +1,24 @@
+---
+title: "M2 · LLM and tool-calling foundations"
+description: Tokens and sampling, raw messages, structured output, tool calling, token accounting.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~4 hours · **Prerequisites:** M0 setup.
+
+| Lesson | Worked example |
+|---|---|
+| [L2.1 Tokens, context, sampling](/ai-native-course/fundamentals/m2/tokens-sampling/) | `sampling.py`: temperature and top-p on toy logits |
+| [L2.2 Raw provider APIs: messages](/ai-native-course/fundamentals/m2/raw-messages/) | the neutral `Message` type and two vendor adapters |
+| [L2.3 Structured output](/ai-native-course/fundamentals/m2/structured-output/) | Pydantic/Zod validation with a repair retry |
+| [L2.4 Tool calling end to end](/ai-native-course/fundamentals/m2/tool-calling/) | the unit converter: raw, Pydantic AI, AI SDK |
+| [L2.5 Caching, batching, token accounting](/ai-native-course/fundamentals/m2/token-accounting/) | cost of a run with and without prompt caching |
+| [Worked example: multimodal frame](/ai-native-course/fundamentals/m2/multimodal/) | ffmpeg frame → pixel budget → coordinate mapping |
+| [Worked example: Android/KMP structured output](/ai-native-course/fundamentals/m2/android-kmp/) | *planned; untested* |
+| [Exercises](/ai-native-course/fundamentals/m2/exercises/) | repair loop, token meter, partial JSON streaming |
+
+<Quiz src="m2" />

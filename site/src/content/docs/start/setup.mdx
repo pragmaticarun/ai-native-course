@@ -1,0 +1,76 @@
+---
+title: "L0.2 Setting up on Ubuntu"
+description: uv, Node 24 + pnpm, mock vs live mode via environment variables.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Aside, Steps } from "@astrojs/starlight/components";
+
+## Intuition
+
+Two toolchains side by side, each with a lockfile, exactly like a Cargo workspace: `uv` + `uv.lock` for Python, `pnpm` + `pnpm-lock.yaml` for TypeScript. Nothing talks to a real model unless you ask it to.
+
+## Hands-on
+
+<Steps>
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/pragmaticarun/ai-native-course.git && cd ai-native-course
+   ```
+2. Python (3.13) with [uv](https://docs.astral.sh/uv/):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh   # or: pipx install uv
+   cd python && uv sync && uv run pytest -q && cd ..
+   ```
+3. TypeScript with Node 24 and pnpm 12:
+   ```bash
+   corepack enable   # or: npm i -g pnpm@12.18.0
+   pnpm install --frozen-lockfile && pnpm test
+   ```
+4. Run a worked example:
+   ```bash
+   cd python && uv run python ../examples/python/m0/hello_agent.py
+   ```
+
+</Steps>
+
+## Mock vs live
+
+| Variable | Meaning |
+|---|---|
+| `COURSE_LLM_PROVIDER` | `mock` (default), `openai` or `anthropic` |
+| `COURSE_LLM_MODEL` | your provider's model id (required for live) |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | that provider's own key |
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+```bash
+cd python && uv sync --extra live
+COURSE_LLM_PROVIDER=anthropic COURSE_LLM_MODEL=<model-id> \
+  uv run python ../examples/python/m0/hello_agent.py
+```
+</TabItem>
+<TabItem label="TypeScript">
+```bash
+pnpm add @ai-sdk/openai   # or @ai-sdk/anthropic (not installed by default)
+COURSE_LLM_PROVIDER=openai COURSE_LLM_MODEL=<model-id> pnpm tsx examples/ts/m0/hello.ts
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution" title="Untested">
+Live mode isn't exercised in CI (no API keys are stored in the repository). The adapters are small and readable (`python/src/aincourse/llm.py`, `examples/ts/lib/mock.ts`), but treat them as starting points.
+</Aside>
+
+Docker (for Temporal/Postgres) is only needed from M8 onwards.
+
+## C++/Rust notes
+- `uv.lock` ≈ `Cargo.lock`; `pyproject.toml` ≈ `Cargo.toml`; `uv run` ≈ `cargo run` inside the project's environment.
+- pnpm's content-addressed store ≈ a shared `~/.cargo/registry`; `--frozen-lockfile` ≈ `cargo build --locked`.
+
+## Sources
+- uv docs: https://docs.astral.sh/uv/
+- pnpm: https://pnpm.io/
+- AI SDK: https://ai-sdk.dev/

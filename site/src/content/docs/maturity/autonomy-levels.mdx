@@ -1,0 +1,45 @@
+---
+title: "L1.5 Autonomy levels: Shapiro vs Feng et al."
+description: Two "level" scales that measure different things.
+sidebar:
+  order: 5
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Both use "levels", but they answer different questions:
+
+- **Shapiro**: how does *the engineering workflow* use AI?
+- **Feng et al.**: what is *the user's role* towards *one agent*?
+
+## Shapiro, "The Five Levels" (Jan 2026)
+
+Six tiers numbered 0–5, modelled on the driving-automation levels:
+
+| Level | Roughly |
+|---|---|
+| **L0** | Manual: AI as search, occasional tab-complete |
+| **L1** | Offload discrete tasks ("write a unit test") |
+| **L2** | Pair with an AI-native tool, in flow |
+| **L3** | You're a manager reviewing diffs ("almost everyone tops out here") |
+| **L4** | You write specs and skills, review plans, leave, and check that tests pass |
+| **L5** | "Dark factory": specs in, software out |
+
+<Aside type="caution">An opinion piece by one practitioner, not research. Useful vocabulary; don't treat it as a standard.</Aside>
+
+## Feng, McDonald & Zhang, "Levels of Autonomy for AI Agents" (2025)
+
+Five levels defined by the **user's role**: **L1 Operator → L2 Collaborator → L3 Consultant → L4 Approver → L5 Observer**. The paper treats autonomy as a **design choice**, separate from capability: a very capable agent can still be deployed at L2.
+
+## Try it
+
+Describe one of your team's AI-assisted tasks. Place it on both scales. If the levels differ, you've understood the lesson (Exercise 1 makes you do this for three teams).
+
+## C++/Rust notes
+- Feng's levels map neatly onto permission design: L4 Approver ≈ "every write syscall needs a confirmation prompt"; L5 Observer ≈ "audit log only".
+
+## Sources
+- Shapiro: https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/ · discussion: https://simonwillison.net/2026/jan/28/the-five-levels/
+- Feng et al.: https://arxiv.org/abs/2506.12469 · https://www.knightcolumbia.org/content/levels-of-autonomy-for-ai-agents-1

@@ -1,0 +1,12 @@
+.quiz { border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem; padding: 1rem; margin: 1.5rem 0; }
+.quiz fieldset { border: 0; padding: 0; margin: 0 0 1.25rem; }
+.quiz legend { font-weight: 600; margin-bottom: 0.5rem; }
+.quiz label { display: block; margin: 0.15rem 0; cursor: pointer; }
+.quiz .feedback { margin-top: 0.4rem; font-size: 0.9em; }
+.quiz .feedback.ok { color: var(--sl-color-green); }
+.quiz .feedback.bad { color: var(--sl-color-red); }
+.quiz .order-list { list-style: decimal; padding-left: 1.5rem; }
+.quiz .order-list button { margin-left: 0.5rem; font-size: 0.8em; }
+details.solution { border: 1px dashed var(--sl-color-gray-4); border-radius: 0.5rem; padding: 0.5rem 1rem; margin: 1rem 0; }
+details.solution summary { cursor: pointer; font-weight: 600; }
+.badge-untested { background: var(--sl-color-orange-low); border: 1px solid var(--sl-color-orange); padding: 0.1rem 0.4rem; border-radius: 0.3rem; font-size: 0.8em; }

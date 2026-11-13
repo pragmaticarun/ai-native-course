@@ -1,0 +1,13 @@
+---
+// Shows a tested file from the repo. The build fails if the path doesn't exist,
+// so every snippet on the site is the same code CI runs.
+import { Code } from "@astrojs/starlight/components";
+import { GITHUB_BLOB, readRepoFile } from "./repo";
+
+interface Props { path: string; lang?: string; title?: string }
+const { path, lang, title } = Astro.props;
+const code = readRepoFile(path).trimEnd();
+const language = lang ?? (path.endsWith(".py") ? "python" : path.endsWith(".ts") ? "ts" : path.split(".").pop());
+---
+<Code code={code} lang={language} title={title ?? path} />
+<p style="font-size:0.8em;margin-top:-0.5rem"><a href={GITHUB_BLOB + path}>View on GitHub</a> · tested in CI</p>

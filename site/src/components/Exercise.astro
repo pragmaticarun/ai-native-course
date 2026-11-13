@@ -1,0 +1,26 @@
+---
+// One exercise: README (task), starter code, and a collapsed, CI-tested solution.
+import { Code } from "@astrojs/starlight/components";
+import { marked } from "./markdown";
+import Solution from "./Solution.astro";
+import { GITHUB_BLOB, readRepoFile } from "./repo";
+
+interface Props { dir: string; lang?: "py" | "ts" }
+const { dir, lang = "py" } = Astro.props;
+const readme = readRepoFile(`${dir}/README.md`);
+const file = lang === "py" ? "impl.py" : "loop.ts";
+const base = lang === "py" ? dir : `${dir}/ts`;
+const starter = readRepoFile(`${base}/starter/${file}`).trimEnd();
+const html = marked(readme.replace(/^# .*\n/, ""));
+const heading = readme.match(/^# (.*)$/m)?.[1] ?? dir;
+---
+<section class="exercise">
+  <h3>{heading}</h3>
+  <Fragment set:html={html} />
+  <Code code={starter} lang={lang === "py" ? "python" : "ts"} title={`${base}/starter/${file} (starter)`} />
+  <p style="font-size:0.85em">Run the tests: {lang === "py"
+    ? <code>cd python && EXERCISE_VARIANT=starter uv run pytest ../{dir}/tests</code>
+    : <code>EXERCISE_VARIANT=starter pnpm vitest run {dir}/ts</code>} (they fail until you finish), or
+    browse <a href={GITHUB_BLOB + dir}>the exercise on GitHub</a>.</p>
+  <Solution path={`${base}/solution/${file}`} />
+</section>

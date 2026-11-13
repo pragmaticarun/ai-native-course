@@ -1,0 +1,51 @@
+module: m1
+title: "M1 quiz: AI maturity models"
+questions:
+  - id: m1q1
+    type: single
+    prompt: "Which of these is a capability map rather than a ladder of levels?"
+    choices: ["MIT CISR Enterprise AI Maturity Model", "DORA AI Capabilities Model", "Gartner AI Maturity Model", "Shapiro's five levels"]
+    answer: 1
+    explanation: "DORA lists seven capabilities that amplify AI's benefits; it doesn't rank teams into levels."
+  - id: m1q2
+    type: order
+    prompt: "Put the MIT CISR Enterprise AI Maturity stages in order."
+    choices: ["Build Pilots & Capabilities", "Become AI Future Ready", "Experiment & Prepare", "Develop AI Ways of Working"]
+    answer: [2, 0, 3, 1]
+    explanation: "Stage 1 Experiment & Prepare → 2 Build Pilots & Capabilities → 3 Develop AI Ways of Working → 4 Become AI Future Ready (MIT CISR, Dec 2024)."
+  - id: m1q3
+    type: single
+    prompt: "In Feng et al.'s autonomy levels, what defines each level?"
+    choices: ["The model's benchmark score", "The user's role towards the agent", "The number of tools", "The company's revenue from AI"]
+    answer: 1
+    explanation: "Operator → Collaborator → Consultant → Approver → Observer: autonomy is treated as a design choice separate from capability."
+  - id: m1q4
+    type: single
+    prompt: "What kind of source is Dan Shapiro's 'five levels' post?"
+    choices: ["Peer-reviewed research", "A practitioner's opinion piece", "An ISO standard", "A Gartner report"]
+    answer: 1
+    explanation: "It's a widely discussed blog post modelled on driving-automation levels, and the course labels it as opinion."
+  - id: m1q5
+    type: multi
+    prompt: "Which caveats does M1 ask you to apply when reading maturity models? (pick all)"
+    choices: ["Vendor frameworks can steer you to the vendor's products", "Survey segments rely on self-reported data", "Stage names can change over time", "Higher levels are always better for every team"]
+    answer: [0, 1, 2]
+    explanation: "The last option is the trap: a ladder describes, it doesn't prescribe that every team should climb."
+  - id: m1q6
+    type: single
+    prompt: "The DORA 2025 research's core finding about AI is summarised as…"
+    choices: ["AI replaces code review", "AI is an amplifier", "AI halves delivery time", "AI only helps junior engineers"]
+    answer: 1
+    explanation: "AI magnifies an organisation's existing strengths and weaknesses, which is why the capabilities matter."
+  - id: m1q7
+    type: single
+    prompt: "The course's 'working ladder' (Shapiro levels gated by DORA capabilities) is…"
+    choices: ["An official DORA standard", "Shapiro's own extension", "The course's teaching synthesis, labelled as such", "A Gartner toolkit"]
+    answer: 2
+    explanation: "No published standard combines them; the course says so explicitly."
+  - id: m1q8
+    type: single
+    prompt: "AWS's CAF for AI organises guidance mainly as…"
+    choices: ["Five numbered maturity levels", "Perspectives of foundational capabilities plus an adoption cycle", "A quiz with a score", "A list of models to buy"]
+    answer: 1
+    explanation: "Six perspectives (Business, People, Governance, Platform, Security, Operations) and Envision → Align → Launch → Scale."

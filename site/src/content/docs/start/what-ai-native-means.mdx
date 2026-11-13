@@ -1,0 +1,45 @@
+---
+title: "L0.1 What “AI-native” means here"
+description: Building with agents vs building agents, and what this course will and won't claim.
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+"AI-native" is used loosely. In this course it means two related skills:
+
+1. **Building *with* agents.** Your engineering workflow uses AI agents to write, review and test code. Your repo, specs and CI are shaped so agents can do useful work safely (M10–M12).
+2. **Building agents.** You ship software in which a language model chooses the next action: tool calls, plans, graphs, GUI actions (M2–M9, M13–M15).
+
+A systems analogy we'll keep coming back to: **an agent loop is an event loop whose scheduler is a language model.** Everything you know about event loops (bounded queues, timeouts, watchdogs, back-pressure, idempotent handlers) still applies. What's new is that the scheduler is *stochastic* and can be *persuaded by its inputs*.
+
+## Smallest example
+
+The whole "agent" idea in three lines of pseudo-code:
+
+```python
+while not done(state):
+    action = model.decide(state)      # the stochastic scheduler
+    state = environment.apply(action) # your deterministic code
+```
+
+M3 turns this into a real ~80-line loop with stop conditions.
+
+## Try it
+
+Write down one task in your current job that you'd hand to an agent tomorrow, and one you wouldn't. For each, note **what could go wrong** and **how you'd check the result without trusting the agent's own report**. Keep the list. M1 and M12 come back to it.
+
+## C++/Rust notes
+
+- The model is like an untrusted plugin with a C ABI: treat everything it emits (tool arguments, JSON, clicks) as input to validate, never as trusted control flow.
+- "Mock first" is your usual dependency injection: the model sits behind an interface (`ChatModel` in Python, `LanguageModel` in the AI SDK), and tests inject a deterministic fake.
+
+<Aside type="caution" title="What this course won't do">
+It won't quote unverified statistics or invent maturity levels. When a claim can't be checked at the source, it's labelled or left out. See the "Could not verify" section of the [syllabus](/ai-native-course/syllabus/).
+</Aside>
+
+## Sources
+- Course syllabus v0.3: [/syllabus/](/ai-native-course/syllabus/)

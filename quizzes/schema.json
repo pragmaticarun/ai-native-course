@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Module quiz",
+  "type": "object",
+  "required": ["module", "title", "questions"],
+  "additionalProperties": false,
+  "properties": {
+    "module": { "type": "string", "pattern": "^m[0-9]+$" },
+    "title": { "type": "string" },
+    "questions": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "prompt", "choices", "answer", "explanation"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["single", "multi", "order", "spot_bug"] },
+          "prompt": { "type": "string" },
+          "code": { "type": "string" },
+          "choices": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "answer": {},
+          "explanation": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+---
+title: "L3.1 Perceive → plan → act → observe → reflect"
+description: The agent loop as an event loop with a language model as the scheduler.
+sidebar:
+  order: 1
+---
+
+## Intuition
+
+```text
+        ┌──────────── reflect ◀────────────┐
+        ▼                                   │
+   perceive ──▶ plan (LLM) ──▶ act (tools) ──▶ observe
+        ▲                                   │
+        └──── stop? (answer / budget / loop) ┘
+```
+
+An event loop you already know, with one difference: the **scheduler is a language model**. It decides which handler (tool) runs next based on everything observed so far. Your code owns the loop, the handlers, and the **stop conditions**:
+
+1. the model answers without tool calls (success, or so it claims),
+2. a **step budget** runs out (watchdog),
+3. a **repetition** detector fires (thrashing).
+
+## Smallest example
+
+```python
+for step in range(max_steps):              # watchdog
+    turn = model.complete(messages, tools) # plan
+    if not turn.tool_calls:
+        return turn.text                   # stop: answered
+    for call in turn.tool_calls:
+        messages.append(observe(act(call)))# act + observe
+return None                                # stop: budget
+```
+
+## Try it
+
+Draw your own system's main loop (a media pipeline, an Android `Looper`, a game loop). Mark where a model would replace a hard-coded decision, and what the watchdog would be.
+
+## C++/Rust notes
+- The loop ≈ a `select!`/epoll loop; the step budget ≈ a watchdog timer; error-as-observation ≈ returning `Result` to the caller instead of `abort()`.

@@ -1,0 +1,15 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+site/dist/
+site/.astro/
+# generated at build time from SYLLABUS.md, CHANGELOG.md and the lockfiles
+site/src/content/docs/syllabus.md
+site/src/content/docs/changelog.md
+site/src/content/docs/reference/versions.md
+radar.svg
+.env

@@ -1,0 +1,40 @@
+---
+title: "L1.6 Build your own assessment"
+description: The course's working ladder, Shapiro levels gated by DORA capabilities. Clearly our synthesis.
+sidebar:
+  order: 6
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+For the team-practice modules (M12, P5) we need one scale. The course uses **Shapiro's L0–L5 for the workflow**, *gated* by **DORA's seven capabilities as prerequisites**: you can *work* at L4 with weak foundations, but you can't *sustain* it.
+
+<Aside type="caution" title="Our synthesis">
+This combination, and the specific gates below, are the course's teaching device. Neither Shapiro nor DORA defines them.
+</Aside>
+
+| To sustain | These capabilities must score ≥ 2 (of 3) |
+|---|---|
+| L2 | clear AI stance |
+| L3 | + strong version control, small batches |
+| L4 | + quality internal platforms, AI-accessible internal data |
+| L5 | all seven |
+
+## Smallest example
+
+```yaml
+team: "Example media-pipeline team"
+workflow_level: 3
+capabilities: { clear_ai_stance: 2, strong_version_control: 3, small_batches: 2, ... }
+```
+
+→ "sustainable level L3; to reach L4 raise quality_internal_platforms and ai_accessible_internal_data". The [worked example](/ai-native-course/maturity/worksheet/) does this in code.
+
+## Try it
+
+Fill in the worksheet for your team. If your observed level is above the sustainable one, which capability would you fix first, and how would you measure that it improved?
+
+## C++/Rust notes
+- Gates ≈ feature flags with prerequisites: the code path exists (you *can* run agents unattended), but you only turn it on when the safety checks (tests, small batches, platform) are in place.

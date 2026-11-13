@@ -1,0 +1,30 @@
+---
+title: "L3.2 A loop from scratch (no framework)"
+description: ~80 lines with stop conditions, max steps, and error-as-observation. Then a read-only explorer agent.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## The loop
+
+<Snippet path="examples/python/m3/scratch_loop.py" />
+
+## Worked example: a read-only file-system explorer
+
+Three read-only tools (`list_dir`, `read_file`, `grep`), sandboxed to one root, skipping dot-directories and binaries, with a step budget. The default model is scripted: grep for `def main`, read the hit, answer from what it read.
+
+<Snippet path="examples/python/m3/explorer_agent.py" />
+
+```bash
+cd python && uv run python ../examples/python/m3/explorer_agent.py ../examples/python/m3
+```
+
+## Try it
+1. Ask the explorer about a tree with no `def main` (it says so instead of inventing).
+2. Set `max_steps=1` and see `stop_reason == "max_steps"`.
+3. Try `read_file("../../etc/passwd")`: `PermissionError` becomes an observation.
+
+## Tests
+<Snippet path="examples/python/m3/test_m3.py" />

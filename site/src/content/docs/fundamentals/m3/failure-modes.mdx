@@ -1,0 +1,26 @@
+---
+title: "L3.5 Failure modes"
+description: Loops, tool thrash, hallucinated tools, and premature "done", with detectors.
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+| Failure | Symptom | Defence |
+|---|---|---|
+| **Loop / thrash** | same call over and over, or A→B→A→B | repetition detector, step budget (Exercise 2 handles cycles) |
+| **Hallucinated tool** | calls a tool that doesn't exist | error observation listing real tools |
+| **Error spiral** | keeps retrying the failing call | reflection prompt after failures (Exercise 1) |
+| **Premature "done"** | claims success without checking | **state-based verification**: never trust the claim |
+
+## Smallest example
+
+<Snippet path="examples/python/m3/failure_modes.py" />
+
+The [computer-use worked example](/ai-native-course/fundamentals/m3/computer-use/) shows premature "done" happening for real (in a simulator).
+
+## Try it
+Run the scratch loop with a scripted model that always calls the same tool; confirm it stops with `stop_reason == "repetition"` before the step budget.

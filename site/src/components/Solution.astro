@@ -1,0 +1,15 @@
+---
+// "Hidden" = collapsed. On a public site the solution is still in the page source and repo.
+import { Code } from "@astrojs/starlight/components";
+import { readRepoFile } from "./repo";
+
+interface Props { path: string; lang?: string; label?: string }
+const { path, lang, label = "Show solution" } = Astro.props;
+const code = readRepoFile(path).trimEnd();
+const language = lang ?? (path.endsWith(".py") ? "python" : "ts");
+---
+<details class="solution">
+  <summary>{label}</summary>
+  <slot />
+  <Code code={code} lang={language} title={path} />
+</details>

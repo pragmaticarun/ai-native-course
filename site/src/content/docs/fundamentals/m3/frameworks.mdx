@@ -1,0 +1,44 @@
+---
+title: "L3.3 The same agent in frameworks"
+description: What Pydantic AI, the AI SDK, the OpenAI Agents SDK and the Claude Agent SDK do for you.
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Frameworks run the same loop. What they add: schema generation from function signatures, validation and retries, step/usage limits, streaming, tracing, and multi-agent plumbing. What they take away: some visibility. Knowing the scratch loop makes their behaviour predictable.
+
+## The explorer, in two frameworks (tested with mock models)
+
+<Tabs syncKey="lang">
+<TabItem label="Pydantic AI">
+The step budget becomes `UsageLimits(request_limit=...)`; `FunctionModel` plays the LLM.
+<Snippet path="examples/python/m3/explorer_pydantic_ai.py" />
+</TabItem>
+<TabItem label="AI SDK (TypeScript)">
+The step budget is `stopWhen: isStepCount(n)`; `MockLanguageModelV4` plays the LLM.
+<Snippet path="examples/ts/m3/explorer.ts" />
+</TabItem>
+</Tabs>
+
+## OpenAI Agents SDK and Claude Agent SDK
+
+<Aside type="caution" title="Not run in this milestone">
+The course pins `openai-agents 0.24.0` and `claude-agent-sdk 0.2.181` (syllabus 2.4), but this milestone has **no tested example** for them: neither is installed in CI yet, and the Claude Agent SDK drives the Claude Code CLI, which needs a live account. They'll get tested examples, with fakes where the SDK allows, when M5/M11 land. Until then, compare them conceptually:
+</Aside>
+
+| | Scratch loop | Pydantic AI | AI SDK | OpenAI Agents SDK | Claude Agent SDK |
+|---|---|---|---|---|---|
+| Tool schema from code | hand-written | function signature + docstring | Zod `inputSchema` | function decorators | built-in tools + MCP |
+| Step budget | `max_steps` | `UsageLimits` | `stopWhen` | run max turns | max turns option |
+| Test double used here | `ScriptedModel` | `FunctionModel`/`TestModel` | `MockLanguageModelV4` | not yet | not yet |
+
+The last two columns describe each SDK's documented features in general terms; check their docs for exact names before use.
+
+## Try it
+1. Add a fourth tool to both framework versions and confirm the mock still drives them.
+2. In the Pydantic AI version, set `request_limit=1` and catch the usage-limit error.

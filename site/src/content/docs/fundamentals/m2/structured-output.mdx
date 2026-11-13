@@ -1,0 +1,32 @@
+---
+title: "L2.3 Structured output: schemas, validation, repair"
+description: JSON Schema in, Pydantic/Zod validation out, and a bounded repair retry.
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Ask for JSON that matches a schema; **validate** whatever comes back; if it fails, send the **validation error** back and retry, a bounded number of times. Many SDKs do the validation for you, but the loop is worth knowing.
+
+## Smallest example
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+<Snippet path="examples/python/m2/structured_output.py" />
+</TabItem>
+<TabItem label="TypeScript">
+The AI SDK validates against the Zod schema via `Output.object`:
+<Snippet path="examples/ts/m2/structured.ts" />
+</TabItem>
+</Tabs>
+
+## Try it
+1. Make the scripted model fail three times and watch `ValueError` after `max_attempts`.
+2. Add a `date` validator that rejects non-ISO dates; add a scripted bad date and confirm the repair message mentions it.
+
+## C++/Rust notes
+- This is `serde` with `#[serde(deny_unknown_fields)]` at a trust boundary: parse into a strict type, reject everything else, report the exact error.

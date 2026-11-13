@@ -1,0 +1,41 @@
+---
+title: "Worked example: mobile use with plain adb"
+description: Screenshot and UI-tree observation, tap/text/keyevent actions. Device steps untested.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Untested on a device or emulator">
+CI runs only the parsing and command-building logic, against a fake `adb` runner and a **hand-written** `uiautomator dump`-style XML fixture. No emulator or phone has been used yet. Running it for real needs `adb` and a booted emulator (M15 sets one up on the self-hosted KVM runner) or your Galaxy A73 with USB debugging.
+</Aside>
+
+## Intuition
+
+Same loop, Android edition:
+
+| Phase | adb command |
+|---|---|
+| observe (pixels) | `adb exec-out screencap -p` |
+| observe (accessibility tree) | `adb shell uiautomator dump /sdcard/ui.xml` + `adb exec-out cat /sdcard/ui.xml` |
+| act | `adb shell input tap X Y` · `input text ...` · `input keyevent KEYCODE_...` |
+
+The UI tree is pruned to actionable or readable nodes and given **set-of-marks** ids (`[3] button 'Sign in'`), so the model picks a mark instead of guessing coordinates. That's usually cheaper and more reliable than screenshot-only observation.
+
+<Snippet path="examples/python/m3/mobile_adb.py" />
+
+Fixture used by the tests (hand-written, not captured from a device):
+
+<Snippet path="examples/python/m3/fixtures/login_screen.xml" lang="xml" />
+
+## Try it (on a real emulator, untested here)
+```bash
+adb devices        # expect emulator-5554 or your phone
+cd python && uv run python ../examples/python/m3/mobile_adb.py
+```
+Compare the token count of `render_for_model(...)` with a downscaled screenshot (see the [multimodal example](/ai-native-course/fundamentals/m2/multimodal/)).
+
+## C++/Rust notes
+- `uiautomator dump` is slow (it writes a file). M15 replaces it with an AccessibilityService that streams a compact tree over a socket, and grabs screenshots via the emulator's gRPC endpoint.

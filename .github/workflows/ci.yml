@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python ${{ matrix.python }} (examples, exercises, quizzes)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.13", "3.14"]
+    defaults:
+      run:
+        working-directory: python
+    env:
+      COURSE_LLM_PROVIDER: mock
+      UV_PYTHON: ${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: "0.13.8"
+      - name: Install ffmpeg (for the M2 frame-grab test)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check ../examples/python ../exercises ../scripts src && uv run ruff format --check ../examples/python ../exercises ../scripts src
+      - name: Type-check
+        run: bash ../scripts/typecheck_python.sh
+      - name: Worked examples (mock models)
+        run: uv run pytest -q -rs ../examples/python
+      - name: Exercises (solutions pass, starters fail)
+        run: uv run python ../scripts/check_exercises.py --lang py
+      - name: Quizzes (schema + answer keys)
+        run: uv run python ../scripts/validate_quizzes.py
+
+  typescript:
+    name: TypeScript (examples, exercises)
+    runs-on: ubuntu-latest
+    env:
+      COURSE_LLM_PROVIDER: mock
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Exercises (solutions pass, starters fail)
+        run: python3 scripts/check_exercises.py --lang ts
+
+  site:
+    name: Site build + internal link validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: site/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build

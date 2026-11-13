@@ -1,0 +1,87 @@
+---
+// Renders quizzes/<src>.yaml. Checking happens in the browser; progress is kept in
+// localStorage only (no tracking, no backend).
+import { parse } from "yaml";
+import { Code } from "@astrojs/starlight/components";
+import { readRepoFile } from "./repo";
+
+interface Question {
+  id: string; type: "single" | "multi" | "order" | "spot_bug"; prompt: string;
+  code?: string; choices: string[]; answer: number | number[]; explanation: string;
+}
+interface Props { src: string }
+const quiz = parse(readRepoFile(`quizzes/${Astro.props.src}.yaml`)) as { title: string; questions: Question[] };
+---
+<div class="quiz" data-quiz={Astro.props.src}>
+  <h3>{quiz.title}</h3>
+  <p style="font-size:0.85em">{quiz.questions.length} questions. Answers are checked in your browser.</p>
+  {quiz.questions.map((q, n) => (
+    <fieldset data-qid={q.id} data-type={q.type} data-answer={JSON.stringify(q.answer)}>
+      <legend>{n + 1}. {q.prompt}</legend>
+      {q.code && <Code code={q.code.trimEnd()} lang="python" />}
+      {q.type === "order" ? (
+        <ol class="order-list">
+          {q.choices.map((c, i) => (
+            <li data-index={i}>{c}<button type="button" data-move="up">↑</button><button type="button" data-move="down">↓</button></li>
+          ))}
+        </ol>
+      ) : (
+        q.choices.map((c, i) => (
+          <label>
+            <input type={q.type === "multi" ? "checkbox" : "radio"} name={q.id} value={i} /> {c}
+          </label>
+        ))
+      )}
+      <button type="button" data-check>Check</button>
+      <div class="feedback" hidden></div>
+      <div class="explanation" hidden><em>{q.explanation}</em></div>
+    </fieldset>
+  ))}
+  <p class="score" aria-live="polite"></p>
+</div>
+
+<script>
+  const same = (a: number[], b: number[]) => a.length === b.length && a.every((v, i) => v === b[i]);
+  for (const quiz of document.querySelectorAll<HTMLElement>(".quiz")) {
+    const key = `quiz:${quiz.dataset.quiz}`;
+    const saved: Record<string, boolean> = JSON.parse(localStorage.getItem(key) ?? "{}");
+    const score = quiz.querySelector<HTMLElement>(".score")!;
+    const total = quiz.querySelectorAll("fieldset").length;
+    const showScore = () => {
+      const right = Object.values(saved).filter(Boolean).length;
+      score.textContent = `Score: ${right} / ${total}`;
+    };
+    for (const fs of quiz.querySelectorAll<HTMLFieldSetElement>("fieldset")) {
+      fs.querySelectorAll<HTMLButtonElement>("[data-move]").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const li = btn.closest("li")!;
+          if (btn.dataset.move === "up" && li.previousElementSibling) li.parentElement!.insertBefore(li, li.previousElementSibling);
+          if (btn.dataset.move === "down" && li.nextElementSibling) li.parentElement!.insertBefore(li.nextElementSibling, li);
+        }),
+      );
+      fs.querySelector("[data-check]")!.addEventListener("click", () => {
+        const expected = JSON.parse(fs.dataset.answer!);
+        let ok = false;
+        if (fs.dataset.type === "order") {
+          const got = [...fs.querySelectorAll<HTMLElement>("li")].map((li) => Number(li.dataset.index));
+          ok = same(got, expected);
+        } else if (fs.dataset.type === "multi") {
+          const got = [...fs.querySelectorAll<HTMLInputElement>("input:checked")].map((i) => Number(i.value)).sort();
+          ok = same(got, [...expected].sort());
+        } else {
+          const picked = fs.querySelector<HTMLInputElement>("input:checked");
+          ok = picked !== null && Number(picked.value) === expected;
+        }
+        const fb = fs.querySelector<HTMLElement>(".feedback")!;
+        fb.hidden = false;
+        fb.textContent = ok ? "Correct." : "Not quite. Try again or read the explanation.";
+        fb.className = `feedback ${ok ? "ok" : "bad"}`;
+        fs.querySelector<HTMLElement>(".explanation")!.hidden = false;
+        saved[fs.dataset.qid!] = ok;
+        localStorage.setItem(key, JSON.stringify(saved));
+        showScore();
+      });
+    }
+    if (Object.keys(saved).length) showScore();
+  }
+</script>

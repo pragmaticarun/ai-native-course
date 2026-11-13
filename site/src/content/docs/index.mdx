@@ -1,0 +1,38 @@
+---
+title: AI-Native Software Development
+description: Maturity models, agent loops, graphs, MCP, on-device & GUI agents, for experienced systems engineers.
+template: splash
+hero:
+  tagline: A hands-on course for engineers who already write C++, Rust, Android and multimedia software, and now want to build agents and work AI-natively. Every code sample runs offline against mock models and is tested in CI.
+  actions:
+    - text: Start with M0
+      link: /ai-native-course/start/
+      icon: right-arrow
+    - text: Read the syllabus
+      link: /ai-native-course/syllabus/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Aside } from "@astrojs/starlight/components";
+
+<Aside type="note" title="Status: v0.1 of the site">
+Modules **M0–M3** are built and tested. Everything else (M4–M15, projects P1–P8) is planned in the [syllabus](/ai-native-course/syllabus/). Device- and emulator-specific steps are marked **untested** until they've actually been run.
+</Aside>
+
+## What's here now
+
+<CardGrid>
+  <LinkCard title="M0 · Orientation & setup" href="/ai-native-course/start/" description="What 'AI-native' means here, the Ubuntu setup, mock vs live mode, how exercises and quizzes work." />
+  <LinkCard title="M1 · AI maturity models" href="/ai-native-course/maturity/" description="Gartner, MIT CISR, Google, AWS, Microsoft, DORA, Shapiro, Feng et al. Compared honestly, with sources." />
+  <LinkCard title="M2 · LLM & tool calling" href="/ai-native-course/fundamentals/m2/" description="Sampling, raw messages, structured output with repair, tool calling end to end, token accounting." />
+  <LinkCard title="M3 · The agent loop" href="/ai-native-course/fundamentals/m3/" description="An agent loop from scratch, the same agent in frameworks, tool design, failure modes, computer-use and mobile-use previews." />
+</CardGrid>
+
+## How it works
+
+<CardGrid>
+  <Card title="Mock first" icon="setting">Examples default to deterministic mock models, so you (and CI) can run everything with no API key. Set `COURSE_LLM_PROVIDER` and `COURSE_LLM_MODEL` to go live with any supported provider.</Card>
+  <Card title="Python + TypeScript" icon="seti:python">Main examples come in both languages. C++/Rust notes map new ideas to things you already know.</Card>
+  <Card title="Tested exercises" icon="approve-check">CI checks that every solution passes its tests and every starter fails them, so exercises can't go stale.</Card>
+  <Card title="Sources, not vibes" icon="open-book">Claims about frameworks and surveys link to primary sources. Anything unverified is labelled.</Card>
+</CardGrid>

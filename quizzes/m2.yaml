@@ -1,0 +1,57 @@
+module: m2
+title: "M2 quiz: LLM and tool-calling foundations"
+questions:
+  - id: m2q1
+    type: single
+    prompt: "Raising the sampling temperature…"
+    choices: ["makes output fully deterministic", "flattens the distribution so unlikely tokens are picked more often", "reduces the context window", "makes the model faster"]
+    answer: 1
+    explanation: "Logits are divided by T before softmax; larger T spreads probability mass out. T→0 approaches greedy decoding."
+  - id: m2q2
+    type: single
+    prompt: "Top-p = 0.5 keeps…"
+    choices: ["the top 50% of tokens by count", "the smallest set of most-likely tokens whose probabilities sum to ≥ 0.5", "every token above probability 0.5", "half of the context"]
+    answer: 1
+    explanation: "Nucleus sampling cuts the long tail by cumulative probability, not by count."
+  - id: m2q3
+    type: order
+    prompt: "Order one tool-calling round trip."
+    choices: ["You execute the tool", "The model returns a tool call", "You send messages plus tool schemas", "You send the tool result back and the model answers"]
+    answer: [2, 1, 0, 3]
+    explanation: "The model never runs your code: it asks, you execute, you report back."
+  - id: m2q4
+    type: single
+    prompt: "A model's JSON fails Pydantic validation. The pattern taught in L2.3 is…"
+    choices: ["crash", "silently fill defaults", "send the validation error back and retry a bounded number of times", "lower the temperature to 0 and hope"]
+    answer: 2
+    explanation: "The error text is the most useful hint you can give the model; cap retries so a broken prompt can't loop forever."
+  - id: m2q5
+    type: spot_bug
+    prompt: "This loop forgets something the model needs. After which line should `messages.append(turn.as_message())` go?"
+    code: |
+      turn = model.complete(messages, tools)
+      while turn.tool_calls:
+          for call in turn.tool_calls:
+              messages.append(Message("tool", run_tool(call), tool_call_id=call.id))
+          turn = model.complete(messages, tools)
+    choices: ["line 1", "line 2", "line 3", "line 4", "line 5"]
+    answer: 1
+    explanation: "Inside the while loop, before the tool results: the assistant turn that made the calls must be in the history, or the tool results arrive with no matching call."
+  - id: m2q6
+    type: single
+    prompt: "Why do multi-step agents get more expensive per step even with short answers?"
+    choices: ["Providers charge more after the first call", "The whole conversation is resent as input on every call", "Tools cost tokens to execute", "Output tokens double each step"]
+    answer: 1
+    explanation: "Models are stateless; input grows with history, which is why prompt caching and context management matter."
+  - id: m2q7
+    type: single
+    prompt: "Prompt caching helps most when…"
+    choices: ["every request has a different system prompt", "many requests share a long, stable prefix (system prompt, tool schemas)", "outputs are long", "you use temperature 0"]
+    answer: 1
+    explanation: "Cached prefix tokens are billed at a lower rate on later calls; a changing prefix defeats the cache."
+  - id: m2q8
+    type: single
+    prompt: "For a C++/Rust engineer, a tool's JSON Schema is closest to…"
+    choices: ["a comment", "an IDL/FFI boundary you validate at the edge", "a unit test", "a linker script"]
+    answer: 1
+    explanation: "Treat model-produced arguments like untrusted input crossing an ABI: validate strictly (cf. serde's deny_unknown_fields)."

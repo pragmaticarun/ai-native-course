@@ -1,0 +1,40 @@
+---
+title: "L1.2 Organisation ladders: Gartner, MIT CISR, BCG, Accenture"
+description: Four organisation-wide views, with their published stages and caveats.
+sidebar:
+  order: 2
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+These look at the **whole organisation**: strategy, data, governance, culture. They say little about how one engineering team should work.
+
+## The models, as published
+
+| Framework | Stages / structure | Caveat |
+|---|---|---|
+| **Gartner AI Maturity Model**, current wording on Gartner's assessment page | 5 stages: **Foundational → Emerging → Operational → Scaled → Transformational**, scored across seven pillars | Gartner's page blocks automated fetches; we read it through a web fetch. |
+| **Gartner**, earlier widely cited wording (c. 2018–2020) | **Awareness → Active → Operational → Systemic → Transformational** | *Secondary source only*: the original research is paywalled. The names changed over time. |
+| **MIT CISR Enterprise AI Maturity Model** (Weill, Woerner, Sebastian; Dec 2024) | **1 Experiment & Prepare** (28% of firms surveyed) → **2 Build Pilots & Capabilities** (34%) → **3 Develop AI Ways of Working** (31%) → **4 Become AI Future Ready** (7%) | Based on a 2022 survey of 721 companies. Stages 1–2 had below-average financial performance, stages 3–4 above-average: correlation, not causation. |
+| **BCG, "The Widening AI Value Gap"** (Sep 2025) | **future-built** (5%), **scaling** (35%), laggards (60%) | Survey segments, not a design guide. We only saw the 60% laggard total on the BCG page itself. |
+| **Accenture, "The Art of AI Maturity"** (2022) | Four archetypes on two axes: **AI Achievers, AI Builders, AI Innovators, AI Experimenters** | A 2×2 of archetypes rather than a strict ladder. We don't quote its percentages (not verified in the source text). |
+
+<Aside type="note">
+Percentages above are quoted only where we read them at the source. Treat them as describing survey respondents, not the world.
+</Aside>
+
+## Try it
+
+Place your organisation on Gartner's current stages *and* MIT CISR's stages. Do the two placements tell the same story? Write one sentence on why or why not.
+
+## C++/Rust notes
+- Org ladders are like a product's *release-maturity* labels (alpha/beta/GA): helpful for planning conversations, useless for deciding which function to refactor today.
+
+## Sources
+- Gartner AI Maturity Model toolkit: https://www.gartner.com/en/chief-information-officer/research/ai-maturity-model-toolkit
+- Earlier Gartner wording (secondary): https://www.usaii.org/ai-insights/understanding-ai-maturity-levels-a-roadmap-for-strategic-ai-adoption
+- MIT CISR: https://cisr.mit.edu/publication/2024_1201_EnterpriseAIMaturityModel_WeillWoernerSebastian · https://cisr.mit.edu/content/press-release-enterprise-ai-maturity-121924
+- BCG: https://www.bcg.com/publications/2025/are-you-generating-value-from-ai-the-widening-gap
+- Accenture: https://www.accenture.com/content/dam/system-files/acom/custom-code/ai-maturity/Accenture-Art-of-AI-Maturity-Report-Global-Revised.pdf

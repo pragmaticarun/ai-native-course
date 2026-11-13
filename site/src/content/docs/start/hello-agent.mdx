@@ -1,0 +1,38 @@
+---
+title: "Worked example: hello agent (mock, then live)"
+description: The smallest model call in Python and TypeScript, against a mock model.
+sidebar:
+  order: 4
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import Snippet from "../../../components/Snippet.astro";
+
+## Intuition
+
+A model call is a function from a list of messages to a reply. Put that function behind an interface, and a test can replace it with a script.
+
+## Smallest example
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+<Snippet path="examples/python/m0/hello_agent.py" />
+The same thing through Pydantic AI's built-in `TestModel`:
+<Snippet path="examples/python/m0/hello_pydantic_ai.py" />
+</TabItem>
+<TabItem label="TypeScript">
+<Snippet path="examples/ts/m0/hello.ts" />
+</TabItem>
+</Tabs>
+
+The provider-agnostic switch lives in one place per language:
+
+<Snippet path="examples/ts/lib/mock.ts" />
+
+## Try it
+1. Run both in mock mode. Then change the mock's reply and watch the test (`examples/python/m0/test_m0.py`) fail.
+2. Set `COURSE_LLM_PROVIDER=nope` and read the error.
+3. If you have a key, run live (see [setup](/ai-native-course/start/setup/)). *Live mode is untested in CI.*
+
+## C++/Rust notes
+- `ScriptedModel` records every request in `calls`, like a gMock expectation log: assert on what the "model" was shown, not just on what it returned.

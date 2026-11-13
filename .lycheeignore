@@ -1,0 +1,10 @@
+# Publishers that block automated link checkers (verified manually via a browser fetch):
+^https://www\.gartner\.com/
+^https://www\.bcg\.com/
+^https://www\.mckinsey\.com/
+^https://www\.accenture\.com/
+# Localhost / examples / templated
+^http://localhost
+example\.com
+# The deployed site itself (checked separately after deploy)
+^https://pragmaticarun\.github\.io/ai-native-course

@@ -1,0 +1,36 @@
+---
+title: "L2.1 Tokens, context windows, sampling"
+description: An LLM call as a stochastic pure function.
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+A model maps **tokens in → a probability distribution over the next token**. Generation repeats that, appending each sampled token. So a model call is a **stochastic pure function**: the same input gives a *distribution* of outputs. Temperature and top-p shape the distribution; the **context window** caps how many tokens the input plus output may use.
+
+- **Temperature** divides the logits before softmax: high T flattens the distribution, T→0 approaches greedy (argmax).
+- **Top-p** keeps the smallest set of most likely tokens whose probabilities sum to ≥ p.
+- **Tokens ≠ characters.** Roughly 4 characters per token for English text is a rule of thumb, not a tokenizer.
+
+## Smallest example
+
+<Snippet path="examples/python/m2/sampling.py" />
+
+```text
+T=0.0: cat=1.00, dog=0.00, car=0.00, cloud=0.00, C++=0.00
+T=0.7: cat=0.62, dog=0.30, car=0.05, cloud=0.02, C++=0.01
+T=1.5: cat=0.42, dog=0.30, car=0.14, cloud=0.08, C++=0.06
+10 samples at T=1.0: ['car', 'cat', 'cloud', 'cat', 'cat', 'dog', 'dog', 'cat', 'cat', 'cat']
+```
+
+## Try it
+1. Run it with different seeds: same seed, same sample.
+2. Set `top_p=0.5` and confirm only `cat` survives.
+3. Why does greedy decoding still not make a hosted model fully deterministic? (Hint: batching and floating-point non-associativity on the server; you don't control those.)
+
+## C++/Rust notes
+- Treat model output like data from a sensor with noise: design for variance (validation, retries, evals) instead of assuming bit-exact replay.
+- Context windows behave like a fixed-size ring buffer you pay for per byte: what you keep in it is an engineering decision (M4).

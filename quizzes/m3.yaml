@@ -1,0 +1,57 @@
+module: m3
+title: "M3 quiz: the agent loop"
+questions:
+  - id: m3q1
+    type: order
+    prompt: "Order the phases of the agent loop as taught in L3.1."
+    choices: ["act", "perceive", "observe", "plan", "reflect"]
+    answer: [1, 3, 0, 2, 4]
+    explanation: "Perceive → plan → act → observe → reflect, then around again until a stop condition fires."
+  - id: m3q2
+    type: spot_bug
+    prompt: "Which stop condition is missing from this loop?"
+    code: |
+      while True:
+          turn = model.complete(messages, specs)
+          if not turn.tool_calls:
+              return turn.text
+          run_tools(turn, messages)
+    choices: ["the final-answer check", "a step budget (max steps)", "tool execution", "appending results"]
+    answer: 1
+    explanation: "`while True` with no budget can loop forever (and spend forever). Add max_steps, like a watchdog timer."
+  - id: m3q3
+    type: single
+    prompt: "A tool raises FileNotFoundError. In the scratch loop, what happens?"
+    choices: ["The loop crashes", "The error text becomes an observation the model can react to", "The tool is retried silently", "The agent stops with success"]
+    answer: 1
+    explanation: "Error-as-observation lets the model recover (e.g. try another path)."
+  - id: m3q4
+    type: single
+    prompt: "The model calls a tool that doesn't exist. Best response?"
+    choices: ["Ignore it", "Return an error observation listing the available tools", "Invent a result", "Crash"]
+    answer: 1
+    explanation: "Hallucinated tools are common; tell the model what exists."
+  - id: m3q5
+    type: single
+    prompt: "In the computer-use simulator, why does the naive agent fail even though it says 'done'?"
+    choices: ["The model is too small", "A layout shift moved the fields after its only screenshot, and it never verified", "The form has no submit button", "The adapters are wrong"]
+    answer: 1
+    explanation: "Missed clicks raise no error. Re-observe before acting and check the state before claiming success."
+  - id: m3q6
+    type: single
+    prompt: "Who should decide whether a GUI task succeeded?"
+    choices: ["The agent's final message", "A state-based checker (DOM, app database, adb state)", "The number of steps", "The model's confidence"]
+    answer: 1
+    explanation: "Never trust the agent's own claim; AndroidWorld/OSWorld-style harnesses check the resulting state."
+  - id: m3q7
+    type: multi
+    prompt: "Which are read-only-tool safety measures in the explorer agent? (pick all)"
+    choices: ["Paths are resolved and must stay inside the sandbox root", "Output is truncated", "There are no write tools", "The model is trusted to avoid ../"]
+    answer: [0, 1, 2]
+    explanation: "Enforce limits in code, not in the prompt."
+  - id: m3q8
+    type: single
+    prompt: "In Anthropic's computer_toolset_20260801, a click arrives as…"
+    choices: ["a tool_use block named left_click with toolset_name 'computer' and input {coordinate: [x, y]}", "a computer_call with an actions list", "an HTTP request to your machine", "a JavaScript snippet"]
+    answer: 0
+    explanation: "OpenAI's Responses computer tool uses computer_call.actions instead; the course maps both onto one neutral Action type."

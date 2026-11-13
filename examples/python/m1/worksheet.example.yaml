@@ -1,0 +1,13 @@
+# M1 self-assessment worksheet (the course's working ladder: Shapiro L0-L5 for
+# the engineering workflow + DORA's seven AI capabilities as prerequisites).
+# This combination is OUR SYNTHESIS for teaching, not a published standard.
+team: "Example media-pipeline team"
+workflow_level: 3        # Shapiro level you observe today (0-5), see lesson L1.5
+capabilities:            # DORA AI Capabilities Model, scored 0 (absent) .. 3 (strong)
+  clear_ai_stance: 2
+  healthy_data_ecosystems: 1
+  ai_accessible_internal_data: 1
+  strong_version_control: 3
+  small_batches: 2
+  user_centric_focus: 2
+  quality_internal_platforms: 1

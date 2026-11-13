@@ -1,0 +1,40 @@
+---
+title: "Worked example: computer use (simulated screen)"
+description: screenshot → decide → act → observe, a vendor-neutral action schema, Anthropic and OpenAI adapters.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+A computer-use agent is the same loop where **observations are screenshots** and **actions are clicks and keystrokes**. Two classic failures show up immediately:
+
+- **Missed clicks after a layout shift:** a banner appears and pushes the form down, so clicks based on a stale screenshot hit nothing, and *no error is raised*.
+- **Premature "done":** the agent declares success without looking.
+
+To stay offline and deterministic, the "screen" is a simulated sign-up form, and a "screenshot" is a text description with pixel boxes (what a vision model would extract). Real browsers (Playwright) arrive in M15.
+
+<Aside type="caution" title="Adapter formats: tested against recorded payloads only">
+`from_anthropic` follows the `computer_toolset_20260801` docs (member `tool_use` blocks such as `left_click` with `"toolset_name": "computer"` and `input: {coordinate: [x, y]}`). `from_openai` follows the Responses API `computer` tool docs (`computer_call.actions` such as `{type: "click", button: "left", x, y}`). Both were read on 13 Nov 2026. Neither adapter has been run against the live APIs.
+</Aside>
+
+<Snippet path="examples/python/m3/computer_use_sim.py" />
+
+## What happens
+
+```text
+naive    claimed_done=True actually_succeeded=False steps=1
+    ['click(250,115) -> nothing', 'click(250,165) -> name_field', 'click(160,220) -> email_field']
+careful  claimed_done=True actually_succeeded=True steps=3
+    ['click(250,175) -> name_field', 'click(250,225) -> email_field', 'click(160,280) -> submit_button']
+```
+
+The naive agent's first click lands on nothing, it types into the wrong fields, never submits, and still claims success. The careful one re-observes before acting and checks the state before saying "done".
+
+## Try it
+1. Turn `layout_shift=False`: the naive agent now "works". Why is that worse than failing?
+2. Add an Anthropic `double_click` member to `from_anthropic` and a test with a recorded block.
+3. Write a policy that verifies by re-screenshotting but *doesn't* re-observe before acting. Does it catch its own failure?

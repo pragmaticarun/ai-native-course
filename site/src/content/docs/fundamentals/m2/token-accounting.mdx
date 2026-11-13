@@ -1,0 +1,23 @@
+---
+title: "L2.5 Prompt caching, batching, token accounting"
+description: Why multi-step runs get expensive, and what a stable prefix buys you.
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Each call bills **input tokens** (the whole conversation, again) plus **output tokens**. In an agent loop the input grows every step. **Prompt caching** lets providers bill a long, unchanged *prefix* (system prompt, tool schemas) at a lower rate on later calls; **batch** APIs trade latency for price on offline jobs. Exact prices and rules vary by provider, so the example takes prices as parameters.
+
+## Smallest example
+
+<Snippet path="examples/python/m2/token_accounting.py" />
+
+## Try it
+1. Make the prefix 600 tokens instead of 6,000: how much does caching still save?
+2. Put a timestamp at the *start* of the system prompt. Why would that defeat a prefix cache?
+
+## C++/Rust notes
+- A prefix cache is like a precompiled header: it only helps if the prefix is byte-identical every time, so put volatile content last.

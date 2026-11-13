@@ -1,0 +1,46 @@
+---
+title: "L0.3 How exercises, solutions and quizzes work"
+description: Starters that fail, solutions that pass, collapsed solutions, browser-graded quizzes.
+sidebar:
+  order: 3
+---
+
+import { Aside, FileTree } from "@astrojs/starlight/components";
+
+## Intuition
+
+Every exercise is a tiny test-driven kata. **The tests define "done".** CI runs each exercise's tests twice: against the **solution** (must pass) and against the **starter** (must fail). If a starter ever passes, the exercise has gone stale and CI fails.
+
+<FileTree>
+- exercises/
+  - m2/
+    - ex1/
+      - README.md the task
+      - starter/impl.py where you work
+      - solution/impl.py the tested solution
+      - tests/test_m2_ex1.py what "done" means
+</FileTree>
+
+## Hands-on
+
+```bash
+cd python
+EXERCISE_VARIANT=starter  uv run pytest ../exercises/m0/ex1/tests   # fails: your job
+EXERCISE_VARIANT=solution uv run pytest ../exercises/m0/ex1/tests   # passes
+uv run python ../scripts/check_exercises.py                          # what CI runs
+```
+
+## Hidden solutions
+
+On lesson pages, solutions are collapsed under **Show solution**. The code shown is read from the same file CI tests.
+
+<Aside type="note">
+On a public static site, "hidden" means *collapsed*, not secret: the solution is in the page source and the repo. Try first, then peek.
+</Aside>
+
+## Quizzes
+
+Each module overview ends with a quiz (single/multiple choice, ordering, spot-the-bug). Answers are checked in your browser and progress is kept in `localStorage` only. CI validates every quiz file against a schema and checks that every answer key points at a real choice.
+
+## C++/Rust notes
+- The starter/solution check is mutation testing in miniature: a test suite that doesn't fail on the unfinished code isn't testing anything.

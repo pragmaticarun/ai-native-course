@@ -1,0 +1,30 @@
+---
+title: "L2.2 Raw provider APIs: messages and system prompts"
+description: The conversation is a list you resend every time; vendors differ in the details.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Chat APIs are **stateless**: every call sends the whole conversation (`system`, `user`, `assistant`, `tool` messages). The "memory" is your list. Vendors differ in shape: OpenAI-style chat puts the system prompt in the message list and tool results in `tool` messages; Anthropic's Messages API takes `system` as a separate field and returns tool calls as `tool_use` content blocks answered by `tool_result` blocks.
+
+## Smallest example
+
+The course uses one neutral type and translates at the edge:
+
+<Snippet path="python/src/aincourse/llm.py" />
+
+<Aside type="caution" title="Untested">
+The two live adapters (`_OpenAIChat`, `_AnthropicChat`) are not run in CI (no keys stored). `ScriptedModel` is what every test uses.
+</Aside>
+
+## Try it
+1. In a Python REPL, build a conversation with `Message(...)`, call `ScriptedModel([...]).complete(...)` twice, and inspect `model.calls`: the second call contains the first reply.
+2. Streaming: the AI SDK's `streamText` and the vendors' streaming endpoints deliver tokens incrementally. Exercise 3 makes you parse a partial JSON stream.
+
+## C++/Rust notes
+- The neutral `Message` type is your internal ABI; vendor formats are wire protocols. Keep the translation in one adapter per vendor, like a codec layer.

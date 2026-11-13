@@ -1,0 +1,21 @@
+---
+title: "Worked example: Android / KMP structured output (planned)"
+description: The same extractor in Kotlin Multiplatform. Planned, not yet built or tested.
+sidebar:
+  order: 7
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Untested: not built yet">
+This worked example is **designed but not yet implemented**. No Kotlin code has been compiled or run for it, and no device has been used. It will ship with the `kmp/` module (M13 milestone), with a JVM test target that runs in CI.
+</Aside>
+
+## Design (from syllabus v0.3)
+
+- `commonMain` holds the extractor: it depends on a small `OnDeviceLlm` interface, validates the JSON against a schema, and retries once with the validation error (the same loop as [L2.3](/ai-native-course/fundamentals/m2/structured-output/)).
+- **Galaxy A73 path:** LiteRT-LM on CPU with a small Gemma model. RAM fit and speed are to be measured on the device.
+- **Documented Gemini Nano path:** the ML Kit Prompt API (`genai-prompt`), with its documented ~4k-token input limit and `BUSY` handling. The A73 isn't on Google's supported-device list, so this path is exercised only through a fake that replays recorded responses.
+- `jvmTest` runs the extractor against the fake in CI.
+
+See the syllabus, sections 2.3.1 and M13: [/syllabus/](/ai-native-course/syllabus/).

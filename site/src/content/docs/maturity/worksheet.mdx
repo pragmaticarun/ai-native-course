@@ -1,0 +1,32 @@
+---
+title: "Worked example: worksheet → score → radar chart"
+description: Score a self-assessment YAML in Python and draw a dependency-free SVG radar.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../components/Snippet.astro";
+
+## The worksheet
+
+<Snippet path="examples/python/m1/worksheet.example.yaml" lang="yaml" />
+
+## The scorer
+
+<Snippet path="examples/python/m1/assess.py" />
+
+```bash
+cd python && uv run python ../examples/python/m1/assess.py ../examples/python/m1/worksheet.example.yaml
+# Team: Example media-pipeline team
+# Observed workflow level: L3
+# Sustainable level (course synthesis): L3
+# To reach L4, raise to >= 2: ['quality_internal_platforms', 'ai_accessible_internal_data']
+# wrote radar.svg
+```
+
+## Try it
+1. Lower `small_batches` to 1 and re-run: the warning appears.
+2. Change `GATES` to your own team's rules, then update `test_m1.py` so the tests describe your rules.
+
+## Tests
+<Snippet path="examples/python/m1/test_m1.py" />

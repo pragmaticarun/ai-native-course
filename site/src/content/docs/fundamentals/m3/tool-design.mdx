@@ -1,0 +1,36 @@
+---
+title: "L3.4 Tool design"
+description: Granularity, idempotency, read vs write, and error messages written for the model.
+sidebar:
+  order: 4
+---
+
+## Intuition
+
+Tools are an API whose caller is a stochastic planner that reads your docstrings. Design rules:
+
+| Rule | Why | In the explorer |
+|---|---|---|
+| **Right granularity**: one tool per user-meaningful step | too fine = many steps and tokens; too coarse = no control | `grep` instead of "read every file" |
+| **Read vs write separation** | you can auto-approve reads, gate writes | all three tools are read-only |
+| **Idempotent where possible** | the model will retry | reading twice is harmless |
+| **Bounded output** | protects the context window | `read_file` truncates, `grep` caps hits at 50 |
+| **Errors for the model** | it can only fix what it can read | `"error: 'x' is outside the sandbox"`, `"no tool named 'y'; available: [...]"` |
+| **Enforce limits in code** | prompts are suggestions | path resolution + `is_relative_to(root)` |
+
+## Smallest example
+
+```python
+def read_file(path: str, max_chars: int = 2000) -> str:
+    """Read a text file (read-only, truncated)."""   # the model reads this
+    p = (root / path).resolve()
+    if not p.is_relative_to(root):
+        raise PermissionError(f"{path!r} is outside the sandbox")  # becomes an observation
+    return p.read_text(errors="replace")[:max_chars]
+```
+
+## Try it
+Add a `write_file` tool to the explorer, then make the loop refuse to run it unless an `approve()` callback returns `True`. Which Feng et al. level (L1.5) did you just implement?
+
+## C++/Rust notes
+- Same instincts as a syscall surface: least privilege, bounded buffers, explicit error codes, and no trust in the caller's arguments.

@@ -1,0 +1,37 @@
+---
+title: "L1.1 Why maturity models exist, and how they mislead"
+description: Ladders vs maps, vendor bias, and self-reported surveys.
+sidebar:
+  order: 1
+---
+
+## Intuition
+
+A maturity model gives people a **shared vocabulary**: "we're at stage 2" is quicker than a 20-page assessment. That's the whole value, and also the trap.
+
+Two shapes keep coming up:
+
+| Shape | What it does | Good for | Example |
+|---|---|---|---|
+| **Ladder** | ordered levels, each "more mature" | saying *where you are* | MIT CISR's four stages |
+| **Map** | capabilities or perspectives, no ranking | deciding *what to fix next* | DORA's seven AI capabilities |
+
+Three ways they mislead:
+
+1. **Ladders imply everyone should climb.** A regulated firmware team may be right to stay at a "lower" level of agent autonomy.
+2. **Vendor frameworks steer.** A cloud provider's adoption framework is excellent guidance *and* a path to its products. Read it for the steering.
+3. **Survey segments are self-reported.** "X% of firms are at stage 3" usually means "X% of respondents said so".
+
+## Smallest example
+
+Ask of any model, in this order: *Who published it? What scope (organisation, engineering team, single agent)? Ladder or map? What evidence: research, survey, opinion?* Exercise 2 turns this into code.
+
+## Try it
+
+Pick one framework your company already uses (or one from L1.2). Answer the four questions above in one line each.
+
+## C++/Rust notes
+- You already know this pattern: **CMMI** (a process ladder) and **SAE J3016 / NHTSA driving-automation levels** (an autonomy ladder). Both are useful vocabularies and both get over-applied. Shapiro's levels (L1.5) are explicitly modelled on the driving levels.
+
+## Sources
+- Syllabus section 2.1 (comparison table with all links): [/syllabus/](/ai-native-course/syllabus/)

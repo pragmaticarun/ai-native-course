@@ -1,0 +1,24 @@
+---
+title: "M3 · The agent loop"
+description: Perceive → plan → act → observe → reflect, from scratch and in frameworks, plus GUI-agent previews.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~5 hours · **Prerequisites:** M2.
+
+| Lesson | Worked example |
+|---|---|
+| [L3.1 The loop as an event loop](/ai-native-course/fundamentals/m3/the-loop/) | the five phases |
+| [L3.2 A loop from scratch](/ai-native-course/fundamentals/m3/from-scratch/) | `scratch_loop.py` + the read-only explorer agent |
+| [L3.3 The same agent in frameworks](/ai-native-course/fundamentals/m3/frameworks/) | Pydantic AI and AI SDK versions (tested); OpenAI Agents SDK and Claude Agent SDK (reading only) |
+| [L3.4 Tool design](/ai-native-course/fundamentals/m3/tool-design/) | granularity, idempotency, errors written for the model |
+| [L3.5 Failure modes](/ai-native-course/fundamentals/m3/failure-modes/) | detectors for loops, thrash, hallucinated tools, premature "done" |
+| [Worked example: computer use (simulated)](/ai-native-course/fundamentals/m3/computer-use/) | screenshot → decide → act → observe, Anthropic + OpenAI adapters |
+| [Worked example: mobile use with adb](/ai-native-course/fundamentals/m3/mobile-use/) | *device steps untested* |
+| [Exercises](/ai-native-course/fundamentals/m3/exercises/) | reflection, cycle detection, port the loop to TypeScript |
+
+<Quiz src="m3" />

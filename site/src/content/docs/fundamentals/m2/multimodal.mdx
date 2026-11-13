@@ -1,0 +1,26 @@
+---
+title: "Worked example: a video frame on a pixel budget"
+description: Grab a frame with ffmpeg, downscale it, and map coordinates back.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Images cost tokens, and providers downscale large images anyway. Downscale **yourself**, so you know the scale factor, and you can map any coordinates the model returns (e.g. "click at 640, 360") back to real pixels. M15 relies on this for GUI agents.
+
+<Snippet path="examples/python/m2/image_budget.py" />
+
+The frame grab runs real ffmpeg in a test (skipped if ffmpeg isn't installed; CI installs it):
+
+```bash
+ffmpeg -f lavfi -i testsrc=duration=2:size=320x240:rate=10 test.mp4
+cd python && uv run python -c "import sys; sys.path.insert(0,'../examples/python/m2'); \
+  from image_budget import grab_frame; print(grab_frame('../test.mp4', 1.0, 'frame.png'))"
+```
+
+## Try it
+1. Compute the pixel savings for a 1080×2400 phone screenshot at a 1280 long-edge budget.
+2. Sending the image to a live model is left to `--live` mode; per-image token pricing differs by provider, so check its docs.

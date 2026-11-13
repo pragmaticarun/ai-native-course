@@ -1,0 +1,33 @@
+module: m0
+title: "M0 quiz: orientation & setup"
+questions:
+  - id: m0q1
+    type: single
+    prompt: "With no environment variables set, which model do the course examples use?"
+    choices: ["The cheapest OpenAI model", "A deterministic mock model", "Whatever model was used last", "They refuse to run"]
+    answer: 1
+    explanation: "Mock first, live second: COURSE_LLM_PROVIDER defaults to mock, so examples and CI run offline and deterministically."
+  - id: m0q2
+    type: multi
+    prompt: "Which variables switch an example to a live provider? (pick all that are needed)"
+    choices: ["COURSE_LLM_PROVIDER", "COURSE_LLM_MODEL", "That provider's own API-key variable", "A model name edited into the source file"]
+    answer: [0, 1, 2]
+    explanation: "Provider and model come only from the environment; the code never hard-codes a vendor or model."
+  - id: m0q3
+    type: single
+    prompt: "For a Rust developer, the closest analogue of `uv.lock` is…"
+    choices: ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", ".cargo/config.toml"]
+    answer: 1
+    explanation: "Both record exact resolved versions of every dependency so builds are reproducible."
+  - id: m0q4
+    type: single
+    prompt: "What does CI check for every exercise?"
+    choices: ["Only that the solution compiles", "That the solution passes its tests and the starter fails them", "That the starter passes", "Nothing; exercises are prose"]
+    answer: 1
+    explanation: "A starter that passes would mean the exercise is stale; a failing solution would mean it's wrong."
+  - id: m0q5
+    type: single
+    prompt: "On this public site, what does a 'hidden' solution mean?"
+    choices: ["Encrypted until you pass the quiz", "Collapsed by default, but visible in the page source and the repo", "Only available to logged-in users", "Removed from the build"]
+    answer: 1
+    explanation: "It's a <details> element. Real secrecy would need a separate private repo."
