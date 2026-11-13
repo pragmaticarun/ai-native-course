@@ -24,6 +24,9 @@ export default defineConfig({
           items: [
             { label: "M2 · LLM & tool calling", items: [{ autogenerate: { directory: "fundamentals/m2" } }] },
             { label: "M3 · The agent loop", items: [{ autogenerate: { directory: "fundamentals/m3" } }] },
+            { label: "M4 · Context & memory", items: [{ autogenerate: { directory: "fundamentals/m4" } }] },
+            { label: "M5 · Planning, multi-agent & HITL", items: [{ autogenerate: { directory: "fundamentals/m5" } }] },
+            { label: "M6 · Evals, guardrails & cost", items: [{ autogenerate: { directory: "fundamentals/m6" } }] },
           ],
         },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },

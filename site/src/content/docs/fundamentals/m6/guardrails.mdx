@@ -1,0 +1,31 @@
+---
+title: "L6.4 Guardrails"
+description: Input/output validation, prompt-injection defences, tool-permission policies, PII handling.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Guardrails sit at the edges:
+
+- **In:** length limits, schema validation, injection heuristics (for flagging and triage);
+- **Tools:** a per-task allow-list and argument rules, checked *before* anything runs;
+- **Out:** secret and PII detection and redaction before text leaves the system or reaches logs.
+
+<Aside type="caution">
+Pattern-based injection detection is easy to evade. The structural defences matter more: least privilege, per-task tool policies, human checkpoints for consequential actions, and treating tool, web, email and screen content as **data**. Exercise 2 fixes an agent that obeys an email.
+</Aside>
+
+<Snippet path="examples/python/m6/guardrails.py" />
+
+## Try it
+1. Bypass `check_input` with a paraphrase. Then make the *tool policy* stop the damage anyway.
+2. Phone numbers: what does `PHONE` miss for your country's formats? Add tests first.
+
+## C++/Rust notes
+- Validate at the boundary ≈ `serde` with `deny_unknown_fields` plus newtypes: once inside, data is trusted *because* it was checked.
+- Luhn-checked card detection ≈ checksumming before acting on a value.

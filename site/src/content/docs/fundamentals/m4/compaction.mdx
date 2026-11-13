@@ -1,0 +1,33 @@
+---
+title: "L4.2 Short-term memory: compaction"
+description: Summarise old turns, keep recent ones verbatim, and pin the details summaries lose.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Long sessions outgrow any window. **Compaction** replaces old turns with a summary while keeping the last few verbatim. Summaries are lossy in a predictable way: they drop the exact decision ("48 kHz stereo AAC"), the constraint ("must run on the A73 CPU"), the number. So **pin** those lines and copy them word for word. Other tools for short-term memory:
+
+- **Tool-result truncation:** cap each result and say it was cut (L4.1).
+- **Scratchpads:** let the agent write notes to a file instead of keeping everything in the chat.
+
+## Smallest example (Python)
+
+<Snippet path="examples/python/m4/compaction.py" />
+
+The demo goes from ~3,300 to ~600 estimated tokens and keeps the pinned lines.
+
+## Same idea in TypeScript (AI SDK)
+
+<Snippet path="examples/ts/m4/context.ts" />
+
+## Try it
+1. Run `compact` twice in a row (compacting an already-compacted chat). Do pins survive? They should.
+2. Exercise 1 makes you measure this with a **fidelity test**.
+
+## C++/Rust notes
+- Compaction ≈ log compaction (Kafka, LSM trees): old entries merge into a snapshot, recent ones stay as the tail.
+- Pinned lines ≈ entries marked "never compact", like tombstones that must survive a merge.

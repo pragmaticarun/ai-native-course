@@ -64,6 +64,35 @@ jobs:
       - name: Exercises (solutions pass, starters fail)
         run: python3 scripts/check_exercises.py --lang ts
 
+  kmp:
+    name: Kotlin Multiplatform (JVM target)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kmp
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Build and test commonMain on the JVM (fakes only; no Android SDK, no device)
+        run: ./gradlew :shared:jvmTest --console=plain
+      - name: Test report
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, re
+          total = fails = 0
+          for f in glob.glob("shared/build/test-results/jvmTest/*.xml"):
+              head = open(f).read(600)
+              t = int(re.search(r'tests="(\d+)"', head).group(1)); x = int(re.search(r'failures="(\d+)"', head).group(1)) + int(re.search(r'errors="(\d+)"', head).group(1))
+              total += t; fails += x
+              print(f, "tests", t, "failed", x)
+          print(f"KMP jvmTest: {total} tests, {fails} failed")
+          PY
+
   site:
     name: Site build + internal link validation
     runs-on: ubuntu-latest

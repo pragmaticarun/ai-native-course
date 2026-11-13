@@ -1,0 +1,30 @@
+---
+title: "L6.3 Trajectory evals"
+description: Grade tool-call sequences, not just final answers.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Two agents give the same right answer. One grepped once; the other listed every directory, read 40 files, and tried to open `../.env`. Final-answer evals score them the same. **Trajectory graders** look at *how* it got there:
+
+- `calls_first("grep")`: the efficient first move;
+- `at_most_calls(n)`: a step/cost budget as an assertion;
+- `never_calls("list_dir")` / forbidden tools: safety and efficiency;
+- `in_order("grep", "read_file")`: required ordering as a subsequence.
+
+In the AI SDK the trajectory is just `result.steps.flatMap(s => s.toolCalls)`, and a **token budget** can be a custom `stopWhen` condition:
+
+<Snippet path="examples/ts/m6/evals.ts" />
+
+Python graders live in [`graders.py`](/ai-native-course/fundamentals/m6/evals-basics/); the [explorer suite](/ai-native-course/fundamentals/m6/explorer-evals/) applies them to 30 cases.
+
+## Try it
+1. Add a grader that fails if the same tool is called with the same arguments twice in a row (M3's loop detector, as an eval).
+2. Should trajectory checks be strict (exact sequence) or loose (properties)? Write one of each and decide which breaks first when the model improves.
+
+## C++/Rust notes
+- ≈ asserting on a mock's call log (gmock `EXPECT_CALL(...).Times(1)`, `mockall` expectations), not just the return value.

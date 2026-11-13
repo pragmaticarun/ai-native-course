@@ -1,0 +1,32 @@
+---
+title: "Worked example: repo-QA under a 20k-token budget"
+description: Answer questions about a 50,000-line codebase without ever exceeding 20k tokens per call.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+You can't paste 50,000 lines into a prompt, and you shouldn't want to. The agent **greps, then reads small line ranges**. Every tool result is capped, and a **budget guard** measures the prompt before each model call and elides the oldest tool results if it would go over.
+
+The codebase is generated (50 modules × 1,000 lines) so the test is reproducible. One module hides `parse_config`.
+
+<Snippet path="examples/python/m4/repo_qa.py" />
+
+## What the tests check
+
+- the generated tree really is 50,000 lines;
+- the answer cites `mod_37.py:991`, in 3 model calls;
+- the largest prompt stays under 20,000 estimated tokens, **even** for a symbol with thousands of grep hits (truncation does the work).
+
+<Snippet path="examples/python/m4/test_m4.py" title="examples/python/m4/test_m4.py (repo-QA and the rest of M4)" />
+
+## Try it
+1. Remove `truncate_to_tokens` from `grep`, then run `Where is \`handler_\` defined?`. What does the guard do?
+2. Replace the scripted policy with a live model (`COURSE_LLM_PROVIDER=...`) and ask about this course's own repo. Untested here: no live keys in CI.
+
+## C++/Rust notes
+- ≈ reading a huge file with `mmap` + seeks instead of `read_to_string`: touch only the pages you need.
+- The budget guard ≈ a memory limit with an eviction callback.

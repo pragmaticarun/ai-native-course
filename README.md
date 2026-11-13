@@ -5,7 +5,7 @@ AI maturity models, agent loops, graphs, MCP, on-device and GUI agents.
 
 - **Site:** https://pragmaticarun.github.io/ai-native-course/
 - **Syllabus (v0.3):** [SYLLABUS.md](SYLLABUS.md)
-- **Status:** modules **M0–M3** built and tested; M4–M15 and projects P1–P8 are planned (see the syllabus).
+- **Status:** modules **M0–M6** built and tested (Python, TypeScript, Kotlin/JVM); M7–M15 and projects P1–P8 are planned (see the syllabus).
 
 ## Run everything locally (offline, mock models)
 
@@ -33,10 +33,13 @@ Live mode: set `COURSE_LLM_PROVIDER` (`openai` | `anthropic`), `COURSE_LLM_MODEL
 | `exercises/mX/exY/` | `README.md`, `starter/`, `solution/`, `tests/` (CI: solution passes, starter fails) |
 | `quizzes/` | quiz YAML + JSON Schema |
 | `scripts/` | exercise checker, quiz validator, type-check script |
-| `kmp/`, `rust/` | placeholders for later modules (M9, M13, P3, P6, P8) |
+| `kmp/` | Kotlin Multiplatform (`./gradlew :shared:jvmTest`, JDK 21); M2/M4/M5 examples, JVM target only |
+| `rust/` | placeholder for later modules (M9, P3) |
 
 ## Untested / not yet built
 - Device and emulator steps (M3 mobile-use with `adb`): only parsing/command logic is tested, against a hand-written fixture.
-- Android/KMP worked example in M2: designed, not implemented (no Kotlin compiled yet).
+- KMP: JVM target only; the Android target, devices and emulators are untested. ML Kit is mirrored with our own types.
+- M6 on-device eval data is a synthetic fixture; GUI evals use the simulator only.
+- promptfoo, DeepEval, Logfire/OTLP export: described, not exercised.
 - OpenAI Agents SDK and Claude Agent SDK versions of the M3 explorer: comparison only, no tested code yet.
 - Computer-use adapters (Anthropic/OpenAI): tested against recorded payload shapes from the docs, not against live APIs.

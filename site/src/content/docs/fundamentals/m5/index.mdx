@@ -1,0 +1,26 @@
+---
+title: "M5 · Planning, reflection, multi-agent & human-in-the-loop"
+description: Plan-then-execute and replanning, verifiers vs critics, multi-agent patterns and the case against them, approval gates, autonomy levels, safety boundaries.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3, M4.
+
+| Lesson | Worked example |
+|---|---|
+| [L5.1 Planning patterns](/ai-native-course/fundamentals/m5/planning/) | `planning.py`: plan-then-execute with replanning |
+| [L5.2 Reflection and self-critique](/ai-native-course/fundamentals/m5/reflection/) | deterministic verifier vs a lenient critic |
+| [L5.3 Multi-agent patterns](/ai-native-course/fundamentals/m5/multi-agent/) | agent-as-tool, supervisor/worker, handoff, and a single-agent baseline |
+| [L5.4 Human-in-the-loop](/ai-native-course/fundamentals/m5/human-in-the-loop/) | LangGraph `interrupt` (Python) and AI SDK tool approval (TS) |
+| [L5.5 Autonomy as a design choice](/ai-native-course/fundamentals/m5/autonomy/) | mapping agents onto Feng et al.'s levels |
+| [L5.6 Safety boundaries](/ai-native-course/fundamentals/m5/safety-boundaries/) | least-privilege tool registry, dry-run, sandboxed paths |
+| [Worked example: release-notes agent](/ai-native-course/fundamentals/m5/release-notes/) | planner → workers → reasoned human approval → publish (mocked) |
+| [Worked example: on-device HITL (KMP)](/ai-native-course/fundamentals/m5/on-device-hitl/) | confirmation decorator for a destructive tool; *Android/device untested* |
+| [Worked example: GUI-agent safety](/ai-native-course/fundamentals/m5/gui-safety/) | consequential-action checkpoint, untrusted screen text |
+| [Exercises](/ai-native-course/fundamentals/m5/exercises/) | replanning trigger, meaningful approval gate, 3-agent → 1-agent |
+
+<Quiz src="m5" />

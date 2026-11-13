@@ -1,0 +1,33 @@
+---
+title: "Worked example: an eval suite for the M3 explorer"
+description: 30 generated cases, trajectory checks, and a cost report; the suite finds the agent's blind spot.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Thirty cases over a generated fixture repo, in four groups: *where is X defined* (functions and classes), *what does f return*, and *which files mention Y*. Every case also asserts on the trajectory: grep first, at most 4 tool calls, never `list_dir`.
+
+The mock agent has a deliberate blind spot: it only greps for `def`, so it can't find classes. The suite reports it:
+
+```text
+pass 27/30 (90%)
+  FAIL class-Muxer: ["missing ['src/muxer.py']"]
+  FAIL class-Demuxer: ["missing ['src/demuxer.py']"]
+  FAIL class-Resampler: ["missing ['src/resampler.py']"]
+tokens in/out 1486/558, illustrative cost $0.003718
+```
+
+Token counts come from the mock model's rough 4-characters-per-token estimate, and prices are illustrative. With a live model, use the provider's reported usage and real prices.
+
+<Snippet path="examples/python/m6/explorer_evals.py" />
+
+## Try it
+1. Fix the blind spot (grep for `class X` too). The suite should go to 30/30. Make the test assert it.
+2. Add 5 cases that *should* fail politely (symbols that don't exist). What should the grader check?
+
+## C++/Rust notes
+- ≈ a table-driven test suite with a known-failures list, where the list shrinking is progress.

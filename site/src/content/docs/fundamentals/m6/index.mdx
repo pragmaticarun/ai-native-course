@@ -1,0 +1,27 @@
+---
+title: "M6 · Evals, guardrails, observability, cost & latency"
+description: Graders and regression suites, trajectory evals, a GUI-agent eval harness, guardrails, OpenTelemetry traces, and cost/latency engineering.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~6 hours · **Prerequisites:** M3–M5.
+
+| Lesson | Worked example |
+|---|---|
+| [L6.1 Evals are the unit tests of agents](/ai-native-course/fundamentals/m6/evals-basics/) | `graders.py`: exact, programmatic, LLM-judge, suites |
+| [L6.2 Eval tooling](/ai-native-course/fundamentals/m6/eval-tooling/) | Inspect AI offline with `mockllm` (tested); promptfoo, deepeval (reading) |
+| [L6.3 Trajectory evals](/ai-native-course/fundamentals/m6/trajectory-evals/) | grading tool-call sequences (Python + AI SDK) |
+| [L6.4 Guardrails](/ai-native-course/fundamentals/m6/guardrails/) | input/output checks, tool policies, PII redaction |
+| [L6.5 Observability](/ai-native-course/fundamentals/m6/observability/) | OpenTelemetry spans with GenAI attributes |
+| [L6.6 Cost and latency](/ai-native-course/fundamentals/m6/cost-latency/) | routing, caching, parallel tools, budgets, circuit breakers |
+| [Worked example: explorer eval suite](/ai-native-course/fundamentals/m6/explorer-evals/) | 30 cases, trajectory checks, cost report |
+| [Worked example: GUI-agent eval harness](/ai-native-course/fundamentals/m6/gui-eval-harness/) | 15 tasks, state checks, pass@1/pass@k (simulator; *device untested*) |
+| [Worked example: on-device eval](/ai-native-course/fundamentals/m6/on-device-eval/) | model ladder × runtime harness (*synthetic fixture only; A73 untested*) |
+| [Worked example: media eval](/ai-native-course/fundamentals/m6/media-eval/) | ffprobe, loudnorm, WER |
+| [Exercises](/ai-native-course/fundamentals/m6/exercises/) | judge calibration, an injection fix, a cost budget (TS) |
+
+<Quiz src="m6" />

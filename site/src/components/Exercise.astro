@@ -5,10 +5,10 @@ import { marked } from "./markdown";
 import Solution from "./Solution.astro";
 import { GITHUB_BLOB, readRepoFile } from "./repo";
 
-interface Props { dir: string; lang?: "py" | "ts" }
-const { dir, lang = "py" } = Astro.props;
+interface Props { dir: string; lang?: "py" | "ts"; file?: string }
+const { dir, lang = "py", file: fileProp } = Astro.props;
 const readme = readRepoFile(`${dir}/README.md`);
-const file = lang === "py" ? "impl.py" : "loop.ts";
+const file = fileProp ?? (lang === "py" ? "impl.py" : "loop.ts");
 const base = lang === "py" ? dir : `${dir}/ts`;
 const starter = readRepoFile(`${base}/starter/${file}`).trimEnd();
 const html = marked(readme.replace(/^# .*\n/, ""));

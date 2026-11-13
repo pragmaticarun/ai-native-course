@@ -1,0 +1,34 @@
+---
+title: "Worked example: release-notes agent with a real approval gate"
+description: Planner, workers, a reasoned human approval, then publish (mocked).
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+The pipeline: a **planner** groups commits into sections → **workers** draft each section → a **human** reviews → a **publisher** (the only component allowed to write) publishes. Publishing is mocked: it records the notes and sends nothing.
+
+The gate is built against rubber-stamping:
+
+- the reviewer sees a **unified diff** against the last published notes;
+- approving requires a reason of **three or more words**, and the decision must name a reviewer;
+- rejections and blocked decisions are logged with the exact diff shown.
+
+<Snippet path="examples/python/m5/release_notes.py" />
+
+## What the tests check
+- a reasoned approval publishes v1, and the reviewer saw `+- Add AV1 decode` / `-- Old` in the diff;
+- an "ok" approval is **blocked**, a rejection is honoured, and nothing is published in either case.
+
+<Snippet path="examples/python/m5/test_m5.py" title="examples/python/m5/test_m5.py" />
+
+## Try it
+1. Add a check that refuses approval if the diff is longer than 200 lines ("too big to review: split it").
+2. Replace the scripted workers with a live model (untested here).
+
+## C++/Rust notes
+- The publisher as the only writer ≈ a single-owner resource (`&mut` held by one component); everything else gets `&`.
+- The audit log ≈ an append-only journal you can replay to see who approved what, and what they saw.

@@ -1,0 +1,32 @@
+---
+title: "L4.1 Context as a scarce resource"
+description: What goes into the prompt, in what order, and what gets cut first.
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+The context window is RAM, not disk. Everything the model sees on a call competes for it: instructions, tool specs, retrieved data, history. Bigger windows don't remove the problem. Long prompts cost more, run slower, and bury the important parts. So decide **priorities** up front:
+
+1. **Instructions and tool specs:** never dropped. If they alone don't fit, that's a design bug, so fail loudly.
+2. **Retrieved data:** the most relevant first, each document capped, and the total capped at a share of the budget.
+3. **History:** newest first, so the oldest turns go first.
+
+Truncate *visibly* (`…[truncated]`) so the model knows it saw a partial result and can ask for more.
+
+## Smallest example
+
+<Snippet path="examples/python/m4/context_budget.py" />
+
+Running it prints the per-section token split, e.g. `{'instructions': 13, 'tools': 13, 'retrieved': 407, 'history': 1520} dropped turns: 11`. The token counts are a 4-characters-per-token estimate; use your provider's counter when precision matters.
+
+## Try it
+1. Lower `budget` to 500. Which section shrinks first?
+2. Put retrieved docs *after* history in the prompt. Which order do you think helps a model more, and how would you test it? (M6 shows how.)
+
+## C++/Rust notes
+- The window ≈ a fixed-size cache with an eviction policy you choose (here, priority classes plus LRU on history).
+- `build_context` raising on oversized fixed sections ≈ a `static_assert` on a buffer size: fail early, not with silent truncation.

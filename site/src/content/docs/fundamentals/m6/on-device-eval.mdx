@@ -1,0 +1,34 @@
+---
+title: "Worked example: on-device eval (model ladder × runtime)"
+description: Quality, tool-call accuracy, TTFT, tokens/s and peak memory across models and runtimes; Gemini Nano version drift.
+sidebar:
+  order: 9
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="danger" title="Synthetic fixture, not measurements">
+This page tests the **harness**. The numbers in `fixtures/ondevice_runs.json` were typed by hand to exercise it. They are **not** measurements from the Galaxy A73 or any other device, and the model names in the fixture are placeholders. Device runs are planned for M13 and are **untested**.
+</Aside>
+
+## Intuition
+
+On-device choices are a grid: **model ladder** (planned: FunctionGemma 270M, Gemma 3 1B, Gemma 4 E2B) × **runtime** (LiteRT-LM CPU, llama.cpp CPU, and LiteRT-LM GPU if it works on the A73). For each cell, run the same golden prompts and record:
+
+- **quality** (text checks) and **tool-call accuracy** (right tool *and* right arguments: `"6pm"` ≠ `"18:00"`);
+- **TTFT** (median), **decode tokens/s**, **peak memory**.
+
+**Gemini Nano version drift:** ML Kit's `GenerativeModel.getBaseModelName()` returns the on-device base model name, and Google's docs note that different Nano versions can answer the same prompt differently. Record it with every run; when it changes, re-baseline. The A73 can't run Nano, so the drift check runs on recorded fixtures.
+
+<Snippet path="examples/python/m6/ondevice_eval.py" />
+
+## Android notes
+- Use Perfetto and the Android Studio profilers for on-device latency and energy, and instrumentation tests as the eval runner on a device. Not done yet; see M13.
+
+## Try it
+1. Add a "memory budget" rule: any row whose `peak_mb` exceeds a limit fails, whatever its quality.
+2. Decide which metric picks the winner for a notification-triage feature: tool accuracy, TTFT or memory?
+
+## C++/Rust notes
+- ≈ a benchmark matrix (compiler × flags × target) where correctness is checked *before* speed is compared.

@@ -1,0 +1,49 @@
+module: m4
+title: "M4 quiz: context engineering & memory"
+questions:
+  - id: m4q1
+    type: multi
+    prompt: "In build_context(), which sections are never dropped or truncated? (Pick all that apply.)"
+    choices: ["history turns", "instructions", "retrieved documents", "tool specs"]
+    answer: [1, 3]
+    explanation: "Instructions and tool specs are fixed (it raises if they alone exceed the budget). Retrieved docs are capped at a share of the budget; history is trimmed oldest-first."
+  - id: m4q2
+    type: single
+    prompt: "Why does compact() copy DECISION:/CONSTRAINT:/FACT: lines verbatim instead of trusting the summary?"
+    choices: ["It's cheaper", "Summaries tend to drop exactly those details, and losing them changes later behaviour", "The model can't read summaries", "To make the prompt longer"]
+    answer: 1
+    explanation: "Compaction trades detail for space. Decisions and constraints must survive; the fidelity test checks they do."
+  - id: m4q3
+    type: multi
+    prompt: "When is plain keyword/key lookup a better long-term memory than vector search? (Pick all that apply.)"
+    choices: ["Facts have stable keys (user.device)", "Queries name identifiers like parse_config", "You need to inspect and delete memories easily", "Queries are fuzzy paraphrases of long prose"]
+    answer: [0, 1, 2]
+    explanation: "Exact keys and identifiers suit lexical lookup and stay inspectable. Paraphrase-heavy recall over prose is where embeddings help."
+  - id: m4q4
+    type: single
+    prompt: "What does reciprocal rank fusion (RRF) combine?"
+    choices: ["Raw similarity scores from different retrievers", "Rank positions from different retrievers, as sum of 1/(k + rank)", "Embeddings from two models", "Token counts"]
+    answer: 1
+    explanation: "RRF uses ranks, so it needs no score calibration between BM25 and a dense retriever."
+  - id: m4q5
+    type: single
+    prompt: "In the set-of-marks pruning example, why are mark ids derived from resource-id + label + role instead of list position?"
+    choices: ["Shorter strings", "They stay the same after a layout shift, so the model's reference stays valid", "Android requires it", "To hide labels from the model"]
+    answer: 1
+    explanation: "Positional ids change when elements move or appear; identity-based ids survive layout shifts."
+  - id: m4q6
+    type: spot_bug
+    prompt: "This sends A73 screenshots to Anthropic's computer-use tool. What's the bug?"
+    code: |
+      png = adb_screencap()            # 1080x2400
+      return {"type": "tool_result", "content": [image_block(png)]}
+      # model replies with click(x, y); we tap (x, y) on the device
+    choices: ["PNG isn't supported", "No downscale to the model's limits, and no mapping of model coordinates back to device pixels", "tool_result can't hold images", "adb can't take screenshots"]
+    answer: 1
+    explanation: "Per Anthropic's docs, oversized computer-use screenshots are rejected, not downscaled. Resize first and map coordinates back with the scale factor."
+  - id: m4q7
+    type: single
+    prompt: "Fitting a prompt into a 2,048-token LiteRT-LM window: what must always stay in?"
+    choices: ["The full chat history", "System prompt, the running summary (memory) and the current question", "Every tool's full documentation", "Nothing; truncate from the start"]
+    answer: 1
+    explanation: "Those are fixed. Recent turns fill whatever budget remains (minus room for the output)."

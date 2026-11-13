@@ -1,0 +1,29 @@
+---
+title: "L4.3 Long-term memory"
+description: Episodic vs semantic memory; plain files and key lookups before vector databases.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+- **Semantic memory:** facts with keys (`user.device = Galaxy A73`). Newer facts supersede older ones, and every fact records *when* it was learned.
+- **Episodic memory:** an append-only log of what happened, searched by keyword or time.
+
+Start with something you can **read, diff and delete**: a JSON file or a SQLite table. Reach for vector search when key or keyword lookup measurably fails on your questions (Exercise 3 in TS shows how to measure). **When not to use RAG:** if the facts have stable keys, change often, or must be exact, a structured store beats similarity search.
+
+Memory goes wrong quietly: an old fact keeps being used after the world changed. Put the age in the prompt, and test for staleness (Exercise 2).
+
+## Smallest example
+
+<Snippet path="examples/python/m4/memory_store.py" />
+
+## Try it
+1. Add a `forget(key)` that also logs an episode. Why log deletions?
+2. Store the device's Android version with `at=` the date you checked. How old may it get before the agent should re-check?
+
+## C++/Rust notes
+- `remember()` refusing older writes ≈ last-writer-wins with timestamps (a simple CRDT register).
+- A JSON store you can `git diff` ≈ preferring a text config over an opaque binary blob: debuggability first.

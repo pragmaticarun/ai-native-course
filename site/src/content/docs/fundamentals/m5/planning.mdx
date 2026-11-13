@@ -1,0 +1,33 @@
+---
+title: "L5.1 Planning patterns"
+description: Plan-then-execute, ReAct, and replanning when observations break the plan.
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+- **ReAct** (the M3 loop): think, act, observe, one step at a time. Flexible; a model call per step.
+- **Plan-then-execute:** the model writes the whole plan once, and plain code runs it. Cheaper and easier to review, but brittle when reality disagrees.
+- **Replanning** fixes the brittleness: when a step fails (or returns something unexpected), feed the failure back to the planner and get a new plan *for the rest*.
+
+The demo transcodes a clip. The first plan picks AV1; the encoder isn't available, so the planner is called again and switches to HEVC.
+
+<Snippet path="examples/python/m5/planning.py" />
+
+```text
+done=True plans=2
+   probe -> h264 1080p
+   transcode -> clip.mov.hevc.mp4
+   upload -> uploaded clip.mov.hevc.mp4
+```
+
+## Try it
+1. Make `upload` fail once. Does the second plan redo the transcode? Should it? (Exercise 1 adds "expected output" checks.)
+2. Cap `max_replans` at 0 and observe the `reason`.
+
+## C++/Rust notes
+- Plan-then-execute ≈ building a command buffer / render graph, then submitting it; replanning ≈ rebuilding after a device-lost error.
+- A plan as JSON ≈ an IR you can validate before running, like checking a `Vec<Op>` before executing it.

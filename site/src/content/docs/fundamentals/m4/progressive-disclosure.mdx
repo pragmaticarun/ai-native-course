@@ -1,0 +1,24 @@
+---
+title: "L4.5 Progressive disclosure"
+description: Load skills and docs only when needed (preview of M10).
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Don't paste every manual into the prompt. Give the model a **one-line index** (name + description) and a tool to load the full text on demand. The model pays for what it uses. This is the idea behind Agent Skills / `SKILL.md` files, covered in M10.
+
+<Snippet path="examples/python/m4/skills_loader.py" />
+
+With three skills, inlining everything costs ~2,200 estimated tokens; the index plus one loaded skill costs ~960. The gap grows with every skill you add.
+
+## Try it
+1. Write descriptions so vague the model can't choose ("misc tools"). How would you detect that in an eval?
+2. Add a second level: a skill body that lists sub-documents loadable by name.
+
+## C++/Rust notes
+- ≈ lazy loading / `dlopen` on demand, or Rust's `OnceCell`: pay the cost on first use.
+- The index ≈ a symbol table: cheap to scan, points at the expensive body.

@@ -1,0 +1,27 @@
+---
+title: "Worked example: media eval"
+description: Objective graders for a media agent with ffprobe, ffmpeg loudnorm, and word error rate.
+sidebar:
+  order: 10
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Media agents produce files, and files can be graded **objectively**:
+
+- **duration and streams:** `ffprobe -show_format -show_streams -of json`;
+- **loudness:** ffmpeg's `loudnorm` filter with `print_format=json` reports integrated loudness (`input_i`, in LUFS);
+- **transcripts:** word error rate (WER) = word-level edit distance ÷ reference length.
+
+The tests generate their own audio: two 1 kHz tones 20 dB apart. They check that ffprobe sees 3 s / 48 kHz / stereo and that the measured loudness differs by ~20 LU. This runs with Ubuntu's ffmpeg in CI; the course's pinned FFmpeg 9.0.2 container arrives with M14.
+
+<Snippet path="examples/python/m6/media_eval.py" />
+
+## Try it
+1. Add a check that video streams are H.264 or HEVC with a max bitrate.
+2. Compute WER on your own voice note transcribed by any ASR (untested here).
+
+## C++/Rust notes
+- ≈ golden-file tests for a codec: don't diff bytes, compare measurable properties within tolerances.

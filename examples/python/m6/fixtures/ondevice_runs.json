@@ -1,0 +1,21 @@
+{
+  "_warning": "SYNTHETIC FIXTURE. These numbers were typed by hand to exercise the harness. They are NOT measurements from a Galaxy A73 or any other device, and must not be quoted as performance results. Replace with real runs (see the lesson's 'run it on your phone' section, untested).",
+  "golden": [
+    {"id": "g1", "prompt": "Turn on do not disturb until 7am", "expect_tool": "set_dnd", "expect_args": {"until": "07:00"}},
+    {"id": "g2", "prompt": "What's 15% of 80?", "expect_text": "12"},
+    {"id": "g3", "prompt": "Remind me to call Priya at 6pm", "expect_tool": "create_reminder", "expect_args": {"time": "18:00"}},
+    {"id": "g4", "prompt": "Summarise: The build failed because the NDK path was missing.", "expect_text": "NDK"}
+  ],
+  "runs": [
+    {"model": "fixture-model-small", "runtime": "litert-lm-cpu", "base_model_name": "fixture-small-v1",
+     "outputs": {"g1": {"tool": "set_dnd", "args": {"until": "07:00"}}, "g2": {"text": "12"}, "g3": {"tool": "create_reminder", "args": {"time": "6pm"}}, "g4": {"text": "Missing path."}},
+     "ttft_ms": [100, 100, 100, 100], "tokens": [10, 10, 10, 10], "decode_ms": [1000, 1000, 1000, 1000], "peak_mb": 500},
+    {"model": "fixture-model-medium", "runtime": "llama-cpp-cpu", "base_model_name": "fixture-medium-v1",
+     "outputs": {"g1": {"tool": "set_dnd", "args": {"until": "07:00"}}, "g2": {"text": "12"}, "g3": {"tool": "create_reminder", "args": {"time": "18:00"}}, "g4": {"text": "The NDK path was missing."}},
+     "ttft_ms": [200, 200, 200, 200], "tokens": [20, 20, 20, 20], "decode_ms": [2000, 2000, 2000, 2000], "peak_mb": 1000}
+  ],
+  "nano_drift": [
+    {"recorded": "fixture-nano-A", "outputs": {"g2": {"text": "12"}, "g4": {"text": "NDK path missing"}}},
+    {"recorded": "fixture-nano-B", "outputs": {"g2": {"text": "twelve"}, "g4": {"text": "NDK path missing"}}}
+  ]
+}

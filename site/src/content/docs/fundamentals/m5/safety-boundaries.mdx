@@ -1,0 +1,26 @@
+---
+title: "L5.6 Safety boundaries"
+description: Sandboxes, least-privilege tools, and dry-run modes.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Assume the model will eventually call the worst tool with the worst arguments, through a bug, a bad plan, or a prompt injection. Design so that this is survivable:
+
+- **Least privilege:** each task gets only the tools it needs (`for_task({"read"})`).
+- **Dry run:** write tools describe what they *would* do; show that plan, then run for real.
+- **Sandboxes:** confine paths to a root (and in production, processes to a container or VM with no network by default).
+
+<Snippet path="examples/python/m5/safety.py" />
+
+## Try it
+1. Add a `max_deletes_per_run` limit to the registry.
+2. What does `sandboxed()` do with a symlink inside the root that points outside? Write the test.
+
+## C++/Rust notes
+- ≈ `seccomp`/`pledge`/`unveil`: drop privileges you don't need before running untrusted logic.
+- Dry run ≈ `make -n` or `terraform plan`: print the effects before applying them.

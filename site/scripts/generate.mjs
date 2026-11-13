@@ -20,7 +20,7 @@ const stripH1 = (md) => md.replace(/^# .*\n+/, "");
 writeFileSync(resolve(docs, "syllabus.md"), page(
   "Syllabus (v0.3)",
   "The full course syllabus and site outline, as approved.",
-  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M3 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
+  `:::note\nGenerated from [SYLLABUS.md](https://github.com/pragmaticarun/ai-native-course/blob/main/SYLLABUS.md). Modules M0–M6 are built; the rest is the plan.\n:::\n\n${stripH1(read("SYLLABUS.md"))}`,
 ));
 
 writeFileSync(resolve(docs, "changelog.md"), page(
@@ -43,6 +43,11 @@ function pnpmVersions(lockPath, pkgPath) {
     return [name, lock.match(re)?.[1] ?? `${spec} (not in lockfile)`];
   });
 }
+// Kotlin Multiplatform: version catalog + Gradle wrapper
+const catalog = read("kmp/gradle/libs.versions.toml");
+const versionsBlock = catalog.split("[versions]")[1].split("[")[0];
+const kt = [...versionsBlock.matchAll(/^([A-Za-z0-9-]+)\s*=\s*"([^"]+)"/gm)].map((m) => [m[1], m[2]]);
+const gradle = read("kmp/gradle/wrapper/gradle-wrapper.properties").match(/gradle-([0-9.]+)-bin\.zip/)?.[1] ?? "?";
 const rows = (pairs) => pairs.map(([n, v]) => `| \`${n}\` | ${v} |`).join("\n");
 
 const body = `Generated at build time (${today}) from the lockfiles, so this always matches what CI tested.
@@ -64,12 +69,21 @@ ${rows(direct.filter((n) => py[n]).map((n) => [n, py[n]]))}
 |---|---|
 ${rows(pnpmVersions("pnpm-lock.yaml", "package.json"))}
 
+## Kotlin Multiplatform (\`kmp/gradle/libs.versions.toml\`)
+| Entry | Version |
+|---|---|
+${rows(kt)}
+| Gradle (wrapper) | ${gradle} |
+| JDK | 21 (Temurin in CI; \`jvmToolchain(21)\`) |
+
+Only the JVM target is built and tested so far. Android-only entries (AGP, LiteRT-LM, ML Kit, ...) are added when the Android target lands.
+
 ## Site (\`site/pnpm-lock.yaml\`)
 | Package | Locked version |
 |---|---|
 ${rows(pnpmVersions("site/pnpm-lock.yaml", "site/package.json"))}
 
-Versions for later modules (LangGraph, MCP SDKs, Temporal, Android/KMP, media and on-device runtimes) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when their lessons ship.
+Versions for later modules (MCP SDKs, Temporal, the Android target, media and on-device runtimes) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when their lessons ship.
 `;
 writeFileSync(resolve(docs, "reference", "versions.md"), page("Versions", "Pinned versions, generated from the lockfiles.", body));
 console.log("generated syllabus.md, changelog.md, reference/versions.md");

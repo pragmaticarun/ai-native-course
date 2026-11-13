@@ -1,0 +1,24 @@
+---
+title: "M4 · Context engineering & memory"
+description: Context as a scarce resource, compaction, long-term memory, retrieval, progressive disclosure, and GUI/on-device context budgets.
+sidebar:
+  label: Overview & quiz
+  order: 0
+---
+
+import Quiz from "../../../../components/Quiz.astro";
+
+**Time:** ~5 hours · **Prerequisites:** M2, M3.
+
+| Lesson | Worked example |
+|---|---|
+| [L4.1 Context as a scarce resource](/ai-native-course/fundamentals/m4/context-budget/) | `context_budget.py`: a prioritised, budgeted prompt builder |
+| [L4.2 Short-term memory: compaction](/ai-native-course/fundamentals/m4/compaction/) | `compaction.py` (+ TS): summarise old turns, pin decisions verbatim |
+| [L4.3 Long-term memory](/ai-native-course/fundamentals/m4/long-term-memory/) | `memory_store.py`: a plain JSON store with supersession |
+| [L4.4 Retrieval done right](/ai-native-course/fundamentals/m4/retrieval/) | chunking with citations, BM25, hybrid RRF, rerank |
+| [L4.5 Progressive disclosure](/ai-native-course/fundamentals/m4/progressive-disclosure/) | skill index + `load_skill` on demand |
+| [Worked example: repo-QA under 20k tokens](/ai-native-course/fundamentals/m4/repo-qa/) | 50,000-line generated codebase |
+| [Worked example: GUI & on-device context](/ai-native-course/fundamentals/m4/gui-ondevice-context/) | set-of-marks pruning, screenshot budgets, 2k/4k windows (Python + KMP) |
+| [Exercises](/ai-native-course/fundamentals/m4/exercises/) | compaction fidelity, stale memory, grep vs embeddings (TS) |
+
+<Quiz src="m4" />

@@ -1,0 +1,31 @@
+---
+title: "L5.5 Autonomy as a design choice"
+description: Mapping your agent onto Feng et al.'s autonomy levels, from Operator to Observer.
+sidebar:
+  order: 5
+---
+
+## Intuition
+
+Autonomy isn't a property the model has. It's a **choice you make per action**. [Feng et al.'s levels](/ai-native-course/maturity/autonomy-levels/) (M1) describe the user's role: from *operator* (the user drives, the agent assists) through *collaborator*, *consultant* and *approver* to *observer* (the agent acts and the user watches). Read the paper for the exact definitions; the course uses the five roles as a design checklist:
+
+| Action in our examples | Reversible? | Blast radius | Sensible user role |
+|---|---|---|---|
+| grep / read a file (M3 explorer) | yes | none | observer |
+| draft release notes (M5) | yes | low | approver of the publish step |
+| transcode a clip (M5 planning) | yes (re-run) | low | observer, with logs |
+| delete a recording (M5 HITL) | **no** | user data | approver, every time |
+| submit / pay / send in a GUI (M5 GUI safety) | **no** | money, messages | approver, every time |
+
+Rules of thumb:
+
+1. Choose the level **per tool**, not per agent.
+2. Irreversible plus external means a human approves.
+3. Raise autonomy only when evals (M6) show the action is reliable, and keep a way to drop back.
+
+## Try it
+Fill this table in for an agent you want to build. Which single tool forces the whole design down a level?
+
+## C++/Rust notes
+- ≈ capability levels in an OS (`CAP_SYS_ADMIN` vs ordinary user), granted per operation, not per program.
+- Like SAE driving levels (M1 notes): the level describes who is responsible when it goes wrong.

@@ -1,0 +1,31 @@
+---
+title: "Worked example: on-device HITL (KMP)"
+description: Wrap a destructive on-device tool in a confirmation decorator; compare with LangGraph interrupt.
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+On a phone, the "human in the loop" is a dialog. ML Kit's preview `genai-agent` docs describe a decorator on `AgentTool` that asks the user before a tool runs. We use the same shape for a destructive tool such as an AppFunction `delete_recording`: wrap every destructive tool and leave read-only tools alone. Denials return a message the model can read, so it can explain or pick another path.
+
+Compared with [LangGraph's `interrupt`](/ai-native-course/fundamentals/m5/human-in-the-loop/): on a device the agent usually *waits in-process* (a suspend function awaiting the dialog), while the server-side graph *checkpoints and exits*, then resumes later.
+
+<Aside type="caution" title="Our types, not ML Kit's">
+`AgentTool`, `Confirmer` and `RequiresConfirmation` are small types defined in this repo so the logic compiles and runs on the JVM in CI (2 tests). They are **not** the ML Kit API, which is alpha/preview and requires a supported device. Nothing here has been built for Android or run on the Galaxy A73.
+</Aside>
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m5/Confirmation.kt" />
+
+<Snippet path="kmp/shared/src/commonTest/kotlin/course/m5/ConfirmationTest.kt" />
+
+## Try it
+1. Add an "always allow for this session" option to `Confirmer`. What is the risk?
+2. Make the confirmation prompt show *which* recording, with its size and date, rather than just the name.
+
+## C++/Rust notes
+- `RequiresConfirmation(inner) : AgentTool by inner` ≈ the decorator pattern; in Rust, a wrapper struct implementing the same trait and delegating.
+- `fun interface Confirmer` ≈ a single-method trait you can pass as a closure.

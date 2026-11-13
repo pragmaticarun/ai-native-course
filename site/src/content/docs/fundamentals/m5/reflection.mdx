@@ -1,0 +1,27 @@
+---
+title: "L5.2 Reflection and self-critique"
+description: When reflection helps, when it burns tokens, and why deterministic verifiers win when available.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+Reflection means: draft, check, revise. What matters is **what does the checking**:
+
+- **Deterministic verifier** (tests pass, schema validates, `ffprobe` says the duration is right): cheap and trustworthy. Use one whenever it exists.
+- **Critic model:** costs a call per round and can approve wrong answers. Worth it only when no mechanical check exists, and then it needs calibration (M6 Exercise 1).
+
+The demo asks for "trim to 10 s without re-encoding". The deterministic checker parses the flags and catches the missing `-c copy`; a lenient critic says "OK" to the wrong first draft.
+
+<Snippet path="examples/python/m5/reflection.py" />
+
+## Try it
+1. Make the critic strict (always finds a problem). How many rounds and tokens until `max_rounds` stops it?
+2. Combine both: run the deterministic check first and the critic only if it passes. When is that worth it?
+
+## C++/Rust notes
+- Deterministic verifier ≈ the compiler and test suite; critic model ≈ a code reviewer who sometimes skims.
+- `max_rounds` ≈ a retry limit with backoff: never let a feedback loop run unbounded.

@@ -1,0 +1,33 @@
+---
+title: "L4.4 Retrieval done right"
+description: Chunking with citations, BM25, a dense stand-in, hybrid fusion, reranking.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Retrieval quality sets the ceiling on answer quality. The pipeline:
+
+1. **Chunk** with overlap, and keep `path:start-end` on every chunk so answers can **cite**.
+2. **Lexical search (BM25)** is unbeatable for identifiers (`parse_config`), error codes, and flags. Split `camelCase`/`snake_case`.
+3. **Dense search** catches paraphrases. Here a hashed character-trigram vector *stands in* for an embedding model so the example runs offline.
+4. **Hybrid:** fuse the two rankings with **reciprocal rank fusion** (sum of `1/(k+rank)`), which needs no score calibration.
+5. **Rerank** the top few with something more expensive (a cross-encoder or model in production; simple bonuses here).
+
+<Aside type="note">
+The trigram "embedding" captures spelling similarity, not meaning. It's there to show the plumbing (vectors, cosine, fusion), not to claim semantic recall.
+</Aside>
+
+<Snippet path="examples/python/m4/retrieval.py" />
+
+## Try it
+1. Search for `"config parser"` (no underscore). Which retriever finds `parse_config`?
+2. Change the chunk size from 40 to 10 lines. What happens to citations and recall?
+
+## C++/Rust notes
+- BM25 over an inverted index ≈ what `ripgrep` + ranking would be; `tantivy` (Rust) and Lucene implement it properly.
+- RRF ≈ merging k sorted streams by rank, with no shared score scale needed.

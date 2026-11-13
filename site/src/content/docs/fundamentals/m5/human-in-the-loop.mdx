@@ -1,0 +1,35 @@
+---
+title: "L5.4 Human-in-the-loop"
+description: Approval gates, interrupts and resumes, escalation, and avoiding HITL theater.
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+A human checkpoint is a **pause** in the agent's run: save state, ask, resume with the answer, possibly hours later. Two mechanics:
+
+- **Python, LangGraph:** `interrupt(payload)` inside a node pauses the graph; a checkpointer stores the state per `thread_id`; `Command(resume=...)` continues it.
+- **TypeScript, AI SDK:** `toolApproval: { delete_recording: "user-approval" }` makes `generateText` stop with a `tool-approval-request`; you resume by sending a `tool-approval-response` (approved or denied, with a reason). A denied call never executes, and the model sees the reason.
+
+**HITL theater** (Thoughtworks Radar Vol. 35) is an approval step nobody really reviews. Make approvals meaningful: show a diff, require a reason, separate requester and reviewer ([release-notes example](/ai-native-course/fundamentals/m5/release-notes/), Exercise 2). Also, ask only when it matters. Too many prompts train people to click "yes".
+
+## Python: LangGraph interrupt and resume
+
+<Snippet path="examples/python/m5/hitl_langgraph.py" />
+
+## TypeScript: AI SDK tool approval
+
+<Snippet path="examples/ts/m5/approval.ts" />
+
+Both are tested offline (langgraph 1.2.21, ai 7.0.170): approval runs the tool once; denial never runs it.
+
+## Try it
+1. Resume the LangGraph thread twice. What happens the second time?
+2. In the TS version, auto-approve deletions of files named `*.tmp` and ask for everything else (`toolApproval` also accepts a function).
+
+## C++/Rust notes
+- `interrupt` + checkpointer ≈ a coroutine suspended at an `await`, with its frame serialised to disk.
+- An approval gate ≈ a two-person rule for production deploys: the code that proposes isn't the code (or person) that authorises.

@@ -1,0 +1,41 @@
+---
+title: "Worked example: GUI & on-device context"
+description: Set-of-marks pruning of accessibility trees and DOMs, screenshot token budgets with coordinate mapping, and small on-device windows.
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## (a) Prune the UI to what the agent can act on
+
+A raw `uiautomator dump` or DOM is mostly layout noise. Keep **interactive** nodes, give each a **stable id** derived from its identity (resource-id + label + role) rather than its position, and show the model a short list such as `[65e5] button 'Sign in'`. The fixture login screen goes from ~230 estimated tokens of XML to ~12, and the id survives a layout shift (a test checks this).
+
+## (b) Screenshots on a budget, and mapping coordinates back
+
+Per Anthropic's vision docs (checked 13 Nov 2026), an image costs `⌈w/28⌉ × ⌈h/28⌉` visual tokens. The standard tier caps the long edge at 1,568 px and the cost at 1,568 tokens; the high-resolution tier (Claude 4.7 and later) at 2,576 px / 4,784 tokens. Screenshots returned to the computer-use tool are **rejected, not downscaled**, when over the limit, so resizing is your job. A Galaxy A73 portrait screenshot (1080×2400) fits the standard tier at about 706×1568 (1,456 visual tokens). Model coordinates must then be divided by the scale factor before you `adb shell input tap`. Other providers price images differently; check their docs.
+
+<Aside type="note" title="Device status">
+The A73's 1080×2400 resolution is from Samsung's spec sheet. No screenshot was taken from a real device in this milestone. The pruning runs on a hand-written fixture in `uiautomator dump` format.
+</Aside>
+
+<Snippet path="examples/python/m4/gui_context.py" />
+
+## (c) Small on-device windows: Python and KMP
+
+Two design constraints: **~4,000 tokens**, ML Kit Prompt API's documented input guidance for Gemini Nano, and **2,048 tokens**, the context we configure for Gemma 3 1B on LiteRT-LM on the A73. The system prompt, a running summary and the question always stay in; the newest turns fill the rest; dropped turns get folded into the summary. If the backend returns an error, the old summary is kept rather than lost.
+
+<Snippet path="kmp/shared/src/commonMain/kotlin/course/m4/SmallWindow.kt" />
+
+<Aside type="caution" title="What was actually run">
+Kotlin: JVM target only, 4 tests in `SmallWindowTest`, run locally and in CI. No Android build, no LiteRT-LM or ML Kit backend, no device run.
+</Aside>
+
+## Try it
+1. Add `content-desc`-only icons (no text) to the XML fixture. Are they kept? Should they be?
+2. Compute the visual-token cost of the same screenshot on the high-resolution tier. Is the extra fidelity worth ~3× the tokens for your task?
+
+## C++/Rust notes
+- Stable ids ≈ content-addressed handles (hash of identity) instead of indices into a `Vec` that gets reordered.
+- Coordinate mapping ≈ the inverse of a viewport transform; keep the scale factor next to the image like you'd keep a stride next to a buffer.

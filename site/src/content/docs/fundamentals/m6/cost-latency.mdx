@@ -1,0 +1,29 @@
+---
+title: "L6.6 Cost and latency engineering"
+description: Model routing, caching, parallel tool calls, streaming, budgets and circuit breakers.
+sidebar:
+  order: 6
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+- **Routing:** easy requests go to a small, cheap model; hard ones to a large one. Measure the router with evals, because a router that misroutes hard questions saves money and loses quality.
+- **Caching:** identical `(model, prompt)` gets the cached answer. Provider prompt caching (M2 L2.5) is the same idea applied to a shared prefix.
+- **Parallel tool calls:** independent tools run concurrently, so total time ≈ the slowest tool.
+- **Streaming:** doesn't make generation faster, but cuts *perceived* latency (time to first token).
+- **Budgets:** a per-run cost cap that **stops cleanly** with a report, rather than crashing mid-way.
+- **Circuit breakers:** after N consecutive provider failures, stop calling for a cooldown and use a fallback.
+
+Prices in the code are illustrative, not any provider's list price.
+
+<Snippet path="examples/python/m6/cost_latency.py" />
+
+## Try it
+1. Make the router use the small model's own answer plus a confidence check, and escalate if it fails. How would you eval that?
+2. Add jitter to the circuit breaker's cooldown. Why does it matter with many clients?
+
+## C++/Rust notes
+- Budgets ≈ resource quotas (`ulimit`, cgroups). Circuit breakers ≈ the resilience pattern from Hystrix/resilience4j; in a Rust service you'd write one as a `tower` layer.
+- Parallel tool calls ≈ `tokio::join!` / `std::async`.

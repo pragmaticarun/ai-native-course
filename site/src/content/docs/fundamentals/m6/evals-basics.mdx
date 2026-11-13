@@ -1,0 +1,28 @@
+---
+title: "L6.1 Evals are the unit tests of agents"
+description: Datasets, graders (exact, programmatic, LLM-as-judge), and regression suites.
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+You can't unit-test a stochastic function with one assertion, but you can test its **behaviour over a dataset**. An eval is:
+
+- a **dataset** of cases (inputs, plus references or properties);
+- **graders**, from cheapest to most expensive: *exact* match → *programmatic* (contains, regex, parses, tests pass) → *LLM-as-judge* (a rubric, used only when nothing mechanical works, and calibrated);
+- a **suite runner** that reports a pass rate and the failing cases, run in CI against mock models, and nightly or before release against live ones.
+
+Treat the suite as a **regression gate**: a prompt or model change that drops the pass rate doesn't merge.
+
+<Snippet path="examples/python/m6/graders.py" />
+
+## Try it
+1. Write three cases for the M2 unit converter: one exact, one regex, one judge-graded. Which is the most brittle?
+2. Add tags to cases and report the pass rate per tag.
+
+## C++/Rust notes
+- Evals ≈ property-based tests and fuzzing: many inputs, assertions about properties, results as rates.
+- A regression suite in CI ≈ a benchmark gate (`criterion` with a threshold): don't merge slowdowns, or here, quality drops.

@@ -1,0 +1,31 @@
+---
+title: "L5.3 Multi-agent patterns"
+description: Handoffs, agent-as-tool, supervisor/worker, debate, and the case against multi-agent.
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+
+## Intuition
+
+| Pattern | Who keeps control | Use when |
+|---|---|---|
+| **Agent-as-tool** | the caller | a specialist answers a sub-question (e.g. an "ffmpeg expert") |
+| **Supervisor/worker** | the supervisor | independent subtasks can run separately and be merged |
+| **Handoff** | moves to the target | the conversation should *belong* to a specialist from now on |
+| **Debate** | a judge | several drafts are compared (expensive; rarely worth it) |
+
+**The case against:** every hop is another model call, another lossy hand-off of context, and another thing to trace and eval. Start with **one agent with good tools**. Split only when you can measure a gain (Exercise 3 makes you measure it).
+
+<Snippet path="examples/python/m5/multi_agent.py" />
+
+The tests show the 3-agent release notes and the single-agent version produce the same content, using 3 calls and 1 call respectively.
+
+## Try it
+1. Make the supervisor's router drop `chore:` commits silently. Would your evals notice?
+2. Turn the handoff's unknown-agent error into a fallback to a generalist. What should be logged?
+
+## C++/Rust notes
+- Supervisor/worker ≈ actor supervision trees (Erlang/OTP, or `tokio` tasks under a supervisor that restarts them).
+- Agent-as-tool ≈ a function call; handoff ≈ `exec()`: the caller doesn't get control back.

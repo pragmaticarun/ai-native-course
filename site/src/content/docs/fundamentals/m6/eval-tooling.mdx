@@ -1,0 +1,34 @@
+---
+title: "L6.2 Eval tooling"
+description: Inspect AI (tested offline), promptfoo and deepeval; fixed seeds and mock models in CI.
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+Hand-rolled graders (L6.1) teach the idea; tools add datasets, logs, viewers, parallelism and many built-in scorers.
+
+- **Inspect AI** (UK AI Security Institute, Python): tasks = dataset + solver + scorer. Its built-in **`mockllm/model`** provider returns outputs you script, so a task runs in CI with no key. **Tested here** with inspect-ai 0.3.289.
+- **promptfoo** (TS/CLI): YAML test matrices across prompts and providers, assertions, red-teaming. *Not exercised in this repo yet.*
+- **deepeval** (Python): pytest-style metrics, many of them LLM-judged. *Not exercised in this repo yet.*
+
+In CI: mock models, fixed seeds, and recorded fixtures. Live evals run on a schedule with a budget (L6.6).
+
+<Snippet path="examples/python/m6/inspect_eval.py" />
+
+The test scripts three answers, two of them correct, and asserts `accuracy == 2/3` from Inspect's own `includes()` scorer and metrics.
+
+<Aside type="note">
+`inspect view` gives a local log viewer for the `.eval` logs that runs write. We don't use it in CI.
+</Aside>
+
+## Try it
+1. Swap `includes()` for `match()` and see which answers still pass.
+2. Point `model=` at a real provider and run it live (untested here: no keys in CI).
+
+## C++/Rust notes
+- Inspect's task/solver/scorer split ≈ a test harness with fixtures, the system under test, and assertions as separate pluggable parts.

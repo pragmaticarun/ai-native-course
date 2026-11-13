@@ -1,0 +1,45 @@
+---
+title: "Worked example: GUI-agent eval harness"
+description: 15 tasks with setup → run → state check → teardown, seeded runs, pass@1 and pass@k, unsafe-action counts.
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+## Intuition
+
+GUI agents need the same discipline as the AndroidWorld and OSWorld benchmarks:
+
+- each task has **setup → run → state check → teardown**;
+- the grader reads **app state** (here the simulator's `db`; on a device, `adb shell` or content-provider queries; in a browser, the DOM), **never the agent's claim**;
+- runs are **seeded**, and you report **pass@1** and **pass@k**. pass@k uses the unbiased estimator from Chen et al. 2021, [arXiv:2107.03374](https://arxiv.org/abs/2107.03374): `1 − C(n−c, k) / C(n, k)`.
+
+The 15 tasks cover forms (with late layout shifts and prefilled fields), settings toggles (including "already set: do nothing"), search, two prompt-injection tasks, a shop with a "Pay now" trap, and an **infeasible** task where the right answer is to say so.
+
+Metrics per run: success, steps (actions), invalid-action rate, unsafe attempts (consequential clicks outside the task's allow-list, blocked or not), illustrative cost, and wall-clock time.
+
+<Aside type="caution" title="Simulator only">
+Everything runs against an in-process simulator. Running these tasks on an Android emulator (self-hosted KVM runner) or the Galaxy A73 is **not done** in this milestone.
+</Aside>
+
+<Snippet path="examples/python/m6/gui_eval_harness.py" />
+
+## Results (5 seeds per task, k = 3)
+
+```text
+naive         {'pass@1': 0.507, 'pass@3': 0.533, 'mean_steps': 2.93, 'invalid_action_rate': 0.089, 'unsafe_attempts': 10, ...}
+careful       {'pass@1': 0.88,  'pass@3': 0.993, 'mean_steps': 5.41, 'invalid_action_rate': 0.033, 'unsafe_attempts': 4,  ...}
+careful+guard {'pass@1': 0.92,  'pass@3': 1.0,   'mean_steps': 5.41, 'invalid_action_rate': 0.033, 'unsafe_attempts': 4,  ...}
+```
+
+Read it like this. The naive agent fails every layout-shift, injection, prefilled and infeasible task, and its 10 unsafe attempts are the two injection tasks × 5 seeds. The careful agent's *slips* (a seeded 25% chance of missing a click by 50 px) sometimes land on **Pay now**: 4 unsafe attempts, a lesson in itself. With [M5's consequential-action guard](/ai-native-course/fundamentals/m5/gui-safety/) those clicks are **blocked** (still counted as attempts) and the cart task passes on every seed.
+
+## Try it
+1. Lower `slip` to 0.1 and raise `max_steps` to 8. How do pass@1 and pass@3 move, and what does that say about step budgets?
+2. Add task 16: a toggle that is *disabled* (greyed out). What should success mean?
+
+## C++/Rust notes
+- setup/teardown per task ≈ test fixtures that restore an emulator snapshot, like a fresh container per integration test.
+- pass@k ≈ flaky-test statistics: "passes at least once in k retries" is not "reliable".

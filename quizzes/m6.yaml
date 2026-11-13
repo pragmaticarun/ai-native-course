@@ -1,0 +1,51 @@
+module: m6
+title: "M6 quiz: evals, guardrails, observability, cost & latency"
+questions:
+  - id: m6q1
+    type: single
+    prompt: "The explorer agent answers correctly but called list_dir five times first. Which grader catches that?"
+    choices: ["exact()", "A trajectory grader such as at_most_calls() or never_calls('list_dir')", "contains()", "None; only answers matter"]
+    answer: 1
+    explanation: "Trajectory evals grade how the agent got there: order, count, forbidden calls."
+  - id: m6q2
+    type: single
+    prompt: "In the GUI harness, how is success decided?"
+    choices: ["The agent says 'done'", "A state check on the app (db / DOM / adb shell), never the agent's claim", "Number of screenshots", "Wall-clock time"]
+    answer: 1
+    explanation: "Like AndroidWorld/OSWorld: setup → run → state check → teardown."
+  - id: m6q3
+    type: single
+    prompt: "A task passed in 2 of 5 seeded runs. What is unbiased pass@3?"
+    choices: ["0.4", "0.6", "0.9", "1.0"]
+    answer: 2
+    explanation: "1 − C(3,3)/C(5,3) = 1 − 1/10 = 0.9."
+  - id: m6q4
+    type: multi
+    prompt: "Which are structural defences against prompt injection (as opposed to pattern matching)? (Pick all that apply.)"
+    choices: ["Per-task tool allow-lists", "Human checkpoints for consequential actions", "Treating tool/screen output as data, not instructions", "A regex for 'ignore previous instructions'"]
+    answer: [0, 1, 2]
+    explanation: "Regexes help triage but are easy to evade. Least privilege and checkpoints limit the damage."
+  - id: m6q5
+    type: single
+    prompt: "What should agent traces log by default?"
+    choices: ["Full prompts and tool outputs", "Operation names, models, token counts, sizes and ids; content only by explicit opt-in", "Nothing", "Only errors"]
+    answer: 1
+    explanation: "Content can contain PII and secrets. The tracing test asserts no content leaks into attributes."
+  - id: m6q6
+    type: single
+    prompt: "Four independent tools take ~50 ms each. Sequential takes ~200 ms. Parallel takes about…"
+    choices: ["~50 ms", "~200 ms", "~400 ms", "~12 ms"]
+    answer: 0
+    explanation: "asyncio.gather runs them concurrently: total ≈ the slowest one."
+  - id: m6q7
+    type: single
+    prompt: "Why calibrate an LLM judge against human labels (Exercise 1)?"
+    choices: ["To make it faster", "To pick a threshold and measure agreement (e.g. Cohen's kappa) before trusting its scores", "Judges are always right", "To train the model"]
+    answer: 1
+    explanation: "A judge is an instrument; measure it like one."
+  - id: m6q8
+    type: single
+    prompt: "The on-device ladder numbers in this module come from…"
+    choices: ["Galaxy A73 measurements", "A synthetic fixture that tests the harness; real device runs are still to do", "Google's published benchmarks", "The emulator"]
+    answer: 1
+    explanation: "The fixture is labelled SYNTHETIC. Never quote it as performance data."
