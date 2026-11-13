@@ -1,0 +1,91 @@
+---
+title: "P2 · Graph research agent: supervisor, workers, critic, HITL, evals"
+description: "A LangGraph supervisor with parallel researcher workers, retries, a citation-checking critic with capped reflection, a human approval interrupt with checkpoints, OpenTelemetry spans, and an eval suite for trajectory, factuality, cost and latency."
+sidebar:
+  order: 2
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M5–M7 · **Suggested time:** ~8 hours · **Code:** [`projects/p2`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p2) · LangGraph 1.2.21, opentelemetry-sdk 1.45.2 (Python)
+
+```
+supervisor ──(no topics)──────────────────────────────▶ no_evidence ─▶ END
+    │ Send × k (parallel, retried)
+    ▼
+research ×k ─▶ write ─▶ critic ─(bad & revisions < cap)─▶ write
+                          │
+                          └──▶ approve (interrupt) ─▶ publish ─▶ END
+                                                   └▶ END (rejected)
+```
+
+<Aside type="note" title="Fictional data, mock model">
+The corpus is about **an invented city, Riverton**, and every number in it is made up. The mock LLM decomposes, extracts and writes deterministically, and can be told to be sloppy (change a number, cite the wrong document) so the critic has real mistakes to catch. No API key is needed.
+</Aside>
+
+## The kit
+
+<Snippet path="projects/p2/common/p2_kit.py" />
+
+## M1 + M2 · Supervisor, router and workers
+
+- The supervisor turns the question into one sub-question per topic; the router sends each to a `research` worker with `Send`, or routes to `no_evidence` when no topic matches. Out-of-scope questions get "No sources in the corpus cover this question", not a confident guess.
+- Workers retry **transient** search errors (`RetryPolicy(retry_on=TransientSearchError, max_attempts=3)`), drop documents about other years (the corpus has a 2019 report on purpose), and spread claims across sources (at most two per document).
+- At fan-in, `write` merges duplicate claims: in "tram status and budget", the tram and budget workers both find the same sentence.
+
+## M3 · The critic, and reflection with a cap
+
+A cited sentence is supported when the cited document exists, **every number** in the sentence appears in it, and at least 70% of its content words do. The critic returns the bad sentence indices and uncovered sub-questions; the graph sends the draft back to `write` with that feedback, at most `max_revisions` times. After the cap, the draft goes to the human **with the critic's notes** rather than looping forever.
+
+<Snippet path="projects/p2/starter/p2_critic.py" title="starter/p2_critic.py" />
+<Solution path="projects/p2/solution/p2_critic.py" />
+
+## M4 · The human gate
+
+`approve` calls `interrupt({...report, notes, revisions})`. Resume with `Command(resume="approve")`, `"reject"` or `{"edit": "..."}`. With a checkpointer, a fresh graph object (think: a new process) built on the same checkpoint store picks the paused run up where it stopped. There's an eval for exactly that.
+
+<Snippet path="projects/p2/starter/p2_graph.py" title="starter/p2_graph.py" />
+<Solution path="projects/p2/solution/p2_graph.py" />
+
+## M5 · Tracing
+
+Each node runs in an OpenTelemetry span `p2.<node>` with the topic, tokens and simulated model seconds. Tests use the in-memory exporter; production would export over OTLP (*not run here*). Parallel workers share one usage counter, so per-span token deltas are approximate for them; the eval suite uses the exact per-call log instead.
+
+<Solution path="projects/p2/solution/p2_tracing.py" />
+
+## M6 · Evals: trajectory, factuality, cost and latency
+
+- **Trajectory:** supervisor first, one worker per expected topic, no research after writing starts, a critic after every draft, revisions within the cap, and the run ends at the human gate (or at `no_evidence`).
+- **Factuality:** gold recall (each gold fact in a sentence citing the right document) and **strict citation precision**: the cited document must contain the sentence verbatim. That's stricter than the critic on purpose, so the eval isn't just re-running the critic.
+- **Cost/latency:** calls, tokens, simulated model seconds, and the **critical path** if the workers really run in parallel.
+
+Measured on the course box (reference solution, sloppy first draft, first search call per query fails):
+
+| question | trajectory | gold recall | citation precision | revisions | calls | tokens | sim s (sequential) | sim s (critical path) |
+|---|---|---|---|---|---|---|---|---|
+| q1 bus + cycling | ok | 1.0 | 1.0 | 1 | 10 | 1659 | 16.82 | 13.76 |
+| q2 air quality | ok | 1.0 | 1.0 | 1 | 7 | 668 | 6.16 | 6.16 |
+| q3 tram + budget | ok | 1.0 | 1.0 | 1 | 11 | 1003 | 8.74 | 6.88 |
+| q4 cycling + parking | ok | 1.0 | 1.0 | 1 | 11 | 1406 | 13.08 | 11.16 |
+| q5 out of scope | ok | 1.0 | 1.0 | 0 | 1 | 12 | 0.32 | 0.32 |
+
+"Simulated seconds" come from the mock (0.3 s per call plus 1 s per 50 output tokens), not from a real model. The point is the shape: fan-out saves time when there's more than one worker, and the critic costs one extra draft when the first one is sloppy.
+
+<Solution path="projects/p2/solution/p2_evals.py" label="Show the eval suite" />
+
+The evals: [`projects/p2/evals/test_p2.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p2/evals/test_p2.py) (17 tests).
+
+## C++/Rust notes
+- The graph's value is orchestration, not compute; if a worker calls native code (a C++ search index, a Rust tokenizer), keep it behind a function with the same retry contract: raise a *transient* error type for retryable failures, and anything else for bugs.
+- Parallel workers in LangGraph's sync API run in a thread pool; a native extension that holds the GIL serializes them. Release it in the extension (PyO3's `Python::detach`, formerly `allow_threads`; pybind11's `gil_scoped_release`) or use async nodes.
+
+## Untested and not built
+- No real LLM, no LLM judge, no OTLP export, no TypeScript (LangGraph.js) port.
+- Max-concurrency limits and real parallel wall-time were not measured (the critical path is simulated).
+
+## Sources
+- LangGraph `Send`, `interrupt`, `RetryPolicy`, checkpointers: https://docs.langchain.com/oss/python/langgraph/overview
+- OpenTelemetry Python SDK: https://opentelemetry.io/docs/languages/python/
+- PyO3 parallelism (`detach`): https://pyo3.rs/main/parallelism.html

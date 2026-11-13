@@ -5,7 +5,7 @@ AI maturity models, agent loops, graphs, MCP, on-device and GUI agents.
 
 - **Site:** https://pragmaticarun.github.io/ai-native-course/
 - **Syllabus (v0.3):** [SYLLABUS.md](SYLLABUS.md)
-- **Status:** modules **M0–M15** built and tested (Python, TypeScript, Kotlin/JVM, Rust; M13 only up to the host side, its Android parts untested); project **P1** built (P2–P8 planned) (see the syllabus).
+- **Status:** modules **M0–M15** built and tested (Python, TypeScript, Kotlin/JVM, Rust; M13 only up to the host side, its Android parts untested); projects **P1–P2** built (P3–P8 planned) (see the syllabus).
 
 ## Run everything locally (offline, mock models)
 

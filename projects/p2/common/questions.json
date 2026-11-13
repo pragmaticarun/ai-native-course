@@ -1,0 +1,99 @@
+[
+ {
+  "id": "q1",
+  "question": "How did bus ridership and cycling change in Riverton in 2025, and why?",
+  "topics": [
+   "bus",
+   "cycling"
+  ],
+  "gold": [
+   [
+    "41 million",
+    "bus-2025"
+   ],
+   [
+    "9 percent",
+    "bus-2025"
+   ],
+   [
+    "fare",
+    "bus-fares"
+   ],
+   [
+    "3.1 million",
+    "cycling-2025"
+   ],
+   [
+    "18 percent",
+    "cycling-2025"
+   ],
+   [
+    "Mill Street",
+    "cycling-survey"
+   ]
+  ]
+ },
+ {
+  "id": "q2",
+  "question": "What happened to air quality in Riverton in 2025 and what explains it?",
+  "topics": [
+   "air"
+  ],
+  "gold": [
+   [
+    "11 percent",
+    "air-2025"
+   ],
+   [
+    "electric buses",
+    "air-2025"
+   ]
+  ]
+ },
+ {
+  "id": "q3",
+  "question": "What is the status and budget of the Riverton tram extension?",
+  "topics": [
+   "tram",
+   "budget"
+  ],
+  "gold": [
+   [
+    "2027",
+    "tram-delay"
+   ],
+   [
+    "245 million",
+    "tram-delay"
+   ]
+  ]
+ },
+ {
+  "id": "q4",
+  "question": "How did the Mill Street lane affect cycling and parking in Riverton?",
+  "topics": [
+   "cycling",
+   "parking"
+  ],
+  "gold": [
+   [
+    "Mill Street",
+    "cycling-survey"
+   ],
+   [
+    "62 percent",
+    "cycling-survey"
+   ],
+   [
+    "400",
+    "parking"
+   ]
+  ]
+ },
+ {
+  "id": "q5",
+  "question": "What is Riverton's policy on drone deliveries?",
+  "topics": [],
+  "gold": []
+ }
+]

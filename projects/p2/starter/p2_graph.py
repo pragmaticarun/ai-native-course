@@ -1,0 +1,131 @@
+"""STARTER. TODO: year filter, merge, reflection loop, human gate, retries.
+
+P2 milestones 1, 2 and 4: the research graph.
+
+    supervisor ──(no topics)──────────────────────────────▶ no_evidence ─▶ END
+        │ Send × k (one per sub-question; parallel, retried)
+        ▼
+    research ×k ─▶ write ─▶ critic ─(bad & revisions < cap)─▶ write
+                              │
+                              └──▶ approve (interrupt: a human decides) ─▶ publish ─▶ END
+                                                                        └▶ END (rejected)
+
+* supervisor: decomposes the question into sub-questions and routes them;
+* research: one worker per sub-question (fan-out with `Send`, fan-in at `write`);
+  searches, drops documents from other years, extracts claims; `RetryPolicy` retries
+  transient search errors;
+* write → critic: reflection with a cap (`max_revisions`); after the cap the draft goes
+  to the human *with* the critic's notes instead of looping forever;
+* approve: `interrupt()` pauses with the report and notes; resume with "approve",
+  "reject" or {"edit": "..."}; the checkpointer makes the pause survive a restart.
+"""
+
+from __future__ import annotations
+
+import operator
+import re
+from typing import Annotated, Any, TypedDict
+
+from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, Send
+from opentelemetry.trace import Tracer
+from p2_critic import critique
+from p2_kit import MockLLM, Search
+from p2_tracing import memory_tracer, traced
+
+
+class State(TypedDict, total=False):
+    question: str
+    subqs: list[dict[str, str]]
+    findings: Annotated[list[dict[str, Any]], operator.add]
+    draft: list[dict[str, str]]
+    bad: list[int]
+    notes: list[str]
+    revisions: int
+    decision: str
+    report: str
+    published: bool
+
+
+def render(draft: list[dict[str, str]], notes: list[str] | None = None) -> str:
+    body = " ".join(f"{d['text']} [{d['cite']}]" for d in draft)
+    if notes:
+        body += "\n\nReviewer notes: " + "; ".join(notes)
+    return body
+
+
+def build(
+    llm: MockLLM,
+    search: Search,
+    *,
+    tracer: Tracer | None = None,
+    checkpointer: BaseCheckpointSaver | None = None,
+    max_revisions: int = 2,
+    claims_per_topic: int = 4,
+    claims_per_doc: int = 2,
+) -> Any:
+    tracer = tracer or memory_tracer()[0]
+    t = lambda name: traced(tracer, name, llm.usage)  # noqa: E731
+
+    @t("supervisor")
+    def supervisor(state: State) -> State:
+        return {"subqs": llm.decompose(state["question"]), "revisions": 0}
+
+    def route(state: State) -> list[Send] | str:
+        if not state["subqs"]:
+            return "no_evidence"
+        return [Send("research", {**sq, "question": state["question"]}) for sq in state["subqs"]]
+
+    @t("research")
+    def research(task: dict[str, str]) -> State:
+        _year = re.findall(r"\b20\d\d\b", task["question"])  # for the TODO below
+        claims: list[dict[str, str]] = []
+        for doc in search(f"{task['topic']} {task['q']}", k=4):
+            # TODO: skip documents about other years when the question names a year
+            found = llm.extract(task, doc)[:claims_per_doc]  # spread claims across sources
+            claims += [{"text": s, "doc": doc["id"]} for s in found]
+        return {"findings": [{"topic": task["topic"], "q": task["q"],
+                              "claims": claims[:claims_per_topic]}]}  # fmt: skip
+
+    @t("write")
+    def write(state: State) -> State:
+        # TODO: merge duplicate claims from different workers before writing
+        draft = llm.write(state["question"], state["findings"], state.get("bad"))
+        return {"draft": draft}
+
+    @t("critic")
+    def critic(state: State) -> Command[Any]:
+        c = critique(state["draft"], state["subqs"], state["findings"])
+        # TODO: send bad drafts back to write, at most max_revisions times
+        return Command(goto="approve", update={"bad": c.bad, "notes": c.notes})
+
+    def approve(state: State) -> Command[Any]:
+        report = render(state["draft"], state.get("notes"))
+        # TODO: pause for a human with interrupt(); handle approve / reject / {"edit": ...}
+        return Command(goto="publish", update={"decision": "approved", "report": report})
+
+    @t("publish")
+    def publish(state: State) -> State:
+        return {"published": True}
+
+    @t("no_evidence")
+    def no_evidence(state: State) -> State:
+        return {"report": "No sources in the corpus cover this question.", "published": False}
+
+    g = StateGraph(State)
+    g.add_node("supervisor", supervisor)
+    g.add_node("research", research)  # type: ignore[arg-type]  # TODO: retry transient errors
+    g.add_node("write", write)
+    g.add_node("critic", critic, destinations=("write", "approve"))
+    g.add_node("approve", approve, destinations=("publish", END))
+    g.add_node("publish", publish)
+    g.add_node("no_evidence", no_evidence)
+    g.add_edge(START, "supervisor")
+    g.add_conditional_edges("supervisor", route, ["research", "no_evidence"])
+    g.add_edge("research", "write")
+    g.add_edge("write", "critic")
+    g.add_edge("publish", END)
+    g.add_edge("no_evidence", END)
+    return g.compile(checkpointer=checkpointer or InMemorySaver())

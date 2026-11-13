@@ -1,0 +1,85 @@
+[
+ {
+  "id": "bus-2025",
+  "title": "Riverton bus network annual report 2025",
+  "tags": [
+   "bus"
+  ],
+  "text": "Riverton's bus network carried 41 million trips in 2025. Bus trips were 9 percent higher than in 2024. Line 7 along the river was the busiest bus route with 6.2 million trips. The city added 30 electric buses during 2025."
+ },
+ {
+  "id": "bus-fares",
+  "title": "Fare policy note",
+  "tags": [
+   "bus",
+   "budget"
+  ],
+  "text": "In March 2025 Riverton capped single bus fares at 1.50 credits. The council linked the bus ridership growth to the fare cap and to more frequent service on Line 7. Bus fare revenue fell 4 percent despite the extra trips."
+ },
+ {
+  "id": "cycling-2025",
+  "title": "Cycling count summary 2025",
+  "tags": [
+   "cycling"
+  ],
+  "text": "Automatic counters recorded 3.1 million bike trips in Riverton in 2025. Cycling grew 18 percent compared with 2024. The new protected cycle lane on Mill Street opened in May 2025."
+ },
+ {
+  "id": "cycling-survey",
+  "title": "Resident cycling survey",
+  "tags": [
+   "cycling"
+  ],
+  "text": "In the 2025 resident survey, 62 percent of new cyclists named the Mill Street protected lane as the reason they started cycling. Safety at junctions remained the top complaint from cyclists."
+ },
+ {
+  "id": "tram-delay",
+  "title": "Tram extension status",
+  "tags": [
+   "tram",
+   "budget"
+  ],
+  "text": "The eastern tram extension was delayed to 2027 after ground surveys found old mine shafts. The tram extension budget rose from 210 million credits to 245 million credits."
+ },
+ {
+  "id": "air-2025",
+  "title": "Air quality bulletin 2025",
+  "tags": [
+   "air"
+  ],
+  "text": "Average nitrogen dioxide levels in central Riverton fell 11 percent in 2025. The air quality bulletin attributes part of the fall to the electric buses and the low-traffic zone around the market square."
+ },
+ {
+  "id": "parking",
+  "title": "Parking review",
+  "tags": [
+   "parking",
+   "budget"
+  ],
+  "text": "Riverton removed 400 on-street parking spaces in 2025 to build the Mill Street lane and bus stops. Parking income dropped 6 percent."
+ },
+ {
+  "id": "budget-2026",
+  "title": "Transport budget 2026",
+  "tags": [
+   "budget"
+  ],
+  "text": "The 2026 transport budget is 180 million credits. It funds 20 more electric buses and two new protected cycle lanes."
+ },
+ {
+  "id": "weather-noise",
+  "title": "Weather notes (unrelated)",
+  "tags": [
+   "weather"
+  ],
+  "text": "Riverton had its wettest October on record in 2025, with 190 millimetres of rain."
+ },
+ {
+  "id": "bus-old",
+  "title": "Bus network report 2019 (outdated)",
+  "tags": [
+   "bus"
+  ],
+  "text": "In 2019 Riverton's bus network carried 38 million trips. Line 3 was the busiest route."
+ }
+]
