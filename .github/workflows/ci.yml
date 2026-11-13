@@ -39,12 +39,12 @@ jobs:
       - name: Playwright Chromium (M15 sandbox agents and Ex 15.4)
         run: uv run playwright install --with-deps chromium
       - name: Lint
-        run: uv run ruff check ../examples/python ../exercises ../scripts src && uv run ruff format --check ../examples/python ../exercises ../scripts src
+        run: uv run ruff check ../examples/python ../exercises ../projects ../scripts src && uv run ruff format --check ../examples/python ../exercises ../projects ../scripts src
       - name: Type-check
         run: bash ../scripts/typecheck_python.sh
       - name: Worked examples (mock models)
         run: uv run pytest -q -rs ../examples/python
-      - name: Exercises (solutions pass, starters fail)
+      - name: Exercises and projects (solutions pass, starters fail)
         run: uv run python ../scripts/check_exercises.py --lang py
       - name: Quizzes (schema + answer keys)
         run: uv run python ../scripts/validate_quizzes.py
@@ -66,7 +66,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      - name: Exercises (solutions pass, starters fail)
+      - name: Exercises and projects (solutions pass, starters fail)
         run: python3 scripts/check_exercises.py --lang ts
 
   kmp:

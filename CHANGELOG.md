@@ -2,6 +2,18 @@
 
 All notable changes to the course. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.0] - 2026-11-14 (in progress: projects)
+
+### Content
+- **P1 Mini-SWE** (`projects/p1`): a coding agent that goes issue → plan → edit → test → PR against a local git sandbox (bare `origin`, PRs recorded by a JSON "forge"; **no GitHub repo is created or touched**). Guarded tools (path allowlist, symlink check, hidden `.git`, read-only tests, node-id-only `run_tests` with a scrubbed env, disabled host plugins and a no-network `sitecustomize`, truncation), a budgeted loop that verifies `finish` itself, PR bodies with a measured before/after test report, and a **15-seeded-bug benchmark**. The model is scripted (mutation-search repair), not an LLM. Starter, reference solution and 24 evals; CI requires the solution to pass and the starter to fail.
+- New `projects/` layout (`spec/`, `common/`, `starter/`, `solution/`, `evals/`), a *Projects* site section, and `check_exercises.py` now covers projects (`PROJECT_VARIANT`).
+
+### Measured (course box)
+- P1 benchmark: 13/13 fixable bugs resolved, 2/2 needing new logic escalated, 0 test files touched; 12 of 13 fixes restore the original line (`mean` was fixed by an equivalent edit); mean 4.1 test runs and ~2,200 estimated tokens per bug.
+
+### Known gaps / untested
+- P1: no LLM backend (the Pydantic AI, Claude Agent SDK and AI SDK variants are not built); no GitHub Actions background run (it would need a sandbox repo the owner creates); no container/network-namespace isolation for test runs.
+
 ## [0.5.0] - 2026-11-14
 
 ### Content

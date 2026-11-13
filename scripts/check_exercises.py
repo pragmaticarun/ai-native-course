@@ -3,6 +3,8 @@
 
 Python exercises: exercises/mX/exY/tests/test_*.py, run with pytest.
 TypeScript exercises: exercises/mX/exY/ts/*.test.ts, run with vitest.
+Projects: projects/pN/evals/test_*.py (pytest) and projects/pN/evals/*.test.ts (vitest),
+with PROJECT_VARIANT instead of EXERCISE_VARIANT.
 Exit code is non-zero if any solution fails or any starter passes.
 Use `--lang py` or `--lang ts` to check one language only.
 """
@@ -18,7 +20,12 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def run(cmd: list[str], variant: str, cwd: Path) -> int:
-    env = {**os.environ, "EXERCISE_VARIANT": variant, "COURSE_LLM_PROVIDER": "mock"}
+    env = {
+        **os.environ,
+        "EXERCISE_VARIANT": variant,
+        "PROJECT_VARIANT": variant,
+        "COURSE_LLM_PROVIDER": "mock",
+    }
     return subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True).returncode
 
 
@@ -28,9 +35,15 @@ def main() -> int:
         langs = {sys.argv[sys.argv.index("--lang") + 1]}
     problems: list[str] = []
     checked = 0
-    for ex in sorted((ROOT / "exercises").glob("m*/ex*")):
-        py_tests = sorted(ex.glob("tests/test_*.py"))
-        ts_tests = sorted(ex.glob("ts/*.test.ts"))
+    if "--projects-only" in sys.argv:
+        units = sorted((ROOT / "projects").glob("p*"))
+    elif "--exercises-only" in sys.argv:
+        units = sorted((ROOT / "exercises").glob("m*/ex*"))
+    else:
+        units = sorted((ROOT / "exercises").glob("m*/ex*")) + sorted((ROOT / "projects").glob("p*"))
+    for ex in units:
+        py_tests = sorted([*ex.glob("tests/test_*.py"), *ex.glob("evals/test_*.py")])
+        ts_tests = sorted([*ex.glob("ts/*.test.ts"), *ex.glob("evals/*.test.ts")])
         jobs: list[tuple[str, list[str], Path]] = []
         if py_tests and "py" in langs:
             jobs.append(
@@ -61,7 +74,7 @@ def main() -> int:
                 problems.append(f"{rel} [{lang}]: solution fails its tests")
             if start == 0:
                 problems.append(f"{rel} [{lang}]: starter passes its tests (exercise is stale)")
-    print(f"\n{checked} exercise test suites checked, {len(problems)} problem(s)")
+    print(f"\n{checked} exercise/project test suites checked, {len(problems)} problem(s)")
     for p in problems:
         print("  -", p)
     return 1 if problems or checked == 0 else 0

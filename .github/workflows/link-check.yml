@@ -38,5 +38,5 @@ jobs:
             --exclude '^file://'
             --exclude-path site/node_modules --exclude-path node_modules
             --user-agent 'Mozilla/5.0 (X11; Linux x86_64) lychee link checker'
-            './site/dist/**/*.html' './*.md' './exercises/**/*.md'
+            './site/dist/**/*.html' './*.md' './exercises/**/*.md' './projects/**/*.md'
           fail: true

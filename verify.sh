@@ -16,8 +16,8 @@ setup() {
 }
 python_checks() {
   step python
-  (cd python && uv run ruff check ../examples/python ../exercises ../scripts src \
-    && uv run ruff format --check ../examples/python ../exercises ../scripts src \
+  (cd python && uv run ruff check ../examples/python ../exercises ../projects ../scripts src \
+    && uv run ruff format --check ../examples/python ../exercises ../projects ../scripts src \
     && bash ../scripts/typecheck_python.sh \
     && uv run pytest -q -rs ../examples/python \
     && uv run python ../scripts/validate_quizzes.py)

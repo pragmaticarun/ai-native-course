@@ -56,6 +56,7 @@ export default defineConfig({
           label: "GUI Agents",
           items: [{ label: "M15 · Computer-use & mobile-use agents", items: [{ autogenerate: { directory: "gui-agents/m15" } }] }],
         },
+        { label: "Projects", items: [{ autogenerate: { directory: "projects" } }] },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         { label: "Syllabus", link: "/syllabus/" },
         { label: "Changelog", link: "/changelog/" },

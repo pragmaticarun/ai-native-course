@@ -1,0 +1,137 @@
+[
+ {
+  "id": "P1-01-mean",
+  "file": "src/textkit/stats.py",
+  "find": "return sum(xs) / len(xs)",
+  "replace": "return sum(xs) / (len(xs) - 1)",
+  "title": "mean() gives the wrong answer",
+  "body": "`mean([1, 2, 3, 4])` returns 3.33 instead of 2.5, and `mean([7])` crashes with ZeroDivisionError.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-02-variance",
+  "file": "src/textkit/stats.py",
+  "find": "/ (n - 1)",
+  "replace": "/ (n + 1)",
+  "title": "variance() is too small",
+  "body": "Sample variance of `[1, 3]` should be 2, we get 0.67.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-03-clamp",
+  "file": "src/textkit/stats.py",
+  "find": "return max(lo, min(x, hi))",
+  "replace": "return min(lo, min(x, hi))",
+  "title": "clamp() ignores the lower bound",
+  "body": "`clamp(5, 0, 10)` returns 0.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-04-palindrome",
+  "file": "src/textkit/strings.py",
+  "find": "return s == s[::-1]",
+  "replace": "return s != s[::-1]",
+  "title": "is_palindrome() is inverted",
+  "body": "'Never odd or even' is reported as not a palindrome.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-05-truncate",
+  "file": "src/textkit/strings.py",
+  "find": "if len(s) <= width:",
+  "replace": "if len(s) < width:",
+  "title": "truncate() cuts strings that already fit",
+  "body": "`truncate('abc', 3)` returns 'ab\u2026'.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-06-word_count",
+  "file": "src/textkit/strings.py",
+  "find": "return len(s.split())",
+  "replace": "return len(s.split(\" \"))",
+  "title": "word_count() miscounts tabs and double spaces",
+  "body": "`word_count('one  two\\tthree\\n')` should be 3; empty string should be 0.",
+  "expected": "escalate"
+ },
+ {
+  "id": "P1-07-slugify",
+  "file": "src/textkit/strings.py",
+  "find": "c.isalnum() or c == \"-\"",
+  "replace": "c.isalnum() and c == \"-\"",
+  "title": "slugify() returns only dashes",
+  "body": "`slugify('Hello Agent World')` returns '--'.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-08-leap",
+  "file": "src/textkit/dates.py",
+  "find": "year % 100 != 0",
+  "replace": "year % 100 == 0",
+  "title": "is_leap() is wrong for 2024",
+  "body": "2024 is reported as not a leap year.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-09-feb",
+  "file": "src/textkit/dates.py",
+  "find": "if month == 2:",
+  "replace": "if month != 2:",
+  "title": "days_in_month() broken for most months",
+  "body": "`days_in_month(2023, 4)` returns 28.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-10-chunk",
+  "file": "src/textkit/seqs.py",
+  "find": "xs[i : i + n]",
+  "replace": "xs[i : i - n]",
+  "title": "chunk() returns empty chunks",
+  "body": "`chunk([1, 2, 3, 4, 5], 2)` returns lists of empty lists.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-11-top_k",
+  "file": "src/textkit/seqs.py",
+  "find": "reverse=True",
+  "replace": "reverse=False",
+  "title": "top_k() returns the smallest values",
+  "body": "`top_k([3, 9, 1, 7], 2)` returns [1, 3].",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-12-dedupe",
+  "file": "src/textkit/seqs.py",
+  "find": "out.append(x)",
+  "replace": "out.insert(0, x)",
+  "title": "dedupe() reverses the order",
+  "body": "`dedupe(['b', 'a', 'b', 'c', 'a'])` returns ['c', 'a', 'b'].",
+  "expected": "escalate"
+ },
+ {
+  "id": "P1-13-discount",
+  "file": "src/textkit/money.py",
+  "find": "(1 - pct / 100)",
+  "replace": "(1 + pct / 100)",
+  "title": "apply_discount() raises the price",
+  "body": "A 15% discount on 1000 cents gives 1150.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-14-split",
+  "file": "src/textkit/money.py",
+  "find": "if i < remainder",
+  "replace": "if i <= remainder",
+  "title": "split_bill() overcharges",
+  "body": "`split_bill(900, 3)` sums to 903.",
+  "expected": "resolve"
+ },
+ {
+  "id": "P1-15-title",
+  "file": "src/textkit/strings.py",
+  "find": "if i > 0 and w in SMALL",
+  "replace": "if i >= 0 and w in SMALL",
+  "title": "title_case() lowercases the first word",
+  "body": "`title_case('the art of war')` returns 'the Art of War'.",
+  "expected": "resolve"
+ }
+]

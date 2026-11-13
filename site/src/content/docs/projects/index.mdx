@@ -1,0 +1,24 @@
+---
+title: "Projects"
+description: "End-to-end projects with milestones, a starter, a CI-tested reference solution and evals on mock models."
+sidebar:
+  label: Overview
+  order: 0
+---
+
+Each project lives in [`projects/pN/`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects) with a `spec/` (brief and milestones), a provided `common/` kit, a `starter/`, a `solution/` and `evals/`. CI runs the evals against both versions: **the solution must pass and the starter must fail**, so the starter can't silently go stale.
+
+| Project | After | What you build | Status |
+|---|---|---|---|
+| [P1 · Mini-SWE coding agent](/ai-native-course/projects/p1/) | M3–M6, M10–M11 | issue → plan → edit → test → PR, with guardrails, budgets and a 15-bug benchmark | built (v0.6) |
+| P2 · Graph research agent | M5–M7 | supervisor, parallel workers, critic, HITL, evals | planned in this release |
+| P3 · Media MCP toolkit | M9, M14 | Python/TS servers, GStreamer tools, Rust `rmcp` probe/loudness, Kotlin port, agent client | planned in this release |
+| P4–P8 | | see the [syllabus](/ai-native-course/syllabus/) | planned |
+
+Run a project's evals locally:
+
+```bash
+cd python
+PROJECT_VARIANT=starter  uv run pytest ../projects/p1/evals   # fails until you finish
+PROJECT_VARIANT=solution uv run pytest ../projects/p1/evals   # the reference passes
+```

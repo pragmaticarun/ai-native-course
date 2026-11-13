@@ -1,0 +1,119 @@
+---
+title: "P1 · Mini-SWE: issue → plan → edit → test → PR"
+description: "A coding agent with guarded tools in a git worktree, a budgeted loop with a verified finish, PRs on a local forge, and a benchmark of 15 seeded bugs. Mock model, runs offline."
+sidebar:
+  order: 1
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M3–M6, M10–M11 · **Suggested time:** ~10 hours · **Code:** [`projects/p1`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p1)
+
+Build a coding agent that takes an issue, plans, edits files with read/search/edit tools in a git worktree, runs the tests, iterates, and opens a pull request with a summary and a test report, or escalates when it can't fix the bug.
+
+<Aside type="note" title="Everything is local">
+The repo is a git clone of a small library (`textkit`), the remote is a bare git repo in a temp directory, and the "forge" that takes PRs is a JSON file. **No GitHub repo is created or touched**, and the model is scripted (no API key). Running it against a real GitHub sandbox repo is a stretch goal that needs the repo owner's go-ahead.
+</Aside>
+
+## The brief and milestones
+
+| # | You build | Concepts |
+|---|---|---|
+| M1 | a **repo map** within a character budget | context engineering on a repo (M4) |
+| M2 | **guarded tools** | tool design and guardrails (M3, M6) |
+| M3 | a **scripted model**: reproduce → localise → repair → finish or give up | the agent loop, TDD with agents (M3, M11) |
+| M4 | the **loop** with budgets and a verified finish | cost budgets, "done" owned by the harness (M6, M11) |
+| M5 | the **PR**: commit, push, body with a measured test report | issue → PR pipelines (M11) |
+| M6 | the **15-seeded-bug benchmark** | evals on a fixed benchmark (M6) |
+
+Start from `projects/p1/starter/` (the evals fail), run `PROJECT_VARIANT=starter uv run pytest ../projects/p1/evals` from `python/`, and work through the TODOs. The provided kit (sandbox, seeded bugs, local forge, `Model` protocol):
+
+<Snippet path="projects/p1/common/p1_kit.py" />
+
+## M1 · A repo map within a budget
+
+The model gets file names, function signatures and the first docstring line, cut at a budget with a pointer to `search` for the rest.
+
+<Snippet path="projects/p1/starter/p1_context.py" title="starter/p1_context.py" />
+<Solution path="projects/p1/solution/p1_context.py" />
+
+## M2 · Guardrails in the tools, not the prompt
+
+- paths stay inside the worktree (no absolute paths, `..` or symlink escapes), `.git` is invisible;
+- **tests are read-only**: they're the oracle, and an agent that edits them to go green hasn't fixed anything;
+- `run_tests` takes only test node ids (no pytest options), with a scrubbed environment, a timeout, host plugins disabled, and a `sitecustomize` that makes socket use fail;
+- every result is truncated and counted.
+
+<Aside type="caution" title="A guard, not a sandbox">
+The socket patch catches accidents in Python code. Real isolation for untrusted code is a container or a network namespace, which this project doesn't set up (*untested here*).
+</Aside>
+
+<Snippet path="projects/p1/starter/p1_tools.py" title="starter/p1_tools.py" />
+<Solution path="projects/p1/solution/p1_tools.py" />
+
+## M3 · The scripted model
+
+It drives the same tools an LLM would, one call at a time, and sees only tool output. Repair is **mutation search**: flip a comparison, swap `+`/`-`, `and`/`or`, `min`/`max`, `True`/`False`, drop a stray ±1, and keep an edit only if the failing tests pass and then the whole suite passes. Anything that needs new logic is escalated. That's classic search-based program repair: deterministic, testable, and honest about its limits.
+
+<Solution path="projects/p1/solution/p1_repairer.py" label="Show the reference model" />
+
+## M4 · The loop: budgets and a verified finish
+
+"finish" is a claim. The loop re-runs the full suite itself and checks that the diff is non-empty and inside `src/` before it calls the issue resolved. A model that deletes an assertion and says "all good" gets `finish rejected` (there's an eval for exactly that).
+
+<Snippet path="projects/p1/starter/p1_agent.py" title="starter/p1_agent.py" />
+<Solution path="projects/p1/solution/p1_agent.py" />
+
+## M5 · The pull request
+
+Commit only `src/`, push the branch to the local origin, and open the PR with the plan, the one-line change, a before/after test report **measured by the loop**, the diff stat and the cost. Escalations open no PR.
+
+<Solution path="projects/p1/solution/p1_pr.py" />
+
+## M6 · The benchmark: 15 seeded bugs
+
+[`bugs.json`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p1/common/bugs.json) seeds one bug per sandbox: 13 that one small edit can fix and 2 (`word_count`, `dedupe`) that need new logic. Measured on the course box with the reference solution:
+
+| bug | expected | outcome | exact fix | test runs | tool calls | ~tokens |
+|---|---|---|---|---|---|---|
+| P1-01-mean | resolve | resolved | no | 4 | 11 | 2766 |
+| P1-02-variance | resolve | resolved | yes | 7 | 18 | 3987 |
+| P1-03-clamp | resolve | resolved | yes | 4 | 8 | 1808 |
+| P1-04-palindrome | resolve | resolved | yes | 4 | 8 | 1995 |
+| P1-05-truncate | resolve | resolved | yes | 4 | 8 | 1993 |
+| P1-06-word_count | escalate | escalated | — | 1 | 4 | 1481 |
+| P1-07-slugify | resolve | resolved | yes | 5 | 11 | 2558 |
+| P1-08-leap | resolve | resolved | yes | 5 | 12 | 2585 |
+| P1-09-feb | resolve | resolved | yes | 6 | 14 | 2652 |
+| P1-10-chunk | resolve | resolved | yes | 5 | 11 | 2267 |
+| P1-11-top_k | resolve | resolved | yes | 4 | 8 | 1755 |
+| P1-12-dedupe | escalate | escalated | — | 1 | 4 | 1252 |
+| P1-13-discount | resolve | resolved | yes | 4 | 8 | 1708 |
+| P1-14-split | resolve | resolved | yes | 4 | 8 | 1754 |
+| P1-15-title | resolve | resolved | yes | 4 | 8 | 2022 |
+
+13/13 fixable bugs resolved, 2/2 escalated, 0 test files touched. Two things to notice:
+
+- **`mean` was fixed, but not the way it was broken**: `/ (len(xs) - 1)` became `/ (len(xs))`, which is equivalent. "Exact fix" is a useful second metric because a test-passing edit isn't always the intended one.
+- Tokens are estimated (4 characters per token) from what the loop sends and receives. A real model would cost more per step and need fewer test runs, or more.
+
+<Solution path="projects/p1/solution/p1_bench.py" label="Show the benchmark harness" />
+
+The evals: [`projects/p1/evals/test_p1.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p1/evals/test_p1.py) (24 tests: guardrails, context, loop, PR, benchmark).
+
+## C++/Rust notes
+- For a C++ or Rust repo, "run the tests" becomes `ctest` or `cargo test`, and the same rules apply: no flags from the model, a timeout, and a separate target dir per worktree (`CARGO_TARGET_DIR`), or parallel agents serialize on the build lock.
+- Mutation operators are language-agnostic. Tools like `cargo-mutants` (Rust) and Mull (C/C++) do the reverse of this agent's search: they mutate to test the tests, which is a good way to check that a benchmark's tests would catch a wrong fix.
+- Compile errors are cheap signals: check that a candidate edit compiles (`cargo check`) before spending a test run, as the scripted model does with `ast.parse`.
+
+## Untested and not built
+- **No LLM**: the Pydantic AI, Claude Agent SDK and AI SDK (TypeScript) variants from the syllabus are not built; the `Model` protocol is where they'd plug in.
+- **No GitHub**: PRs go to a local JSON forge. The GitHub Actions background-agent stretch is not built and needs a sandbox repo the owner creates.
+- **No container or network namespace** around test runs (the socket guard is in-process).
+
+## Sources
+- SWE-bench (the benchmark style this mimics): https://www.swebench.com/
+- cargo-mutants: https://mutants.rs/ · Mull: https://github.com/mull-project/mull
+- git worktree: https://git-scm.com/docs/git-worktree

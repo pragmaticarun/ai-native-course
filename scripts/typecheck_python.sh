@@ -12,4 +12,11 @@ for f in "$ROOT"/exercises/m*/ex*/{starter,solution}/impl.py; do
   MYPYPATH="$EX_PATHS" uv run mypy "$f" "$(dirname "$(dirname "$f")")"/tests/*.py >/dev/null \
     || { echo "mypy failed: $f"; MYPYPATH="$EX_PATHS" uv run mypy "$f"; exit 1; }
 done
+for proj in "$ROOT"/projects/p*; do
+  for v in starter solution; do
+    [ -d "$proj/$v" ] || continue
+    MYPYPATH="$proj/common:$proj/$v:$EX_PATHS" uv run mypy "$proj/common" "$proj/$v" "$proj/evals" >/dev/null \
+      || { echo "mypy failed: $proj/$v"; MYPYPATH="$proj/common:$proj/$v:$EX_PATHS" uv run mypy "$proj/common" "$proj/$v" "$proj/evals"; exit 1; }
+  done
+done
 echo "mypy: all clean"
