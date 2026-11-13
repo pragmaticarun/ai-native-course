@@ -34,6 +34,7 @@ from p7_kit import (
 )
 
 SILENT_DB = -60.0
+MIN_SEGMENT_S = 0.3
 REEL_SHOT_S = 1.2
 TARGET_LUFS = -16.0
 
@@ -64,10 +65,14 @@ def build(asr: MockASR, checkpointer: Any = None) -> Any:
         path = Path(s["path"])
         # Fuse the two modalities: a dark slide after a dark slide can slip under the scene
         # threshold, but the pause's silence edges still mark it. Snap to frames, dedupe.
-        marks = mt.scene_cuts(path) + [t for a, b in mt.silences(path) for t in (a, b)]
+        # Scene cuts are frame-exact; a silence edge only counts where no cut is near (the
+        # audio edge can sit a few hundredths off, and ffmpeg versions differ here).
+        cuts = mt.scene_cuts(path)
+        quiet = [t for a, b in mt.silences(path) for t in (a, b)]
+        marks = cuts + [t for t in quiet if all(abs(t - c) > MIN_SEGMENT_S for c in cuts)]
         edges = [0.0]
         for t in sorted(round(round(m * FPS) / FPS, 3) for m in marks):
-            if t - edges[-1] > 0.1 and s["duration"] - t > 0.1:
+            if t - edges[-1] > MIN_SEGMENT_S and s["duration"] - t > MIN_SEGMENT_S:
                 edges.append(t)
         edges.append(s["duration"])
         segs = [

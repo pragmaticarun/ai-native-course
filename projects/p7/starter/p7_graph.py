@@ -32,6 +32,7 @@ from p7_kit import (
 )
 
 SILENT_DB = -60.0
+MIN_SEGMENT_S = 0.3
 REEL_SHOT_S = 1.2
 TARGET_LUFS = -16.0
 
@@ -65,7 +66,7 @@ def build(asr: MockASR, checkpointer: Any = None) -> Any:
         marks = mt.scene_cuts(path)
         edges = [0.0]
         for t in sorted(round(round(m * FPS) / FPS, 3) for m in marks):
-            if t - edges[-1] > 0.1 and s["duration"] - t > 0.1:
+            if t - edges[-1] > MIN_SEGMENT_S and s["duration"] - t > MIN_SEGMENT_S:
                 edges.append(t)
         edges.append(s["duration"])
         segs = [
