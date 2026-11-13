@@ -1,0 +1,380 @@
+[
+ {
+  "id": "rec01",
+  "title": "Riverton tram budget review",
+  "shots": [
+   {
+    "color": "red",
+    "seconds": 1.6,
+    "tone_hz": 440,
+    "title": "Why the tram is late",
+    "transcript": "In this part we talk about why the tram is late for the riverton tram budget review and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "blue",
+    "seconds": 2.0,
+    "tone_hz": 550,
+    "title": "Where the money went",
+    "transcript": "In this part we talk about where the money went for the riverton tram budget review and what it means for everyone here"
+   },
+   {
+    "color": "green",
+    "seconds": 2.4,
+    "tone_hz": 660,
+    "title": "What changes next year",
+    "transcript": "In this part we talk about what changes next year for the riverton tram budget review and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec02",
+  "title": "Onboarding for the clips team",
+  "shots": [
+   {
+    "color": "blue",
+    "seconds": 2.0,
+    "tone_hz": 550,
+    "title": "Welcome and tools",
+    "transcript": "In this part we talk about welcome and tools for the onboarding for the clips team and what it means for everyone here"
+   },
+   {
+    "color": "green",
+    "seconds": 2.4,
+    "tone_hz": 660,
+    "title": "How we review code",
+    "transcript": "In this part we talk about how we review code for the onboarding for the clips team and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "yellow",
+    "seconds": 1.6,
+    "tone_hz": 770,
+    "title": "Shipping on Fridays",
+    "transcript": "In this part we talk about shipping on fridays for the onboarding for the clips team and what it means for everyone here"
+   },
+   {
+    "color": "purple",
+    "seconds": 2.0,
+    "tone_hz": 880,
+    "title": "Questions",
+    "transcript": "In this part we talk about questions for the onboarding for the clips team and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec03",
+  "title": "Cooking with a rice cooker",
+  "shots": [
+   {
+    "color": "green",
+    "seconds": 2.4,
+    "tone_hz": 660,
+    "title": "Rinse the rice",
+    "transcript": "In this part we talk about rinse the rice for the cooking with a rice cooker and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "yellow",
+    "seconds": 1.6,
+    "tone_hz": 770,
+    "title": "Water ratios",
+    "transcript": "In this part we talk about water ratios for the cooking with a rice cooker and what it means for everyone here"
+   },
+   {
+    "color": "purple",
+    "seconds": 2.0,
+    "tone_hz": 880,
+    "title": "Steaming vegetables on top",
+    "transcript": "In this part we talk about steaming vegetables on top for the cooking with a rice cooker and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec04",
+  "title": "Garden planning for spring",
+  "shots": [
+   {
+    "color": "yellow",
+    "seconds": 1.6,
+    "tone_hz": 770,
+    "title": "Soil tests",
+    "transcript": "In this part we talk about soil tests for the garden planning for spring and what it means for everyone here"
+   },
+   {
+    "color": "purple",
+    "seconds": 2.0,
+    "tone_hz": 880,
+    "title": "Choosing seeds",
+    "transcript": "In this part we talk about choosing seeds for the garden planning for spring and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "orange",
+    "seconds": 2.4,
+    "tone_hz": 330,
+    "title": "Watering schedule",
+    "transcript": "In this part we talk about watering schedule for the garden planning for spring and what it means for everyone here"
+   },
+   {
+    "color": "white",
+    "seconds": 1.6,
+    "tone_hz": 990,
+    "title": "Pests",
+    "transcript": "In this part we talk about pests for the garden planning for spring and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec05",
+  "title": "Intro to sourdough",
+  "shots": [
+   {
+    "color": "purple",
+    "seconds": 2.0,
+    "tone_hz": 880,
+    "title": "Feeding the starter",
+    "transcript": "In this part we talk about feeding the starter for the intro to sourdough and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "orange",
+    "seconds": 2.4,
+    "tone_hz": 330,
+    "title": "Mixing and folding",
+    "transcript": "In this part we talk about mixing and folding for the intro to sourdough and what it means for everyone here"
+   },
+   {
+    "color": "white",
+    "seconds": 1.6,
+    "tone_hz": 990,
+    "title": "Baking day",
+    "transcript": "In this part we talk about baking day for the intro to sourdough and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec06",
+  "title": "Quarterly support metrics",
+  "shots": [
+   {
+    "color": "orange",
+    "seconds": 2.4,
+    "tone_hz": 330,
+    "title": "Ticket volume",
+    "transcript": "In this part we talk about ticket volume for the quarterly support metrics and what it means for everyone here"
+   },
+   {
+    "color": "white",
+    "seconds": 1.6,
+    "tone_hz": 990,
+    "title": "Response times",
+    "transcript": "In this part we talk about response times for the quarterly support metrics and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "cyan",
+    "seconds": 2.0,
+    "tone_hz": 495,
+    "title": "Top complaints",
+    "transcript": "In this part we talk about top complaints for the quarterly support metrics and what it means for everyone here"
+   },
+   {
+    "color": "red",
+    "seconds": 2.4,
+    "tone_hz": 440,
+    "title": "Next quarter goals",
+    "transcript": "In this part we talk about next quarter goals for the quarterly support metrics and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "blue",
+    "seconds": 1.6,
+    "tone_hz": 550,
+    "title": "Thanks",
+    "transcript": "In this part we talk about thanks for the quarterly support metrics and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec07",
+  "title": "Bike maintenance basics",
+  "shots": [
+   {
+    "color": "white",
+    "seconds": 1.6,
+    "tone_hz": 990,
+    "title": "Tyre pressure",
+    "transcript": "In this part we talk about tyre pressure for the bike maintenance basics and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "cyan",
+    "seconds": 2.0,
+    "tone_hz": 495,
+    "title": "Chain cleaning",
+    "transcript": "In this part we talk about chain cleaning for the bike maintenance basics and what it means for everyone here"
+   },
+   {
+    "color": "red",
+    "seconds": 2.4,
+    "tone_hz": 440,
+    "title": "Brake checks",
+    "transcript": "In this part we talk about brake checks for the bike maintenance basics and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec08",
+  "title": "Writing clear release notes",
+  "shots": [
+   {
+    "color": "cyan",
+    "seconds": 2.0,
+    "tone_hz": 495,
+    "title": "Who reads them",
+    "transcript": "In this part we talk about who reads them for the writing clear release notes and what it means for everyone here"
+   },
+   {
+    "color": "red",
+    "seconds": 2.4,
+    "tone_hz": 440,
+    "title": "What to leave out",
+    "transcript": "In this part we talk about what to leave out for the writing clear release notes and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "blue",
+    "seconds": 1.6,
+    "tone_hz": 550,
+    "title": "Examples",
+    "transcript": "In this part we talk about examples for the writing clear release notes and what it means for everyone here"
+   },
+   {
+    "color": "green",
+    "seconds": 2.0,
+    "tone_hz": 660,
+    "title": "Checklist",
+    "transcript": "In this part we talk about checklist for the writing clear release notes and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec09",
+  "title": "Home network setup",
+  "shots": [
+   {
+    "color": "red",
+    "seconds": 2.4,
+    "tone_hz": 440,
+    "title": "Router placement",
+    "transcript": "In this part we talk about router placement for the home network setup and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "blue",
+    "seconds": 1.6,
+    "tone_hz": 550,
+    "title": "Guest network",
+    "transcript": "In this part we talk about guest network for the home network setup and what it means for everyone here"
+   },
+   {
+    "color": "green",
+    "seconds": 2.0,
+    "tone_hz": 660,
+    "title": "Updates and passwords",
+    "transcript": "In this part we talk about updates and passwords for the home network setup and what it means for everyone here"
+   }
+  ]
+ },
+ {
+  "id": "rec10",
+  "title": "Planning a team offsite",
+  "shots": [
+   {
+    "color": "blue",
+    "seconds": 1.6,
+    "tone_hz": 550,
+    "title": "Picking a place",
+    "transcript": "In this part we talk about picking a place for the planning a team offsite and what it means for everyone here"
+   },
+   {
+    "color": "green",
+    "seconds": 2.0,
+    "tone_hz": 660,
+    "title": "Agenda",
+    "transcript": "In this part we talk about agenda for the planning a team offsite and what it means for everyone here"
+   },
+   {
+    "color": "black",
+    "seconds": 0.8,
+    "tone_hz": null,
+    "pause": true
+   },
+   {
+    "color": "yellow",
+    "seconds": 2.4,
+    "tone_hz": 770,
+    "title": "Budget",
+    "transcript": "In this part we talk about budget for the planning a team offsite and what it means for everyone here"
+   },
+   {
+    "color": "purple",
+    "seconds": 1.6,
+    "tone_hz": 880,
+    "title": "Follow-ups",
+    "transcript": "In this part we talk about follow-ups for the planning a team offsite and what it means for everyone here"
+   }
+  ]
+ }
+]

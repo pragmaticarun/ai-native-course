@@ -1,0 +1,75 @@
+---
+title: "P7 · Multimodal media-analysis graph"
+description: "Probe, segment, fan out per segment, merge into chapters, a summary, an index and a highlight reel, verify objectively, and wait for a human: one graph under a local and a cloud profile, compared."
+sidebar:
+  order: 7
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M7, M14 · **Suggested time:** ~8 hours · **Code:** [`projects/p7`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p7) · LangGraph 1.2.21 (Python), ffmpeg
+
+```
+probe ─▶ segment (scene cuts + silence edges) ─▶ Send × N: analyse ─▶ merge (supervisor)
+            keyframe colour · audio level · ASR (retried)        chapters · titles · summary · index
+   ─▶ [highlight reel: P3 MCP server `cut`] ─▶ verify ─▶ approve (interrupt) ─▶ publish
+```
+
+<Aside type="caution" title="Real media, mock models, placeholder costs">
+Everything that touches the media is real ffmpeg: the ten recordings, probing, scene and silence detection, keyframe colour, loudness and the highlight reel. The models are mocks: ASR returns the reference words with every Nth word replaced, the summariser is a template (the "local" one sometimes invents a sponsor), and the judge is M14's mock judge. **The profiles' cost and latency numbers are placeholders**, not vendor prices or benchmarks. What you build is the graph and the comparison machinery; swap in real models with the same interfaces.
+</Aside>
+
+## The kit
+
+Ten generated "talks" (`recordings.json`): each chapter is a coloured slide with its own tone, and some chapters are separated by a silent black pause. The reference chapters and transcripts come from the same file. `keyframe_color` grabs one frame, scales it to 1×1 pixel and names the nearest colour, a stand-in for a VLM caption that still reads real pixels. `MockASR` records calls and peak concurrency, and can fail a segment once.
+
+<Snippet path="projects/p7/common/p7_kit.py" />
+
+## M1–M2 · Segment and fan out
+
+Scene cuts alone miss some boundaries: the cut from a black pause into a dark blue slide stays under ffmpeg's scene threshold of 0.3. The pause is silent, though, so the solution fuses the two signals: scene cuts plus silence edges, snapped to frames and deduplicated. Each segment becomes a `Send` to `analyse`; `max_concurrency` in the run config bounds the workers, and a `RetryPolicy` on the node absorbs a transient ASR error.
+
+<Snippet path="projects/p7/starter/p7_graph.py" title="starter/p7_graph.py" />
+
+## M3–M4 · Merge, reel, verify
+
+The supervisor drops pauses, titles each chapter from its transcript (a mock LLM), writes the summary and a word → chapter-start index. The reel takes the middle 1.2 s of the two longest chapters and calls the **P3 toolkit's `cut` tool over MCP**. `verify` re-measures: chapters monotonic, reel duration within 0.1 s, a cut within one frame of the shot boundary, loudness within 1 LU of −16 LUFS. Then `interrupt` shows the summary, chapter titles and any problems to a human; only `approve` publishes the chapters file.
+
+<Solution path="projects/p7/solution/p7_graph.py" />
+
+## M5 · Local vs cloud
+
+Measured on the course box (10 recordings, 80 s of media per profile, reference solution):
+
+| profile | boundary F1 | WER | judge pass | USD / media hour (placeholder) | simulated s / media min (placeholder) | measured wall s / media min |
+|---|---|---|---|---|---|---|
+| local | 1.0 | 0.142 | 7/10 | 0.00 | 54.0 | 4.2 |
+| cloud | 1.0 | 0.047 | 10/10 | 1.20 | 9.0 | 4.3 |
+
+Boundary F1 is the same because segmentation doesn't depend on the profile. The judge caught the invented "Sponsored by Acme." on rec01, rec05 and rec09. Measured wall time is the graph itself (ffmpeg plus mocks) on this box, which is why it's the same for both profiles; the starter scores below 1.0 on boundaries because it skips the silence edges.
+
+<Solution path="projects/p7/solution/p7_evals.py" label="Show the metrics and comparison table" />
+
+The evals: [`projects/p7/evals/test_p7.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p7/evals/test_p7.py) (9 tests: fixtures, F1 unit, boundaries, judge, comparison, concurrency limit, retry, human approval across a rebuilt graph, reel checks).
+
+## C++/Rust notes
+
+- The fan-out is scatter/gather with a bounded worker pool; `operator.add` on `results` is the reducer that makes the gather order-independent (the merge sorts by start time).
+- Sensor fusion in miniature: two weak detectors (video scene score, audio silence) beat either alone. Snapping to the frame grid is the same "quantise before comparing" trick as comparing floats with a tolerance.
+- The verify node re-measures the output instead of trusting the tool's return value, like asserting post-conditions on a function you didn't write.
+
+## Untested and not built
+
+- No real ASR, VLM, OCR or LLM; no llama.cpp `mtmd` or whisper.cpp run; the cost and latency figures are placeholders, not measurements.
+- No TypeScript port; no Temporal durable variant for multi-hour files.
+- Only 6.8–11.6 s synthetic recordings were used, not real long talks.
+
+## Sources
+
+- LangGraph `Send` (map-reduce): https://docs.langchain.com/oss/python/langgraph/graph-api#send
+- LangGraph interrupts: https://docs.langchain.com/oss/python/langgraph/interrupts
+- ffmpeg `silencedetect` and filters: https://ffmpeg.org/ffmpeg-filters.html
+- llama.cpp multimodal (`mtmd`): https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md
+- whisper.cpp: https://github.com/ggml-org/whisper.cpp
