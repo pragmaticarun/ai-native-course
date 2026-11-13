@@ -1,0 +1,93 @@
+---
+title: "P4 · Durable triage workflow on Temporal"
+description: "Classify an incident, gather logs, propose a fix, wait days for a human, apply, verify, roll back: a Temporal workflow that survives kill -9, keeps side effects exactly-once and replays old histories."
+sidebar:
+  order: 4
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M7–M8 · **Suggested time:** ~8 hours · **Code:** [`projects/p4`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p4) · temporalio 1.36.0 (Python)
+
+```
+classify ─▶ gather_logs (retried) ─▶ propose_fix ─┬─ no safe change ─▶ escalate
+                                                  └─ notify ─▶ wait for decide(signal)
+                                                        1 day: reminder · 3 days: expire
+                                         approve/edit ─▶ apply_fix ─▶ verify ─┬─ resolved
+                                                                              └─ rollback
+reject / expire ─▶ nothing changes          every path ─▶ notify owner (v1, patched)
+```
+
+<Aside type="note" title="Local test servers, fictional incidents">
+The evals use `WorkflowEnvironment.start_time_skipping()` (days pass in milliseconds) and, for the kill test, `start_local()`, Temporal's dev server. The SDK downloads both on first use. No cloud account or API key. The eight incidents are about an invented company, Larkspur Pay.
+</Aside>
+
+## The kit
+
+`World` is the outside world in SQLite: per-service config, a change log keyed by idempotency key, an outbox, and an attempts table that lets the evals see retries. `MockTriageModel` classifies from the report and proposes a change from the logs. `p4_legacy.py` is **v0 of your workflow, already deployed**: v1 must replay its histories.
+
+<Snippet path="projects/p4/common/p4_kit.py" />
+
+## M1–M2 · Pipeline and activities
+
+The workflow only orchestrates. Everything that touches the world, including the model, is an activity, so its result is recorded in the history and a replay doesn't call the model again (one eval counts the model calls). The log tool times out on its first call per incident; a `RetryPolicy` handles it.
+
+Idempotency keys come from the incident, not the attempt: `INC-101:apply`. A retried `apply_fix` finds its own earlier change and returns the values it recorded the first time.
+
+<Snippet path="projects/p4/starter/p4_activities.py" title="starter/p4_activities.py" />
+<Solution path="projects/p4/solution/p4_activities.py" />
+
+## M3 · The human gate
+
+The decision is a signal (`decide(Decision)`); a query (`state`) shows what's pending. Waiting is `workflow.wait_condition(..., timeout=...)`: a durable timer in the history, not a sleeping process. One day without an answer sends a reminder; three days expires the request with nothing changed. An approver can edit the change; if the edited change doesn't make the health check pass, the workflow rolls back to the recorded previous values.
+
+<Snippet path="projects/p4/starter/p4_workflow.py" title="starter/p4_workflow.py" />
+<Solution path="projects/p4/solution/p4_workflow.py" />
+
+## M4 · Kill -9 and versioning
+
+Worker A runs in its own process, applies the fix, then hangs. The eval kills it with `SIGKILL`. The heartbeat timeout (2 s) notices, the activity is retried on worker B, and B finds the change already recorded under its key: **attempts A, B; one change**.
+
+v1 adds "notify the owner on close". Runs started on v0 may still be waiting for approval when v1 ships, so the new step sits behind `workflow.patched("notify-owner-on-close")`. The eval records v0 histories (approved and rejected) and replays them against your v1 with Temporal's `Replayer`. Without the patch, replay fails with a non-determinism error (that's why the starter fails it).
+
+<Solution path="projects/p4/solution/p4_run.py" label="Show the runner, kill test and replay check" />
+
+## M5 · The suite and SLOs
+
+Measured on the course box (reference solution, log tool fails once per incident):
+
+| incident | category | cause | human | status | change | wait (h) |
+|---|---|---|---|---|---|---|
+| INC-101 | latency | timeout_too_low | approves after 2 h | resolved | timeout_ms 2000 | 2.0 |
+| INC-102 | errors | pool_exhausted | **edits** to pool_size 12 | rolled_back | pool_size 12 | 2.0 |
+| INC-103 | errors | bad_flag | approves | resolved | send_receipts_v2 false | 2.0 |
+| INC-104 | availability | out_of_memory | approves after **2 days** (1 reminder) | resolved | max_heap_mb 1024 | 48.0 |
+| INC-105 | errors | rate_limited | rejects | rejected | – | 2.0 |
+| INC-106 | security | cert_expired | approves | resolved | cert_id mobile-2026 | 2.0 |
+| INC-107 | availability | dependency_down | – | escalated | – | – |
+| INC-108 | latency | pool_exhausted | never answers | expired | – | 72.0 |
+
+Classification and cause accuracy 8/8; proposal and apply SLOs met; zero unapproved changes; every applied change verified or rolled back. Times are workflow time.
+
+<Solution path="projects/p4/solution/p4_slo.py" label="Show the SLO scoring" />
+
+The evals: [`projects/p4/evals/test_p4.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p4/evals/test_p4.py) (14 tests).
+
+## C++/Rust notes
+
+- A workflow is a deterministic state machine whose input log is the history; replay is "re-run the reducer over the event log". Anything non-deterministic (clock, random, I/O) must be an activity or come from the SDK (`workflow.now()`).
+- Temporal's Python and TypeScript SDKs sit on a shared Rust core (`sdk-core`); the warnings you see in test output come from it. There's no official C++ SDK.
+- Idempotency keys are the distributed version of "make the operation safe to retry": think `INSERT ... ON CONFLICT DO NOTHING`, not a mutex.
+
+## Untested and not built
+
+- No real model; no TypeScript worker; no OpenTelemetry export; no real config system or paging tool.
+- Only Temporal's local test/dev servers were used, not a production cluster or Temporal Cloud.
+
+## Sources
+
+- Temporal Python SDK: https://docs.temporal.io/develop/python
+- Testing (time-skipping, replay): https://docs.temporal.io/develop/python/testing-suite
+- Versioning with patching: https://docs.temporal.io/develop/python/versioning
