@@ -140,6 +140,12 @@ jobs:
           P3_REQUIRE_ALL: "1"
           PROJECT_VARIANT: solution
         run: uv run pytest -q -rs ../projects/p3/evals
+      - name: P5 capstone bench (Python, TypeScript and Rust team repo; skips become failures)
+        working-directory: python
+        env:
+          P5_REQUIRE_ALL: "1"
+          PROJECT_VARIANT: solution
+        run: uv run pytest -q -rs ../projects/p5/evals
       - name: M10 agent-friendly Rust benchmark (real cargo builds; skips become failures)
         working-directory: python
         env:

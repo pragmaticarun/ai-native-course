@@ -1,0 +1,14 @@
+# M1 worksheet for the Larkspur Clips team, filled in at the start of the capstone.
+# Capability scores are the team's own judgement (0 absent .. 3 strong).
+team: "Larkspur Clips (fictional)"
+workflow_level: 1
+capabilities:
+  clear_ai_stance: 2           # docs/AI_POLICY.md exists and people know it
+  healthy_data_ecosystems: 1
+  ai_accessible_internal_data: 1
+  strong_version_control: 1    # long-lived branches, no CI
+  small_batches: 1             # PRs average ~900 lines
+  user_centric_focus: 2
+  quality_internal_platforms: 1
+reviewer_hours_per_week: 6
+agent_prs_per_week: 4

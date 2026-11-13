@@ -1,0 +1,3 @@
+*                 @larkspur/clips
+/rust/            @larkspur/clips-core
+/.github/         @larkspur/clips-leads

@@ -1,0 +1,87 @@
+---
+title: "P5 · Capstone: move a team repo up one maturity level"
+description: "Assess a legacy Python/TypeScript/Rust repo against the course ladder, make it agent-friendly with a verify command, fast tests, specs, skills and a PR policy, and measure before and after with a mock agent on ten seeded tasks."
+sidebar:
+  order: 5
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M10–M12 · **Suggested time:** ~10 hours · **Code:** [`projects/p5`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p5)
+
+<Aside type="caution" title="What the numbers are">
+The agent is the M10 stand-in: it runs the repo's documented check and tries fixed candidate patches. The before/after numbers show **how to measure** a repo change; they aren't evidence about any real agent or team. The ladder is the course's synthesis of Shapiro's levels and DORA's capabilities, not a published standard.
+</Aside>
+
+## The legacy repo
+
+`common/legacy_repo/` ("Larkspur Clips", fictional): `py/clipsvc`, `web/src/format.ts`, `rust/clipcore`. Traps a newcomer (or an agent) falls into:
+
+- the README says `make test`, and there's no Makefile;
+- one Python test file, covering one function, with a two-second "staging" test;
+- no TypeScript tests at all;
+- the Rust tests start with `#![cfg(feature = "full")]`, so `cargo test` is green with none of them run.
+
+Ten seeded tasks (`common/tasks.json`) each break one function; the agent tries candidate fixes (usually a plausible wrong one first) and keeps the first its check accepts. Hidden acceptance tests decide.
+
+<Snippet path="projects/p5/common/p5_kit.py" />
+
+## M1 · Baseline assessment
+
+Artefacts come from files (an AGENTS.md with a verify command, tests in every language and a fast verify, a PR template plus review policy, specs that pass Spec Kit lint, valid skills). Capabilities come from the team's M1 worksheet: the code doesn't pretend to measure them. M12's `ready_for` turns both into a gap list.
+
+<Snippet path="projects/p5/starter/p5_assess.py" title="starter/p5_assess.py" />
+<Solution path="projects/p5/solution/p5_assess.py" />
+
+The generated baseline: [`assessment.md`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/solution/deliverables/assessment.md). L1, M10 audit 1/6, missing for L2: version control and small-batch capabilities, `agents-md`, `fast-tests`.
+
+## M2–M3 · The repo change
+
+<Snippet path="projects/p5/solution/overlay/AGENTS.md" title="overlay/AGENTS.md" />
+<Snippet path="projects/p5/solution/overlay/verify.sh" title="overlay/verify.sh" lang="bash" />
+
+Also in the overlay: tests in all three languages (the slow test marked and skipped by default, the Rust feature gate removed), CI running `./verify.sh`, a PR template, CODEOWNERS, `docs/REVIEW_POLICY.md`, a Spec Kit spec and a `run-verify` skill. An eval checks that no existing assertion was dropped.
+
+## M4 · Before and after
+
+Measured on the course box:
+
+| metric | before | after |
+|---|---|---|
+| agent task success (10 seeded tasks) | 30% | 100% |
+| rework (passed its own check, failed acceptance) | 70% | 0% |
+| verify command documented | no (guessed `pytest`) | yes (`./verify.sh`) |
+| verify runs by the agent | 11 | 18 |
+| review time per PR (course proxy) | 15.0 min | 5.0 min |
+| by language: Python / TypeScript / Rust | 2/4 · 0/3 · 1/3 | 4/4 · 3/3 · 3/3 |
+| one clean verify run | ~2.2 s (sleeps) | ~0.5–1 s |
+
+Before, the guessed `pytest` only ran one Python file, so seven wrong fixes "passed": that's the 70% rework. The agent runs its check *more* afterwards because the tests reject wrong candidates. Review time is a stated proxy (base + per line + 10 minutes when there's no passing check to trust), not a measurement of people.
+
+## M5 · Deliverables
+
+- [`assessment.md`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/solution/deliverables/assessment.md) and [`dashboard.md`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/solution/deliverables/dashboard.md): generated, committed, and checked by an eval to be current.
+- [`adoption_plan.yaml`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/solution/deliverables/adoption_plan.yaml): three stages in M12's template; `plan90.check_plan` passes (guardrail metrics, owners, exit criteria, ≤ 90 days, no vanity metrics).
+- [`retrospective.md`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/solution/deliverables/retrospective.md).
+
+The evals: [`projects/p5/evals/test_p5.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p5/evals/test_p5.py) (7 tests; the bench needs Node ≥ 22.6 and cargo, and CI's rust job runs it with `P5_REQUIRE_ALL=1`).
+
+## C++/Rust notes
+
+- The Rust trap (`#![cfg(feature = "full")]` on the test file) is common in real crates: CI must run the same feature set the tests need, or `cargo test` reports success with nothing run. `cargo test --all-features` or an explicit list in `verify.sh` is the fix.
+- Separate build directories per repo copy: cargo trusts file timestamps, and copying sources with preserved mtimes into a shared `CARGO_TARGET_DIR` gave stale builds during development. The kit copies without metadata and uses one target dir per copy.
+- For a C++ component the same steps apply: one documented build-and-test command (CMake presets + `ctest`), tests that run without network, and a fast default suite.
+
+## Untested and not built
+
+- No live coding agent; the capability scores are the team's own; review time is a proxy.
+- No real team history (DORA metrics from git/CI are M11's `dora.py`, not used here).
+- The overlay's CI workflow is checked as a file, not run on GitHub.
+
+## Sources
+
+- Spec Kit: https://github.com/github/spec-kit
+- Agent Skills specification: https://agentskills.io/specification
+- DORA AI Capabilities Model: https://dora.dev/ai/capabilities-model/

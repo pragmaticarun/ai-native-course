@@ -1,0 +1,28 @@
+# 90-day adoption plan (M12 template), checked by plan90.check_plan.
+team: "Larkspur Clips (fictional)"
+start: 2026-11-16
+stages:
+  - name: "Make the repo agent-friendly (L1 -> L2 entry)"
+    target_level: 2
+    ends: 2026-12-07
+    owner: "priya"
+    exit_criterion: "./verify.sh green in CI on main for 2 weeks; 10/10 seeded tasks pass acceptance"
+    metrics:
+      - {name: "agent task success on seeded tasks", baseline: "30%", target: "90%"}
+      - {name: "rework rate of agent PRs", baseline: "70%", target: "10%", guardrail: true}
+  - name: "Agents open PRs for small issues"
+    target_level: 2
+    ends: 2027-01-18
+    owner: "sam"
+    exit_criterion: "4 agent PRs/week merged with review load under 0.8"
+    metrics:
+      - {name: "review load (share of reviewer hours)", baseline: 0.33, target: 0.6, guardrail: true}
+      - {name: "change failure rate", baseline: "unknown", target: "<= 15%", guardrail: true}
+  - name: "Spec-first for features (L3 prep)"
+    target_level: 3
+    ends: 2027-02-12
+    owner: "priya"
+    exit_criterion: "every feature PR links a linted spec; eval suite runs in CI"
+    metrics:
+      - {name: "features with a linted spec", baseline: "1 of 1", target: "100%"}
+      - {name: "lead time for changes (days)", baseline: 9, target: 4, guardrail: true}

@@ -1,0 +1,13 @@
+# M1 worksheet re-scored at the end of the capstone (team judgement, 0-3).
+team: "Larkspur Clips (fictional)"
+workflow_level: 2
+capabilities:
+  clear_ai_stance: 2
+  healthy_data_ecosystems: 1
+  ai_accessible_internal_data: 1
+  strong_version_control: 2    # CI runs ./verify.sh on every PR; CODEOWNERS; PR template
+  small_batches: 2             # 400-line limit in REVIEW_POLICY.md, stacked PRs
+  user_centric_focus: 2
+  quality_internal_platforms: 1
+reviewer_hours_per_week: 6
+agent_prs_per_week: 6
