@@ -1,0 +1,113 @@
+{
+ "task": "mob-08",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 2
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 0,
+     "text": "Design review"
+    },
+    {
+     "action": "type",
+     "mark": 1,
+     "text": "2026-12-05"
+    },
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "10:00"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-08",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": false,
+  "why": "0 matching rows (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 10,
+  "invalid": 4,
+  "blocked": 1,
+  "interventions": 0,
+  "recoveries": 2,
+  "tokens": 392,
+  "answer": ""
+ }
+}

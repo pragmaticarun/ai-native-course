@@ -1,0 +1,288 @@
+{
+ "task": "mob-01",
+ "adapter": "openai",
+ "seed": 2,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 95
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 410,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 180
+      },
+      {
+       "type": "type",
+       "text": "Design review"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-05"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "10:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_004",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-05"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "10:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_005",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 410,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_006",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-05"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "10:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_007",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-05"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "10:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_008",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 95
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_009",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 410,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-01",
+  "adapter": "openai",
+  "seed": 2,
+  "success": false,
+  "why": "0 matching rows (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 10,
+  "invalid": 5,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 2,
+  "tokens": 15336,
+  "answer": ""
+ }
+}

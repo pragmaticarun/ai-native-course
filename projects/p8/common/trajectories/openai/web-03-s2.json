@@ -1,0 +1,141 @@
+{
+ "task": "web-03",
+ "adapter": "openai",
+ "seed": 2,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 110
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Budget sync"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 135
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-19"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 160
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "17:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 35,
+       "y": 176
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "event created"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-03",
+  "adapter": "openai",
+  "seed": 2,
+  "success": true,
+  "why": "1 matching events (want exactly 1)",
+  "status": "done",
+  "steps": 3,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 6294,
+  "answer": "event created"
+ }
+}

@@ -1,0 +1,73 @@
+{
+ "task": "web-06",
+ "adapter": "neutral",
+ "seed": 2,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 7
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Vendor demo"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-27"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "10:30"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 5
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-06",
+  "adapter": "neutral",
+  "seed": 2,
+  "success": true,
+  "why": "1 matching events (want exactly 1)",
+  "status": "done",
+  "steps": 4,
+  "invalid": 0,
+  "blocked": 1,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 459,
+  "answer": "event created"
+ }
+}

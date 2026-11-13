@@ -1,0 +1,46 @@
+{
+ "task": "web-07",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 5
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 2
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "deleted 'Lunch?'"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-07",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": true,
+  "why": "deleted [4], want [4]",
+  "status": "done",
+  "steps": 2,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 344,
+  "answer": "deleted 'Lunch?'"
+ }
+}

@@ -1,0 +1,432 @@
+{
+ "task": "mob-07",
+ "adapter": "anthropic",
+ "seed": 1,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Parent call"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-15"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_001_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Parent call"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-15"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_002_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_002_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_003_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_003_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_004_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-15"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_4",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_005_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-15"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_4",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_006_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       90,
+       1000
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_006_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_007_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_008_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_2",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_009_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_009_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_009_2",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-07",
+  "adapter": "anthropic",
+  "seed": 1,
+  "success": false,
+  "why": "0 matching rows (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 10,
+  "invalid": 6,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 2,
+  "tokens": 15280,
+  "answer": ""
+ }
+}

@@ -1,0 +1,317 @@
+{
+ "task": "web-09",
+ "adapter": "openai",
+ "seed": 0,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Team lunch"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-10"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "12:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Team lunch"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-10"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "12:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_004",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_005",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_006",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_007",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Team lunch"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-10"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "12:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-09",
+  "adapter": "openai",
+  "seed": 0,
+  "success": false,
+  "why": "0 matching events (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 8,
+  "invalid": 5,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 2,
+  "tokens": 12943,
+  "answer": ""
+ }
+}

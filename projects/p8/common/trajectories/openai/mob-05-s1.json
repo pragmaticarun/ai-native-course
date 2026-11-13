@@ -1,0 +1,204 @@
+{
+ "task": "mob-05",
+ "adapter": "openai",
+ "seed": 1,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 1000
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 90,
+       "y": 1000
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 410,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 537,
+       "y": 180
+      },
+      {
+       "type": "type",
+       "text": "Dentist"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-03"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "09:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_004",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 180
+      },
+      {
+       "type": "type",
+       "text": "Dentist"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 260
+      },
+      {
+       "type": "type",
+       "text": "2026-12-03"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 270,
+       "y": 340
+      },
+      {
+       "type": "type",
+       "text": "09:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_005",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 410,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "event created"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-05",
+  "adapter": "openai",
+  "seed": 1,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "done",
+  "steps": 6,
+  "invalid": 2,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 10780,
+  "answer": "event created"
+ }
+}

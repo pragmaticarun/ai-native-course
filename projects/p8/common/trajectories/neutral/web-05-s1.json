@@ -1,0 +1,108 @@
+{
+ "task": "web-05",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Vendor demo"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-09"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "14:00"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Vendor demo"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-09"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "14:00"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-05",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": false,
+  "why": "0 matching events (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 8,
+  "invalid": 4,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 1,
+  "tokens": 816,
+  "answer": ""
+ }
+}

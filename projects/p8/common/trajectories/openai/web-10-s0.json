@@ -1,0 +1,56 @@
+{
+ "task": "web-10",
+ "adapter": "openai",
+ "seed": 0,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 38,
+       "y": 142
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Minutes from yesterday are in the shared folder."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-10",
+  "adapter": "openai",
+  "seed": 0,
+  "success": true,
+  "why": "read=True answer='Minutes from yesterday are in the shared folder.'",
+  "status": "done",
+  "steps": 1,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 3201,
+  "answer": "Minutes from yesterday are in the shared folder."
+ }
+}

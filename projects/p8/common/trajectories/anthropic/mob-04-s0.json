@@ -1,0 +1,219 @@
+{
+ "task": "mob-04",
+ "adapter": "anthropic",
+ "seed": 0,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       95
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_001_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       95
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_002_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_002_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_003_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_003_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_004_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Design review"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-05"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "10:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_005_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "text",
+     "text": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-04",
+  "adapter": "anthropic",
+  "seed": 0,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "done",
+  "steps": 6,
+  "invalid": 2,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 10787,
+  "answer": "event created"
+ }
+}

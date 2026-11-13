@@ -1,0 +1,89 @@
+{
+ "task": "web-03",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Budget sync"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-19"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "17:00"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 5
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-03",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": true,
+  "why": "1 matching events (want exactly 1)",
+  "status": "done",
+  "steps": 6,
+  "invalid": 3,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 1,
+  "tokens": 783,
+  "answer": "event created"
+ }
+}

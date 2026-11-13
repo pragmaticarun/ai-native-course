@@ -1,0 +1,201 @@
+{
+ "task": "web-05",
+ "adapter": "openai",
+ "seed": 2,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 43,
+       "y": 186
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 110
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Vendor demo"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 135
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-09"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 68,
+       "y": 160
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "14:00"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_004",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 176
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_005",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 35,
+       "y": 176
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "event created"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-05",
+  "adapter": "openai",
+  "seed": 2,
+  "success": true,
+  "why": "1 matching events (want exactly 1)",
+  "status": "done",
+  "steps": 6,
+  "invalid": 2,
+  "blocked": 1,
+  "interventions": 0,
+  "recoveries": 1,
+  "tokens": 11161,
+  "answer": "event created"
+ }
+}

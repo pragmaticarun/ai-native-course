@@ -1,0 +1,76 @@
+{
+ "task": "web-07",
+ "adapter": "anthropic",
+ "seed": 2,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       41,
+       142
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_001_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       27,
+       111
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "text",
+     "text": "deleted 'Lunch?'"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-07",
+  "adapter": "anthropic",
+  "seed": 2,
+  "success": true,
+  "why": "deleted [4], want [4]",
+  "status": "done",
+  "steps": 2,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 4844,
+  "answer": "deleted 'Lunch?'"
+ }
+}

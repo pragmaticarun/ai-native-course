@@ -1,0 +1,73 @@
+{
+ "task": "mob-09",
+ "adapter": "neutral",
+ "seed": 2,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 3
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 0,
+     "text": "Gym"
+    },
+    {
+     "action": "type",
+     "mark": 1,
+     "text": "2026-12-20"
+    },
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "07:00"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 3
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-09",
+  "adapter": "neutral",
+  "seed": 2,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "done",
+  "steps": 4,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 179,
+  "answer": "event created"
+ }
+}

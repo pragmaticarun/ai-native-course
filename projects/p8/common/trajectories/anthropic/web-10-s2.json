@@ -1,0 +1,53 @@
+{
+ "task": "web-10",
+ "adapter": "anthropic",
+ "seed": 2,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       38,
+       142
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "text",
+     "text": "Minutes from yesterday are in the shared folder."
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-10",
+  "adapter": "anthropic",
+  "seed": 2,
+  "success": true,
+  "why": "read=True answer='Minutes from yesterday are in the shared folder.'",
+  "status": "done",
+  "steps": 1,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 3201,
+  "answer": "Minutes from yesterday are in the shared folder."
+ }
+}

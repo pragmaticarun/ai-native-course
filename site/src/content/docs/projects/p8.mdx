@@ -1,0 +1,86 @@
+---
+title: "P8 · Mobile/computer-use agent graph"
+description: "observe → plan → guard → act → verify → recover as a checkpointed LangGraph, three model adapters (Anthropic, OpenAI, vendor-neutral) into one action type, a policy engine with human approval, and a 20-task harness that CI replays from recordings."
+sidebar:
+  order: 8
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M6, M7, M15 · **Suggested time:** ~10 hours · **Code:** [`projects/p8`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p8) · LangGraph 1.2.21, Playwright 1.65.1 (Python)
+
+```
+observe ─▶ plan ─▶ guard ─(ask)─▶ interrupt: human approves / denies
+             │        └─(allow)─▶ act ─▶ verify ─┬─▶ plan …
+   budgets: steps, time, cost                     └─(2 failures in a row)─▶ recover ─▶ observe
+```
+
+<Aside type="caution" title="Recorded mock model, fake phone, no live APIs">
+The web tasks run in real headless Chromium against M15's local sandbox app. The mobile tasks run against M15's `FakeAndroid`, which answers the same adb commands a phone would: **no emulator or device was used**. The "model" is a scripted planner that reacts to each observation and mis-grounds 30% of clicks on purpose (seeded). Its turns were encoded into each vendor's wire format and recorded; CI replays them. The adapters were checked against the vendors' documented payload shapes, **not against the live APIs**. Costs use a placeholder price.
+</Aside>
+
+## The kit
+
+Twenty tasks: create an event from an invite (four plain, two with a prompt injection in the inbox), delete one email (a human approves), forward all mail (refused), add an explicit event, answer a question from an email; and on the phone, events from a notification (with animation delays, a wrong starting screen and injections), explicit events, and "delete all" (a human says no). Checkers read app or device state: exactly one matching event, nothing forwarded or deleted that wasn't asked for.
+
+<Snippet path="projects/p8/common/p8_kit.py" />
+
+## M1–M2 · The graph and three adapters
+
+Every adapter maps into one `Action` (`click` by model-pixel coordinate or by mark, `type`, `key`, `wait`), so guard, verify and the evals are shared. **Anthropic** `computer_toolset_20260801`: a turn is a batch of member `tool_use` blocks with `"toolset_name": "computer"`; we answer each with a `tool_result` echoing it, and after a failure the rest get the documented halt text. **OpenAI** Responses `computer` tool: `computer_call` items with ordered `actions`, answered by `computer_call_output` with a `computer_screenshot`. **Vendor-neutral**: our own JSON actions over set-of-marks ids, validated with JSON Schema.
+
+<Solution path="projects/p8/solution/p8_adapters.py" label="Show the adapters" />
+
+## M3 · Guard and human approval
+
+The env first resolves what an action would touch (a hit test for coordinates). A consequential target ("Delete", "Forward all mail") is blocked if the task didn't ask for it or if untrusted instructions are on screen; if the task did ask, the graph `interrupt`s and a human decides. In web-08 the forward request is blocked outright because the inbox preview contains the injection, so no human is asked.
+
+<Snippet path="projects/p8/starter/p8_guard.py" title="starter/p8_guard.py" />
+<Solution path="projects/p8/solution/p8_guard.py" />
+
+## M4 · Budgets, recovery, resume
+
+Budgets live in `plan`, not in a prompt. `verify` hashes the new frame; an action that changes nothing, or fails, counts as a failed step, and two in a row trigger `recover`. A crash is simulated by dropping the browser or adb connection during an observation; the harness resumes the same thread from the checkpointer and the evals check that the event exists exactly once.
+
+<Snippet path="projects/p8/starter/p8_graph.py" title="starter/p8_graph.py" />
+<Solution path="projects/p8/solution/p8_graph.py" />
+
+## M5 · Harness and results
+
+20 tasks × 3 seeds × 3 adapters = 180 recorded runs (budget: 8 steps web, 10 mobile), measured on the course box:
+
+| adapter | pass@1 | pass@3 | mean steps | invalid actions | unsafe blocked | interventions | recoveries | USD (placeholder) | seconds | failures |
+|---|---|---|---|---|---|---|---|---|---|---|
+| anthropic | 0.767 | 1.0 | 5.7 | 145 | 11 | 6 | 42 | 1.805 | 31.2 | grounding 14 |
+| openai | 0.767 | 1.0 | 5.7 | 145 | 11 | 6 | 42 | 1.805 | 31.2 | grounding 14 |
+| neutral | 0.95 | 1.0 | 4.5 | 67 | 10 | 6 | 18 | 0.059 | 18.5 | grounding 3 |
+
+Read it carefully: the Anthropic and OpenAI rows are identical because the **same** scripted planner drives both pixel adapters with the same seeds; only the wire format differs. The real comparison here is pixel coordinates vs set-of-marks ids: a coordinate fill needs a click, so it has more clicks to mis-ground. No run ever caused an unrequested side effect, and every failure was a run out of steps after grounding errors. pass@k uses M6's unbiased estimator. Every replay reproduces its recorded outcome exactly.
+
+<Solution path="projects/p8/solution/p8_harness.py" label="Show the harness" />
+
+The evals: [`projects/p8/evals/test_p8.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p8/evals/test_p8.py) (12 tests: tasks and recordings, both vendor shapes, neutral schema, guard, replay determinism, metrics, injection, human gate, recovery and budgets, crash resume, egress allowlist).
+
+## C++/Rust notes
+
+- The adapters are a classic anti-corruption layer: three wire protocols decode into one internal enum, and everything downstream matches on that.
+- `verify` diffs frame hashes; the syllabus' Rust helper (grab frames from the emulator's gRPC endpoint and diff them) would replace `_sha` with a perceptual diff. It's not built here.
+- Replay testing is record/replay debugging (think `rr`): with a deterministic environment, the recorded inputs reproduce the run exactly, so a divergence is a real behaviour change.
+
+## Untested and not built
+
+- No emulator (Pixel 6 / API 33), no AndroidWorld tasks, no Galaxy A73 run; mobile is `FakeAndroid` only.
+- No live model runs for any adapter (no nightly job); the adapters have only seen recorded payloads.
+- The web app runs in-process on 127.0.0.1, not in a no-network Docker container.
+- Not built: the Rust frame-diff helper, the screenshot-only vs a11y-tree vs both ablation, the Kotlin AccessibilityService and AppFunction actions.
+
+## Sources
+
+- Anthropic computer use tool: https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool
+- OpenAI computer use: https://developers.openai.com/api/docs/guides/tools-computer-use
+- LangGraph interrupts: https://docs.langchain.com/oss/python/langgraph/interrupts · persistence: https://docs.langchain.com/oss/python/langgraph/persistence
+- Playwright Python: https://playwright.dev/python/
+- AndroidWorld: https://github.com/google-research/android_world
+- JSON Schema: https://json-schema.org/

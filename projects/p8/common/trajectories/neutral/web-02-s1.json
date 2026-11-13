@@ -1,0 +1,108 @@
+{
+ "task": "web-02",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Design review"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-03"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "10:30"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 1
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "Design review"
+    },
+    {
+     "action": "type",
+     "mark": 3,
+     "text": "2026-12-03"
+    },
+    {
+     "action": "type",
+     "mark": 4,
+     "text": "10:30"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 5
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-02",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": true,
+  "why": "1 matching events (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 8,
+  "invalid": 3,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 1,
+  "tokens": 574,
+  "answer": ""
+ }
+}

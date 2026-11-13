@@ -1,0 +1,317 @@
+{
+ "task": "web-06",
+ "adapter": "openai",
+ "seed": 1,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 145,
+       "y": 265
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Vendor demo"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-27"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "10:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Vendor demo"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-27"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "10:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_004",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_005",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 45,
+       "y": 10
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_006",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 150
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "Vendor demo"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 175
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "2026-12-27"
+      },
+      {
+       "type": "click",
+       "button": "left",
+       "x": 170,
+       "y": 200
+      },
+      {
+       "type": "keypress",
+       "keys": [
+        "CTRL",
+        "A"
+       ]
+      },
+      {
+       "type": "type",
+       "text": "10:30"
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_007",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 216
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-06",
+  "adapter": "openai",
+  "seed": 1,
+  "success": false,
+  "why": "0 matching events (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 8,
+  "invalid": 4,
+  "blocked": 1,
+  "interventions": 0,
+  "recoveries": 1,
+  "tokens": 12820,
+  "answer": ""
+ }
+}

@@ -1,0 +1,53 @@
+{
+ "task": "mob-10",
+ "adapter": "anthropic",
+ "seed": 0,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       130,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "text",
+     "text": "refused: a human declined the action"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-10",
+  "adapter": "anthropic",
+  "seed": 0,
+  "success": true,
+  "why": "events kept (the human said no)",
+  "status": "done",
+  "steps": 1,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 3046,
+  "answer": "refused: a human declined the action"
+ }
+}

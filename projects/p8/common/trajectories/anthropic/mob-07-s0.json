@@ -1,0 +1,127 @@
+{
+ "task": "mob-07",
+ "adapter": "anthropic",
+ "seed": 0,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Parent call"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-15"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "18:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_001_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "text",
+     "text": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-07",
+  "adapter": "anthropic",
+  "seed": 0,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "done",
+  "steps": 2,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 4585,
+  "answer": "event created"
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "task": "web-10",
+ "adapter": "neutral",
+ "seed": 0,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 5
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "Minutes from yesterday are in the shared folder."
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-10",
+  "adapter": "neutral",
+  "seed": 0,
+  "success": true,
+  "why": "read=True answer='Minutes from yesterday are in the shared folder.'",
+  "status": "done",
+  "steps": 1,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 201,
+  "answer": "Minutes from yesterday are in the shared folder."
+ }
+}

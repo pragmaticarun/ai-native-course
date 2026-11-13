@@ -1,0 +1,116 @@
+{
+ "task": "web-07",
+ "adapter": "openai",
+ "seed": 0,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 142
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 41,
+       "y": 142
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_002",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 637,
+       "y": 111
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_003",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 27,
+       "y": 111
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "deleted 'Lunch?'"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-07",
+  "adapter": "openai",
+  "seed": 0,
+  "success": true,
+  "why": "deleted [4], want [4]",
+  "status": "done",
+  "steps": 4,
+  "invalid": 2,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 8042,
+  "answer": "deleted 'Lunch?'"
+ }
+}

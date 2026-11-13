@@ -1,0 +1,354 @@
+{
+ "task": "mob-09",
+ "adapter": "anthropic",
+ "seed": 1,
+ "turns": [
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_000_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       90,
+       1000
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_000_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_001_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_001_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_002_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_002_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_003_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1000
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_003_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_004_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       1000
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_004_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_005_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       90,
+       1000
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_005_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_006_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_006_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_007_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       537,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Gym"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-20"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "07:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_007_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_008_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       180
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_1",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "Gym"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_2",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       260
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_3",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "2026-12-20"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_4",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       270,
+       340
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_5",
+     "name": "type",
+     "toolset_name": "computer",
+     "input": {
+      "text": "07:00"
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_008_6",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  },
+  {
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_009_0",
+     "name": "left_click",
+     "toolset_name": "computer",
+     "input": {
+      "coordinate": [
+       410,
+       1112
+      ]
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_009_1",
+     "name": "screenshot",
+     "toolset_name": "computer",
+     "input": {}
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-09",
+  "adapter": "anthropic",
+  "seed": 1,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "out_of_steps",
+  "steps": 10,
+  "invalid": 5,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 2,
+  "tokens": 15441,
+  "answer": ""
+ }
+}

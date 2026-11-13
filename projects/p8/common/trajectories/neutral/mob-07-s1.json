@@ -1,0 +1,65 @@
+{
+ "task": "mob-07",
+ "adapter": "neutral",
+ "seed": 1,
+ "turns": [
+  {
+   "actions": [
+    {
+     "action": "type",
+     "mark": 0,
+     "text": "Parent call"
+    },
+    {
+     "action": "type",
+     "mark": 1,
+     "text": "2026-12-15"
+    },
+    {
+     "action": "type",
+     "mark": 2,
+     "text": "18:00"
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 999
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "click",
+     "mark": 3
+    }
+   ]
+  },
+  {
+   "actions": [
+    {
+     "action": "done",
+     "answer": "event created"
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-07",
+  "adapter": "neutral",
+  "seed": 1,
+  "success": true,
+  "why": "1 matching rows (want exactly 1)",
+  "status": "done",
+  "steps": 3,
+  "invalid": 1,
+  "blocked": 0,
+  "interventions": 0,
+  "recoveries": 0,
+  "tokens": 109,
+  "answer": "event created"
+ }
+}

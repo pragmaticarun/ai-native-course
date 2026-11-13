@@ -1,0 +1,56 @@
+{
+ "task": "mob-10",
+ "adapter": "openai",
+ "seed": 1,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 130,
+       "y": 1112
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "refused: a human declined the action"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "mob-10",
+  "adapter": "openai",
+  "seed": 1,
+  "success": true,
+  "why": "events kept (the human said no)",
+  "status": "done",
+  "steps": 1,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 3046,
+  "answer": "refused: a human declined the action"
+ }
+}

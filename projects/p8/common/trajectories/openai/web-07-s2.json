@@ -1,0 +1,76 @@
+{
+ "task": "web-07",
+ "adapter": "openai",
+ "seed": 2,
+ "turns": [
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_000",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 41,
+       "y": 142
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "computer_call",
+     "call_id": "call_001",
+     "actions": [
+      {
+       "type": "click",
+       "button": "left",
+       "x": 27,
+       "y": 111
+      },
+      {
+       "type": "screenshot"
+      }
+     ],
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "output": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "deleted 'Lunch?'"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "outcome": {
+  "task": "web-07",
+  "adapter": "openai",
+  "seed": 2,
+  "success": true,
+  "why": "deleted [4], want [4]",
+  "status": "done",
+  "steps": 2,
+  "invalid": 0,
+  "blocked": 0,
+  "interventions": 1,
+  "recoveries": 0,
+  "tokens": 4844,
+  "answer": "deleted 'Lunch?'"
+ }
+}

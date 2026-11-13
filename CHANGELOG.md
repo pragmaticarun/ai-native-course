@@ -2,7 +2,7 @@
 
 All notable changes to the course. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.6.0] - 2026-11-14 (projects P1–P5, P7)
+## [0.6.0] - 2026-11-14 (projects P1–P5, P7, P8)
 
 ### Content
 - **P1 Mini-SWE** (`projects/p1`): a coding agent that goes issue → plan → edit → test → PR against a local git sandbox (bare `origin`, PRs recorded by a JSON "forge"; **no GitHub repo is created or touched**). Guarded tools (path allowlist, symlink check, hidden `.git`, read-only tests, node-id-only `run_tests` with a scrubbed env, disabled host plugins and a no-network `sitecustomize`, truncation), a budgeted loop that verifies `finish` itself, PR bodies with a measured before/after test report, and a **15-seeded-bug benchmark**. The model is scripted (mutation-search repair), not an LLM. Starter, reference solution and 24 evals; CI requires the solution to pass and the starter to fail.
@@ -11,6 +11,7 @@ All notable changes to the course. Format: [Keep a Changelog](https://keepachang
 - **P4 Durable triage workflow** (`projects/p4`, temporalio 1.36.0): classify → gather logs (retried) → propose a config change → human decision as a signal (reminder after 1 day, expiry after 3, approve / edit / reject) → apply → verify → roll back if unhealthy; escalation when no safe change exists. Side effects are exactly-once under idempotency keys; a worker killed with `SIGKILL` after applying is replaced without re-applying; v1 replays the deployed v0's histories thanks to `workflow.patched`. Runs on Temporal's local time-skipping and dev servers. 8 fictional incidents, 14 evals.
 - **P5 Capstone** (`projects/p5`): a fictional legacy team repo (Python + TypeScript + Rust, roughly L1, with real traps: a README pointing at a missing Makefile, a two-second "staging" test, no TS tests, Rust tests behind `--features full`); artefact detection plus the team's M1 worksheet fed into M12's ladder; an overlay that makes the repo agent-friendly (AGENTS.md `Verify:`, `verify.sh`, fast tests in three languages, CI, PR template, CODEOWNERS, review policy, a Spec Kit spec, a skill); a before/after bench with M10's mock agent on 10 seeded tasks and hidden acceptance tests; deliverables (generated assessment and dashboard, adoption plan checked by `plan90`, retrospective). 7 evals.
 - **P7 Multimodal media-analysis graph** (`projects/p7`, LangGraph 1.2.21): probe → segment (ffmpeg scene cuts fused with silence edges) → `Send` fan-out per segment (real keyframe colour and audio level, mock ASR with a `RetryPolicy`, `max_concurrency`) → supervisor merge (chapters, titles, summary, search index) → optional highlight reel through the P3 server's `cut` tool over MCP → verify (monotonic chapters, reel duration, cut position, loudness) → human `interrupt` before publishing. Local vs cloud profiles with mock models and placeholder cost/latency. 10 generated recordings, 9 evals.
+- **P8 Mobile/computer-use agent graph** (`projects/p8`, LangGraph 1.2.21, Playwright 1.65.1): observe → plan → guard (policy engine; `interrupt` for a human on requested consequential actions; blocks unrequested ones and any consequential action while an injection is on screen) → act → verify (frame diff) → recover, checkpointed so a run resumes after the environment drops; step/time/cost budgets in the graph. Anthropic `computer_toolset_20260801`, OpenAI Responses `computer` and vendor-neutral JSON adapters into one action type. 20 tasks (10 web in real Chromium on M15's sandbox app, 10 mobile on M15's FakeAndroid over adb argv), 180 recorded trajectories (3 seeds × 3 adapters) that CI replays and must reproduce exactly. 12 evals.
 - New `projects/` layout (`spec/`, `common/`, `starter/`, `solution/`, `evals/`), a *Projects* site section, and `check_exercises.py` now covers projects (`PROJECT_VARIANT`).
 
 ### Measured (course box)
@@ -21,6 +22,7 @@ All notable changes to the course. Format: [Keep a Changelog](https://keepachang
 - P4 suite (8 incidents, flaky log tool): classification and cause 8/8; 4 resolved, 1 rolled back (an approver's edit that didn't fix it), 1 rejected, 1 expired after 72 h, 1 escalated; zero unapproved changes; kill -9 test: apply attempted by A then B, applied once.
 - P5 bench (mock agent, 10 seeded tasks): success 30% → 100%, rework 70% → 0%, agent verify runs 11 → 18; review time per PR 15 → 5 min by the course's stated proxy.
 - P7 comparison (10 recordings, 80 s of media per profile): boundary F1 1.0 for both; WER 0.142 local vs 0.047 cloud (mock ASR); judge pass 7/10 local (it caught the invented sponsor on 3) vs 10/10 cloud; measured graph wall time 4.2–4.3 s per media minute; cost and simulated latency are placeholders.
+- P8 (180 recorded runs, scripted planner with 30% simulated mis-grounding): pass@1 0.767 / pass@3 1.0 for both pixel adapters (identical: same planner, same seeds), 0.95 / 1.0 for set-of-marks; 0 unrequested side effects; 6 human interventions per adapter; all failures are grounding (out of steps).
 
 ### Known gaps / untested
 - P1: no LLM backend (the Pydantic AI, Claude Agent SDK and AI SDK variants are not built); no GitHub Actions background run (it would need a sandbox repo the owner creates); no container/network-namespace isolation for test runs.
@@ -28,6 +30,7 @@ All notable changes to the course. Format: [Keep a Changelog](https://keepachang
 - P3: no real LLM; tasks extension not used (progress notifications instead); OAuth authorization server mocked; `live_detect`'s real onnx path untested (no plugin on the box or CI); TypeScript server is a subset; Kotlin uses fakes (no Media3, adb or device) and its starter isn't run in CI; no Android Studio Agent Mode. Deviation: the tool is `loudness`, not `measure_loudness`.
 - P4: no real model, no TypeScript worker, no OTel export; only Temporal's local test/dev servers (no production cluster).
 - P7: no real ASR, VLM, OCR or LLM (llama.cpp `mtmd` and whisper.cpp not run); cost/latency are placeholders; no TypeScript port; no Temporal durable variant; synthetic short recordings only.
+- P8: no emulator, AndroidWorld or device runs (FakeAndroid only); no live model runs for any adapter; web app not in Docker; Rust frame-diff helper, ablation and Kotlin AccessibilityService not built.
 - P5: no live coding agent; capability scores are the team's own judgement; review time is a proxy formula; the team repo's CI workflow is checked as a file, not run.
 
 ## [0.5.0] - 2026-11-14
