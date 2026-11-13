@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["examples/ts/**/*.ts", "exercises/**/ts/**/*.ts"]
+  "include": ["examples/ts/**/*.ts", "exercises/**/ts/**/*.ts", "projects/*/{starter,solution}/ts/**/*.ts", "projects/*/evals/**/*.ts"]
 }

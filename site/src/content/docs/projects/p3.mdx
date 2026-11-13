@@ -1,0 +1,109 @@
+---
+title: "P3 · Media MCP toolkit: Python, TypeScript, Rust, Kotlin, and an agent client"
+description: "An MCP server that makes ffmpeg and GStreamer safe for agents (path guard, preset allowlist, confirmation, progress, OAuth scopes), with one contract over Python, TypeScript and Rust rmcp servers, a Kotlin adb port, and an agent client graded by objective media checks."
+sidebar:
+  order: 3
+---
+
+import Snippet from "../../../components/Snippet.astro";
+import Solution from "../../../components/Solution.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+**After:** M9 (core), M14 (extended) · **Suggested time:** ~10 hours · **Code:** [`projects/p3`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p3) · mcp 2.3.0 (Python), @modelcontextprotocol/server 2.4.0 (TS), rmcp 3.10.0 (Rust), MCP Kotlin SDK 0.16.0
+
+```
+             ┌── probe, loudness ──────────▶ Rust rmcp server (media-probe, M9)
+agent ─ ToolRouter
+             └── everything else ─────────▶ Python media-toolkit ──▶ ffmpeg / gst-launch-1.0
+                                              (TS subset: same contract)
+```
+
+<Aside type="note" title="Real ffmpeg, mock model">
+Every tool runs real ffmpeg (and GStreamer for the pipeline tools) on fixtures the kit generates. The "model" is a scripted editor that plans only from tool output, so the evals are deterministic and need no API key.
+</Aside>
+
+## The kit
+
+`common/p3_fixtures.py` generates `match.mp4`: 10.52 s, five colour shots with a tone each, scene cuts at 2.0, 3.52, 6.04 and 8.04 s, and silence from 2.0 to 3.52 s (both confirmed by the detectors). `common/p3_contract.py` reuses M9's contract and adds checks every server must pass: annotations present, path escapes refused, non-allowlisted presets refused, bad EDLs refused.
+
+<Snippet path="projects/p3/common/p3_contract.py" />
+
+## M1–M3 · The Python toolkit
+
+| tool | kind | guard |
+|---|---|---|
+| `probe`, `loudness` | read-only | same structured output as the M9 servers |
+| `detect_scenes`, `detect_silence` | read-only | threshold range checked |
+| `extract_frames` | writes new files | at most 20 timestamps, inside the clip |
+| `transcode` | expensive | three named presets only; asks first; progress from `ffmpeg -progress pipe:1`; never overwrites |
+| `cut`, `concat` | writes | EDL validated (in range, ordered, no overlaps, ≤ 20 entries); asks only if the output exists |
+| `validate_pipeline`, `run_pipeline` | GStreamer | M14's parser and element allowlist, `num-buffers` required, 30 s cap |
+| `live_detect` | GStreamer 1.28 | needs `onnxinference`; refuses with a clear message when it's missing |
+
+Confirmation uses the SDK's `Resolve`/`Elicit` resolvers, which become `input_required` on the 2026-07-28 revision and an elicitation request on 2025-11-25. Two details that matter in practice: a resolver can return a plain `Confirm` to skip the question (nothing to overwrite, or a preset that will be refused anyway, so the human is never asked about a request that can't run), and a client that doesn't declare elicitation can't run `transcode` at all: the server fails closed.
+
+<Snippet path="projects/p3/starter/p3_server.py" title="starter/p3_server.py" />
+<Solution path="projects/p3/solution/p3_server.py" />
+
+## M4 · HTTP and OAuth
+
+Over Streamable HTTP the server is an OAuth resource server (`AuthSettings` + a token verifier). The evals check: no token → **401** with a `resource_metadata` URL; that metadata document lists `media:read`; a token issued for another resource → 401; a read-only token gets an error from `extract_frames` saying it lacks `media:write`, and a write token succeeds. Scopes are checked inside each write tool, not only at the door. The authorization server is mocked with a static verifier.
+
+<Solution path="projects/p3/solution/p3_auth.py" />
+
+## M5 · TypeScript and Rust, one contract
+
+The TypeScript server covers `probe`, `loudness`, `detect_scenes`, `detect_silence` and `transcode` (with `inputRequired`). The Rust server is M9's `rust/media-probe` (rmcp 3.10.0, `probe` + `loudness`). The same Python contract runs against all of them, on both protocol revisions.
+
+<Solution path="projects/p3/solution/ts/mediaToolkit.ts" label="Show the TypeScript server" />
+
+## M6 · Agent client and objective evals
+
+`ToolRouter` connects to several servers and gives the model one flat tool list; `probe` and `loudness` prefer the Rust server. Tool output goes back wrapped as `<tool_output>` data (M5's rule). The scripted editor probes, detects scenes and silence, drops silent shots, keeps the two longest, trims each to 1.6 s on frame boundaries, cuts at −16 LUFS, and checks the loudness.
+
+Measured on the course box (reference solution):
+
+| check | target | measured |
+|---|---|---|
+| route | probe, loudness → rust; cut → python | rust, rust, python |
+| EDL | two longest non-silent shots, ≤ 1.6 s | 4.00–5.56 s, 8.48–10.08 s |
+| duration | 3.20 s ± 0.1 | 3.2 s |
+| streams | video + audio | both |
+| loudness (ffmpeg `ebur128`, independent of the server's `loudnorm`) | −16 LUFS ± 1 LU | −15.9 LUFS |
+| cut position | 1.60 s ± 1 frame | 1.6 s |
+
+<Solution path="projects/p3/solution/p3_client.py" label="Show the router and agent" />
+<Solution path="projects/p3/solution/p3_evals.py" label="Show the objective checks" />
+
+The evals: [`projects/p3/evals/test_p3.py`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p3/evals/test_p3.py) (26 tests) and [`p3.test.ts`](https://github.com/pragmaticarun/ai-native-course/blob/main/projects/p3/evals/p3.test.ts) (3 tests). CI's rust job runs them with `P3_REQUIRE_ALL=1`, so a missing TS server, Rust binary or GStreamer is a failure there, not a skip.
+
+## M7 · Kotlin port (JVM, fakes)
+
+`AdbMediaServer.kt` (commonMain, MCP Kotlin SDK 0.16.0) exposes `screenrecord` (1–180 s, always asks the user through M5's `Confirmer`), `pull` (only from `/sdcard/`, no `..` or shell characters, into a safe relative name) and `transform` (a plain-language intent such as "trim to 5 s, mute, 720p" parsed into fixed steps; anything unrecognised is an error, not a guess). adb is an argument-list interface and the transformer is an interface; the tests use fakes over `ChannelTransport`. No Android SDK, device or adb binary is involved.
+
+<Solution path="kmp/shared/src/commonMain/kotlin/course/p3/AdbMediaServer.kt" label="Show the Kotlin server" />
+
+## C++/Rust notes
+
+- The Rust server is the required component: same tool names and output shape as Python, so one contract tests both. It runs ffmpeg with `tokio::process::Command` and an argument vector, never a shell.
+- ffmpeg's libraries (libavformat/libavfilter) are C; binding them directly (Rust `ffmpeg-next`, C++ directly) avoids process start-up but puts a crashy parser in your server's address space. A subprocess per job, with a timeout, is the safer default for an agent-facing server.
+- A GStreamer element written in Rust (`gst-plugins-rs`) or C could publish analytics metadata that the server exposes as a resource; that's the stretch, not built here.
+
+## Untested and not built
+
+- No real LLM; the editor is scripted. No Android Studio Agent Mode connection.
+- The tasks extension isn't used (progress notifications instead). The OAuth authorization server is a static verifier.
+- `live_detect`'s real path (GStreamer 1.28 `onnxinference` → `tensordecodebin`) is untested: the course box and CI have no onnx plugin, so only the refusal is tested.
+- TypeScript is a subset (no `extract_frames`, `cut`, `concat`, GStreamer tools, progress or HTTP auth).
+- Kotlin: fakes only; no Media3 Transformer, no real adb, no device. The Kotlin starter is a skeleton and isn't run in CI.
+- Deviation: the tool is `loudness`, not the syllabus's `measure_loudness`, to keep one contract.
+
+## Sources
+
+- MCP 2026-07-28 changelog: https://modelcontextprotocol.io/specification/2026-07-28/changelog
+- MCP Python SDK: https://py.sdk.modelcontextprotocol.io/
+- MCP Rust SDK (rmcp): https://github.com/modelcontextprotocol/rust-sdk
+- MCP Kotlin SDK: https://github.com/modelcontextprotocol/kotlin-sdk
+- ffmpeg filters (`silencedetect`, `loudnorm`, `ebur128`): https://ffmpeg.org/ffmpeg-filters.html
+- GStreamer onnx plugin: https://gstreamer.freedesktop.org/documentation/onnx/index.html
+- Media3: https://developer.android.com/media/media3

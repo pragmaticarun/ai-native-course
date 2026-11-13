@@ -5,7 +5,7 @@ AI maturity models, agent loops, graphs, MCP, on-device and GUI agents.
 
 - **Site:** https://pragmaticarun.github.io/ai-native-course/
 - **Syllabus (v0.3):** [SYLLABUS.md](SYLLABUS.md)
-- **Status:** modules **M0–M15** built and tested (Python, TypeScript, Kotlin/JVM, Rust; M13 only up to the host side, its Android parts untested); projects **P1–P2** built (P3–P8 planned) (see the syllabus).
+- **Status:** modules **M0–M15** built and tested (Python, TypeScript, Kotlin/JVM, Rust; M13 only up to the host side, its Android parts untested); projects **P1–P3** built (P4–P8 planned) (see the syllabus).
 
 ## Run everything locally (offline, mock models)
 
@@ -44,7 +44,7 @@ Live mode: set `COURSE_LLM_PROVIDER` (`openai` | `anthropic`), `COURSE_LLM_MODEL
 | `quizzes/` | quiz YAML + JSON Schema |
 | `scripts/` | exercise checker, quiz validator, type-check script |
 | `kmp/` | Kotlin Multiplatform (`./gradlew :shared:jvmTest`, JDK 21); M2/M4/M5/M9 examples, JVM target only |
-| `rust/media-probe/` | M9 `rmcp` MCP server (`probe`, `loudness`), used by P3 later |
+| `rust/media-probe/` | M9 `rmcp` MCP server (`probe`, `loudness`), also used by P3 |
 | `AGENTS.md` (+ `kmp/`, `rust/`, `site/`), `.cursor/rules/`, `.claude/skills/`, `verify.sh` | the repo's own agent instructions, rules, skills and verify command (M10 practises them; tests check them) |
 
 ## Untested / not yet built

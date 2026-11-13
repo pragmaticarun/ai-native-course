@@ -111,8 +111,8 @@ jobs:
         with:
           toolchain: "1.100.0"
           components: rustfmt, clippy
-      - name: Install ffmpeg
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Install ffmpeg and GStreamer (P3 pipeline tools)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good
       - name: fmt, clippy, test
         working-directory: rust/media-probe
         run: |
@@ -134,6 +134,12 @@ jobs:
         run: uv sync --locked && uv run pytest -q -rs ../examples/python/m9
       - name: TypeScript client vs Rust server
         run: pnpm vitest run examples/ts/m9
+      - name: P3 media toolkit (Python, TypeScript and Rust servers, agent client; skips become failures)
+        working-directory: python
+        env:
+          P3_REQUIRE_ALL: "1"
+          PROJECT_VARIANT: solution
+        run: uv run pytest -q -rs ../projects/p3/evals
       - name: M10 agent-friendly Rust benchmark (real cargo builds; skips become failures)
         working-directory: python
         env:
