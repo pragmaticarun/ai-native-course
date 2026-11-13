@@ -8,3 +8,7 @@
 example\.com
 # The deployed site itself (checked separately after deploy)
 ^https://pragmaticarun\.github\.io/ai-native-course
+# Returns 403 to automated checkers from CI; verified 200 in a browser fetch on 13 Nov 2026.
+^https://news\.samsung\.com/
+# Sitemap/canonical links to the site itself are checked after deploy, not here.
+^https://pragmaticarun\.github\.io/

@@ -15,13 +15,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Check links in the syllabus, lessons, exercises and examples
-        uses: lycheeverse/lychee-action@v2
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: site/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+      # Internal links are validated by starlight-links-validator during the build;
+      # this job checks the external links readers actually see in the built HTML.
+      - name: Build site
+        working-directory: site
+        run: pnpm install --frozen-lockfile && pnpm build
+      - name: Check external links (built site + repo Markdown)
+        uses: lycheeverse/lychee-action@v2.9.0
         with:
           args: >-
             --no-progress --max-concurrency 8 --timeout 30 --max-retries 2
             --accept 200..=299,429
+            --root-dir ${{ github.workspace }}/site/dist
+            --exclude '^file://'
             --exclude-path site/node_modules --exclude-path node_modules
-            './*.md' './site/src/content/docs/**/*.mdx' './exercises/**/*.md'
-            './examples/**/*.py' './examples/**/*.ts' './python/src/**/*.py'
+            --user-agent 'Mozilla/5.0 (X11; Linux x86_64) lychee link checker'
+            './site/dist/**/*.html' './*.md' './exercises/**/*.md'
           fail: true
