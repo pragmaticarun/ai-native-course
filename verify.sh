@@ -20,6 +20,9 @@ python_checks() {
     && uv run ruff format --check ../examples/python ../exercises ../projects ../scripts src \
     && bash ../scripts/typecheck_python.sh \
     && uv run pytest -q -rs ../examples/python \
+    && M15_REQUIRE_BROWSER_USE=1 BROWSER_USE_NO_UPDATE_CHECK=1 ANONYMIZED_TELEMETRY=false uv run --isolated --no-project \
+      --with browser-use==1.0.6 --with pytest==9.2.0 --with pytest-asyncio==1.5.0 \
+      pytest -q -rs -c ../pytest.ini ../examples/python/m15/test_browser_use_pins.py \
     && uv run python ../scripts/validate_quizzes.py)
 }
 ts_checks() { step typescript; pnpm typecheck && pnpm test; }

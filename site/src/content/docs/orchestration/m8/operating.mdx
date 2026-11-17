@@ -25,6 +25,12 @@ The example records a real v1 history, then replays it against an unsafe v2 (a *
 
 <Snippet path="examples/python/m8/versioning.py" />
 
+### SDK upgrades change behaviour too: logic flags
+
+Your own `patched()` calls aren't the only versioned changes. The SDK does the same thing internally: when a release changes how workflow code runs, it records a **logic flag** in the history the first time a run uses the new behaviour, and replay keeps honouring whatever a history recorded. So old and new histories can run on one worker.
+
+A recent example: temporalio **1.36.0** turned on *single-batch activation* (flag 2) for new runs, so signal and update handlers no longer ran before other jobs delivered in the same workflow task. **1.36.1** (the course pin) turned it off again by default "to preserve legacy signal, condition-wait, and cancellation behavior for unflagged workflows"; histories that already recorded flag 2 keep single-batch processing ([1.36.1 release notes](https://github.com/temporalio/sdk-python/releases/tag/1.36.1), [1.36.0 release notes](https://github.com/temporalio/sdk-python/releases/tag/1.36.0)). The M8 tests check both halves: a new history recorded on 1.36.1 has no flag 2, and a v1 history recorded on 1.36.0 (`examples/python/m8/fixtures/publish_v1_temporalio_1.36.0.json`) still carries flag 2 and replays cleanly. Take the habit with you: **replay a sample of real histories in CI on every SDK bump**, not only on your own code changes, and read the release notes for anything about activation order, signals or cancellation.
+
 Prompts need versioning too: put the prompt version in the fingerprint, and treat a prompt change like a code change (evals in CI, gradual rollout).
 
 ## Incident runbook (template)

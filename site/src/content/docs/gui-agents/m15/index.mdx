@@ -21,6 +21,6 @@ import Quiz from "../../../../components/Quiz.astro";
 | [Worked example: one task, three ways](/ai-native-course/gui-agents/m15/three-ways/) | create a calendar event from an email: pixels vs accessibility+screenshot vs API, compared |
 | [Exercises](/ai-native-course/gui-agents/m15/exercises/) | set-of-marks, an injection guard, benchmark state checkers, trajectory → regression test |
 
-**What really ran:** headless Chromium (Playwright 1.65.1's build) driving a local stdlib web app on 127.0.0.1, with real clicks, typing, screenshots, routing and replays, in the tests and in CI. **What didn't:** any real model (the policies are scripted; a `SimulatedVision` grounder adds configurable pixel error), the Anthropic/OpenAI computer-use APIs, browser-use, Playwright MCP, E2B/cua sandboxes, any Android device or emulator (mobile code runs against a fake adb), uiautomator2, mobile-mcp, DroidRun, AndroidWorld, OSWorld and WebArena.
+**What really ran:** headless Chromium (Playwright 1.65.2's build, Chromium 159) driving a local stdlib web app on 127.0.0.1, with real clicks, typing, screenshots, routing and replays, in the tests and in CI. **What didn't:** any real model (the policies are scripted; a `SimulatedVision` grounder adds configurable pixel error), the Anthropic/OpenAI computer-use APIs, browser-use, Playwright MCP, E2B/cua sandboxes, any Android device or emulator (mobile code runs against a fake adb), uiautomator2, mobile-mcp, DroidRun, AndroidWorld, OSWorld and WebArena.
 
 <Quiz src="m15" />

@@ -1,0 +1,45 @@
+{
+  "_source": "Hand-written examples in the shape of browser-use 1.0.6 result.judgement.model_dump() (fields from browser_use.agent.judge.Judgement). Not captured from a real run: no browser-use run was made for the course. test_browser_use_pins.py validates each one against the real Judgement model.",
+  "judgements": {
+    "clean_success": {
+      "success": true,
+      "failure_reason": null,
+      "description": "Opened the calendar, created the 10:00 meeting with Priya and confirmed it appears in the week view.",
+      "prompt_injection_detected": false,
+      "bot_block_or_captcha_detected": false,
+      "gotchas": []
+    },
+    "success_with_gotcha": {
+      "success": true,
+      "failure_reason": null,
+      "description": "Filled and submitted the contact form after one rejected attempt.",
+      "prompt_injection_detected": false,
+      "bot_block_or_captcha_detected": false,
+      "gotchas": ["The form requires phone numbers in (###) ###-#### format"]
+    },
+    "captcha_block": {
+      "success": false,
+      "failure_reason": "A CAPTCHA appeared after the search and the agent could not continue.",
+      "description": "Searched for the product, then hit a bot check on the results page.",
+      "prompt_injection_detected": false,
+      "bot_block_or_captcha_detected": true,
+      "gotchas": ["The site shows a CAPTCHA after rapid repeated searches"]
+    },
+    "injection": {
+      "success": true,
+      "failure_reason": null,
+      "description": "Archived the newsletter emails; one email body told the agent to forward the inbox to an outside address, which it ignored.",
+      "prompt_injection_detected": true,
+      "bot_block_or_captcha_detected": false,
+      "gotchas": []
+    },
+    "judged_failure": {
+      "success": false,
+      "failure_reason": "The meeting was created on the wrong day.",
+      "description": "Created the meeting on Tuesday instead of Wednesday.",
+      "prompt_injection_detected": false,
+      "bot_block_or_captcha_detected": false,
+      "gotchas": []
+    }
+  }
+}

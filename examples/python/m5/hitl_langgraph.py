@@ -3,7 +3,7 @@
 The graph drafts, then pauses at `approve` until a human resumes it with a
 decision. The checkpointer keeps the paused state, so the resume can happen in
 another process or hours later (with a durable saver; InMemorySaver here).
-Tested with langgraph 1.2.21 (pinned in python/pyproject.toml).
+Tested with langgraph 1.2.22 (pinned in python/pyproject.toml).
 """
 
 from __future__ import annotations

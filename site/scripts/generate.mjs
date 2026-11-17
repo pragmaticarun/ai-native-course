@@ -97,7 +97,8 @@ ${rows(rustDeps)}
 |---|---|---|
 | GitHub Spec Kit (\`specify\`) | v1.4.0 (git tag) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init\` |
 | git | runner's version | M10 hooks, M11 worktrees and sandbox repos |
-| llama.cpp | v1.0.0 (prebuilt release assets of build b12359, \`llama-b12359-bin-ubuntu-x64.tar.gz\`) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
+| llama.cpp | build b12428 (post-v1.0.0; prebuilt \`llama-b12428-bin-ubuntu-x64.tar.gz\`; checked 17 Nov 2026) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
+| browser-use | 1.0.6 (PyPI; isolated env, not in \`uv.lock\`, because its exact pins conflict with the course lock; checked 17 Nov 2026) | M15 API check, \`examples/python/m15/test_browser_use_pins.py\`; no agent run |
 | Playwright browsers | Chromium bundled with \`playwright\` (Python, locked above) | M15 sandbox agents; CI runs \`playwright install --with-deps chromium\` |
 | ffmpeg / ffprobe | Ubuntu package on the CI runner (7.1.5 on the course box) | M8, M9, M14 |
 | GStreamer | Ubuntu packages on the CI runner (1.28.9 from conda-forge on the course box) | M14 pipeline validator (\`gst-launch-1.0\`, base/good plugins) |

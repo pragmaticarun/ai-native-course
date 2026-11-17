@@ -22,9 +22,17 @@ from media_chunks import (
     plan_chunks,
 )
 from operate import Release, Run, burn_rate, diff, percentile, should_page, slo_report
+from temporalio.client import WorkflowHistory
 from temporalio.testing import ActivityEnvironment, WorkflowEnvironment
 from temporalio.worker import Worker
-from versioning import PublishV1, PublishV2, PublishV2Unsafe, record_history, replay_check
+from versioning import (
+    PublishV1,
+    PublishV2,
+    PublishV2Unsafe,
+    record_history,
+    replay_check,
+    sdk_flags,
+)
 
 import aincourse  # noqa: F401  (sets PYDANTIC_AI_NO_BANNER before pydantic_ai is imported)
 
@@ -116,6 +124,29 @@ def test_patched_change_replays_old_histories_unpatched_does_not():
     safe, unsafe = asyncio.run(go())
     assert safe is None
     assert unsafe is not None and "Nondeterminism" in unsafe
+
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def test_new_histories_no_longer_record_single_batch_flag():
+    """temporalio 1.36.1: flag 2 (single-batch activation) is off by default for new runs."""
+
+    async def go():
+        async with await WorkflowEnvironment.start_time_skipping() as env:
+            return await record_history(env.client, PublishV2)
+
+    assert 2 not in sdk_flags(asyncio.run(go()))
+
+
+def test_history_recorded_on_1_36_0_keeps_flag_2_and_still_replays():
+    """A v1 history recorded with temporalio 1.36.0 (flag 2 set) replays on the pinned SDK."""
+    text = (FIXTURES / "publish_v1_temporalio_1.36.0.json").read_text()
+    history = WorkflowHistory.from_json("publish-recorded-1-36-0", text)
+    assert 2 in sdk_flags(history)
+    assert asyncio.run(replay_check(history, PublishV1)) is None
+    assert asyncio.run(replay_check(history, PublishV2)) is None
+    assert "Nondeterminism" in (asyncio.run(replay_check(history, PublishV2Unsafe)) or "")
 
 
 # ------------------------------------------------------------------ L8.3 Pydantic AI on Temporal
