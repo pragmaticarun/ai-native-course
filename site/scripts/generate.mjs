@@ -84,7 +84,7 @@ ${rows(kt)}
 | Gradle (wrapper) | ${gradle} |
 | JDK | 21 (Temurin in CI; \`jvmToolchain(21)\`) |
 
-Only the JVM target is built and tested so far. Android-only entries (AGP, LiteRT-LM, ML Kit, ...) are added when the Android target lands.
+Both KMP targets are built and tested in CI. The JVM target runs in the \`kmp\` job. Since 14 Nov 2026 (Android SDK install approved by the owner) the \`android\` job builds the Android target and P6's app: the Android host tests, \`assembleDebug\` and \`testDebugUnitTest\`. It also compiles the instrumentation APK, which is not run. AGP, Compose, Koog's LiteRT executor and LiteRT-LM above are what that build uses. **Untested:** nothing has run on a device, an emulator or the Galaxy A73 yet.
 
 ## Rust (\`rust/media-probe/Cargo.lock\`)
 | Crate | Locked version |
@@ -108,7 +108,7 @@ ${rows(rustDeps)}
 |---|---|
 ${rows(pnpmVersions("site/pnpm-lock.yaml", "site/package.json"))}
 
-Android-side versions (AGP, LiteRT-LM, ML Kit GenAI, ExecuTorch, ONNX Runtime GenAI) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when the Android target is built; M13 quotes the versions it checked, unrun. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
+Android SDK packages, installed by \`sdkmanager\` in the CI \`android\` job and on the course box: \`platforms;android-37.0\`, \`build-tools;36.0.0\`, \`platform-tools\`. ML Kit GenAI, ExecuTorch and ONNX Runtime GenAI are not part of the Android build. They are planned in [syllabus](/ai-native-course/syllabus/) section 2.4, and M13 quotes the versions it checked without running them. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
 `;
 writeFileSync(resolve(docs, "reference", "versions.md"), page("Versions", "Pinned versions, generated from the lockfiles.", body));
 console.log("generated syllabus.md, changelog.md, reference/versions.md");

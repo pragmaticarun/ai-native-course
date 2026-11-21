@@ -43,23 +43,23 @@ Live mode: set `COURSE_LLM_PROVIDER` (`openai` | `anthropic`), `COURSE_LLM_MODEL
 | `exercises/mX/exY/` | `README.md`, `starter/`, `solution/`, `tests/` (CI: solution passes, starter fails) |
 | `quizzes/` | quiz YAML + JSON Schema |
 | `scripts/` | exercise checker, quiz validator, type-check script |
-| `kmp/` | Kotlin Multiplatform (`./gradlew :shared:jvmTest`, JDK 21); M2/M4/M5/M9 examples, JVM target only |
+| `kmp/` | Kotlin Multiplatform (`./gradlew :shared:jvmTest`, JDK 21); M2/M4/M5/M9 examples and the P6 agent and app; JVM target (`kmp` CI job) and Android target + P6 APKs (`android` CI job) |
 | `rust/media-probe/` | M9 `rmcp` MCP server (`probe`, `loudness`), also used by P3 |
 | `AGENTS.md` (+ `kmp/`, `rust/`, `site/`), `.cursor/rules/`, `.claude/skills/`, `verify.sh` | the repo's own agent instructions, rules, skills and verify command (M10 practises them; tests check them) |
 
 ## Untested / not yet built
 - Device and emulator steps (M3 mobile-use with `adb`): only parsing/command logic is tested, against a hand-written fixture.
-- KMP: JVM target only; the Android target, devices and emulators are untested. ML Kit is mirrored with our own types.
+- KMP: the JVM and Android targets build and pass their tests in CI (Android host tests, `assembleDebug`, P6 unit tests). The instrumentation APK is compiled only. Nothing has run on a device, an emulator or the Galaxy A73. ML Kit is mirrored with our own types.
 - M6 on-device eval data is a synthetic fixture; GUI evals use the simulator only.
 - promptfoo, DeepEval, Logfire/OTLP export: described, not exercised.
 - OpenAI Agents SDK and Claude Agent SDK versions of the M3 explorer: comparison only, no tested code yet.
 - Computer-use adapters (Anthropic/OpenAI): tested against recorded payload shapes from the docs, not against live APIs.
 - M7: Mastra workflows (reading only); GUI graph and media fan-out use a simulated emulator and fake models.
 - M8: OpenAI Agents SDK Temporal integration, DBOS/Restate/Inngest (reading only); no real 2-hour recording.
-- M9: MCP Inspector, TS codemod, OAuth/CIMD, tasks extension, Android Studio Agent Mode, `@mobilenext/mobile-mcp`, `@playwright/mcp`, AppFunctions, real devices (not exercised). The Android SDK is not installed.
-- M10: Kiro (comparison from its docs; fixture files hand-written), live coding agents on the agent-friendly benchmark (the measured agent is a script), Android CLI / `android skills add` / the Android CLI plugin, Gradle Android tasks and screenshot tests (no Android SDK).
+- M9: MCP Inspector, TS codemod, OAuth/CIMD, tasks extension, Android Studio Agent Mode, `@mobilenext/mobile-mcp`, `@playwright/mcp`, AppFunctions, real devices (not exercised). The Android SDK is installed (since 14 Nov 2026), but no M9 tool has run against a device or emulator.
+- M10: Kiro (comparison from its docs; fixture files hand-written), live coding agents on the agent-friendly benchmark (the measured agent is a script), Android CLI / `android skills add` / the Android CLI plugin, screenshot tests (Gradle Android build and host-test tasks run in CI's `android` job since 14 Nov 2026).
 - M11: no live coding agent, cloud agent (Copilot coding agent, Codex cloud, Cursor cloud agents) or GitHub API call; the issue-to-PR workflow template's live path is untested; Android Studio Agent Mode, Android CLI, emulator and Journeys are untested.
 - M12: the team journey and its numbers are fictional; the entry criteria are the course's own synthesis.
-- M13: host side only. Android, emulators and the Galaxy A73 are untested (LiteRT-LM, Gemini Nano / ML Kit GenAI, `AgentRunner`, AppFunctions, ExecuTorch, ORT QNN EP, the KMP Android target). llama.cpp and ONNX Runtime ran on x86 CPU only.
+- M13: host side only. Android, emulators and the Galaxy A73 are untested (LiteRT-LM, Gemini Nano / ML Kit GenAI, `AgentRunner`, AppFunctions, ExecuTorch, ORT QNN EP). The KMP Android target builds in CI, but nothing has run on a device. llama.cpp and ONNX Runtime ran on x86 CPU only.
 - M14: no real ASR/VLM models (scripted); silero-vad, faster-whisper, whisper.cpp, pyannote, PySceneDetect, MediaPipe, PyAV, PyGObject and GStreamer `onnxinference` not run; `MediaExtractor` (Ex 14.4) untested.
 - M15: provider computer-use APIs, browser-use, Playwright MCP, E2B/cua, real devices/emulators, uiautomator2, mobile-mcp and AndroidWorld/OSWorld/WebArena not run; agents use simulated vision and scripted policies against the local sandbox.
