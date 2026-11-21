@@ -84,7 +84,7 @@ ${rows(kt)}
 | Gradle (wrapper) | ${gradle} |
 | JDK | 21 (Temurin in CI; \`jvmToolchain(21)\`) |
 
-Only the JVM target is built and tested so far. Android-only entries (AGP, LiteRT-LM, ML Kit, ...) are added when the Android target lands.
+Both KMP targets are built and tested in CI. The JVM target runs in the \`kmp\` job. Since 14 Nov 2026 (Android SDK install approved by the owner) the \`android\` job builds the Android target and P6's app: the Android host tests, \`assembleDebug\` and \`testDebugUnitTest\`. It also compiles the instrumentation APK, which is not run. AGP, Compose, Koog's LiteRT executor and LiteRT-LM above are what that build uses. **Untested:** nothing has run on a device, an emulator or the Galaxy A73 yet.
 
 ## Rust (\`rust/media-probe/Cargo.lock\`)
 | Crate | Locked version |
@@ -97,7 +97,8 @@ ${rows(rustDeps)}
 |---|---|---|
 | GitHub Spec Kit (\`specify\`) | v1.4.0 (git tag) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init\` |
 | git | runner's version | M10 hooks, M11 worktrees and sandbox repos |
-| llama.cpp | v1.0.0 (prebuilt release assets of build b12359, \`llama-b12359-bin-ubuntu-x64.tar.gz\`) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
+| llama.cpp | build b12428 (post-v1.0.0; prebuilt \`llama-b12428-bin-ubuntu-x64.tar.gz\`; checked 17 Nov 2026) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
+| browser-use | 1.0.6 (PyPI; isolated env, not in \`uv.lock\`, because its exact pins conflict with the course lock; checked 17 Nov 2026) | M15 API check, \`examples/python/m15/test_browser_use_pins.py\`; no agent run |
 | Playwright browsers | Chromium bundled with \`playwright\` (Python, locked above) | M15 sandbox agents; CI runs \`playwright install --with-deps chromium\` |
 | ffmpeg / ffprobe | Ubuntu package on the CI runner (7.1.5 on the course box) | M8, M9, M14 |
 | GStreamer | Ubuntu packages on the CI runner (1.28.9 from conda-forge on the course box) | M14 pipeline validator (\`gst-launch-1.0\`, base/good plugins) |
@@ -107,7 +108,7 @@ ${rows(rustDeps)}
 |---|---|
 ${rows(pnpmVersions("site/pnpm-lock.yaml", "site/package.json"))}
 
-Android-side versions (AGP, LiteRT-LM, ML Kit GenAI, ExecuTorch, ONNX Runtime GenAI) are planned in the [syllabus](/ai-native-course/syllabus/) section 2.4 and will appear here when the Android target is built; M13 quotes the versions it checked, unrun. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
+Android SDK packages, installed by \`sdkmanager\` in the CI \`android\` job and on the course box: \`platforms;android-37.0\`, \`build-tools;36.0.0\`, \`platform-tools\`. ML Kit GenAI, ExecuTorch and ONNX Runtime GenAI are not part of the Android build. They are planned in [syllabus](/ai-native-course/syllabus/) section 2.4, and M13 quotes the versions it checked without running them. The Temporal test/dev server binaries are downloaded by the Temporal SDKs at test time and are not pinned here.
 `;
 writeFileSync(resolve(docs, "reference", "versions.md"), page("Versions", "Pinned versions, generated from the lockfiles.", body));
 console.log("generated syllabus.md, changelog.md, reference/versions.md");

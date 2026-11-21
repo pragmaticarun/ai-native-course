@@ -12,7 +12,7 @@ The demo (`run_demo`, also the test):
    side effect already in the ledger under its idempotency key and does not repeat it.
 
 Runs against Temporal's local dev server (`WorkflowEnvironment.start_local()`, which
-downloads the Temporal CLI on first use). Tested with temporalio 1.36.0.
+downloads the Temporal CLI on first use). Tested with temporalio 1.36.1.
 """
 
 from __future__ import annotations

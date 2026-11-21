@@ -1,6 +1,6 @@
 # P7 · Multimodal media-analysis graph
 
-**After:** M7, M14 · **Language:** Python (LangGraph 1.2.21) · **Needs:** ffmpeg
+**After:** M7, M14 · **Language:** Python (LangGraph 1.2.22) · **Needs:** ffmpeg
 
 Ingest a recording, split it into chapters, analyse each segment in parallel, merge the results
 into chapters, a summary, a search index and an optional highlight reel, check the output

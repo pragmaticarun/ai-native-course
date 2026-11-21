@@ -1,6 +1,6 @@
 ---
-title: "L1.4 Engineering-team views: DORA and Thoughtworks"
-description: The DORA AI Capabilities Model ("AI is an amplifier") and Technology Radar Vol. 35 themes.
+title: "L1.4 Engineering-team views: DORA, Thoughtworks and Flatiron"
+description: The DORA AI Capabilities Model ("AI is an amplifier"), Technology Radar Vol. 35 themes, and Flatiron Health's four-layer Agentic Maturity Model.
 sidebar:
   order: 4
 ---
@@ -27,9 +27,37 @@ DORA also published an ROI framework and calculator for AI-assisted development 
 
 Not levels, but a useful read on practice. Themes include harness engineering at scale, **keeping human judgment as agents multiply** (warning against "human-in-the-loop theater"), choosing beyond frontier models, and AI economics. The Adopt ring includes **agent sandboxing** and threat modelling.
 
+## Flatiron Health's Agentic Maturity Model (Nov 2026)
+
+Published by the Flatiron Health Engineering Team on 9 Nov 2026. It is one company's internal model for its own engineering teams, written up in a blog post: a practitioner source, not research or a standard. It has **four layers**, each defined by what the human does and what the agent does (quoted from the post's table):
+
+| Layer | Human role | Agent role |
+|---|---|---|
+| **1 Manual** | Authors code and retains full operational control over all changes. | Acts strictly as an automated reviewer evaluating human-written code against rules. |
+| **2 Interactive** | Prompts, steers interactively, and verifies suggestions step-by-step. | Acts as a conversational assistant responding directly to engineer directives. |
+| **3 Structured** | Orchestrates the overall process and reviews intermediate artifacts at phase gates. | Follows explicit multi-phase workflows (specify, plan, implement) sequentially. |
+| **4 Autonomous** | Monitors execution asynchronously and intervenes on edge cases or failures. | Executes end-to-end multi-phase workflows independently within set guardrails. |
+
+Its central claim: what changes from layer to layer "isn't how much human expertise is involved, but where that expertise lives." At Layer 1 it is in the engineer's head, applied review by review; by Layer 4 it "has to be externalized into the artifacts and checks that govern the agent's behavior", and that externalization, "not better models", is what unlocks trust. So the post treats maturity as an **evaluation problem**, and describes evaluation as shared infrastructure: traces and tool calls in CI, layered checks routed by risk (deterministic validation, LLM judges, expert review), and feedback that updates steering artifacts.
+
+Two details make it useful in practice. A team can run **different layers for different work** (Layer 2 for routine changes, Layer 1 for a legacy codebase), as long as "each layer's guarantees hold before the next one depends on them". And Flatiron uses it as a shared self-assessment, so a team says "we operate confidently at Layer 2, we're piloting Layer 3" instead of everyone claiming Layer 4. The post names one internal system per layer (agent code review, a plugin marketplace, an agent evaluation harness, an agent runtime) but gives no numbers, so the course doesn't quote any results.
+
+Its layers sit close to the autonomy levels in [L1.5](/ai-native-course/maturity/autonomy-levels/): like Feng et al., it defines levels by the human's role, and Layer 3 is the spec → plan → implement workflow you build in [M10](/ai-native-course/ai-native/m10/).
+
+## How the three compare
+
+| | DORA AI Capabilities Model | Thoughtworks Radar Vol. 35 | Flatiron Agentic Maturity Model |
+|---|---|---|---|
+| Publisher, date | Google Cloud's DORA research programme, 2025 | Thoughtworks, Nov 2026 | Flatiron Health Engineering Team, 9 Nov 2026 |
+| Kind of source | Survey-based research | Practitioner trend report | One company's internal model (blog post) |
+| Shape | **Map**: seven capabilities, no ranking | Themes and Adopt/Trial/Assess/Hold rings for techniques and tools | **Ladder**: four layers, but layers can differ by codebase or kind of work |
+| Unit | The team and organisation | The industry's practice | The workflow: who does what, human or agent |
+| What moves you up | Strengthening the capabilities that amplify AI | — (not levels) | Externalizing expertise into artifacts and checks the agent must pass |
+| Use it for | Deciding what to fix first | Spotting practices worth trying or avoiding | Saying honestly which layer each kind of work runs at, and what checks must exist before the next |
+
 ## Try it
 
-Score your team 0–3 on each DORA capability. Keep the numbers: the [worked example](/ai-native-course/maturity/worksheet/) turns them into a radar chart.
+Score your team 0–3 on each DORA capability. Keep the numbers: the [worked example](/ai-native-course/maturity/worksheet/) turns them into a radar chart. Then, for two kinds of work your team does (say, routine dependency bumps and changes to a legacy module), write down which Flatiron layer each runs at today and one check that would have to exist, as a test, eval or rule file, before it could move up a layer.
 
 ## C++/Rust notes
 - "AI is an amplifier" is the same lesson as "a faster compiler doesn't fix a flaky test suite": small batches, strong version control and good platforms are what let speed turn into delivery.
@@ -39,3 +67,4 @@ Score your team 0–3 on each DORA capability. Keep the numbers: the [worked exa
 - DORA AI Capabilities Model: https://dora.dev/ai/capabilities-model/report/
 - DORA ROI: https://dora.dev/ai/roi/report/
 - Thoughtworks Radar: https://www.thoughtworks.com/radar · agent sandboxing: https://www.thoughtworks.com/en-us/radar/techniques/agent-sandboxing
+- Flatiron Health, "Applying AI to Solve Problems That Matter: Introducing Flatiron's Agentic Maturity Model" (9 Nov 2026): https://resources.flatiron.com/applying-ai-to-solve-problems-that-matter-introducing-flatirons-agentic-maturity-model

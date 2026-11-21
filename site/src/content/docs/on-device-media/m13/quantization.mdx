@@ -18,22 +18,24 @@ import { Aside } from "@astrojs/starlight/components";
 
 <Snippet path="examples/python/m13/llama_quant.py" />
 
-Run on the course box (x86 "Intel Xeon Processor", 4 threads), llama.cpp **b12359** (= v1.0.0), `stories15M.gguf` F32, 128-token context, our own 1,000-word eval text:
+Run on the course box (x86 "Intel Xeon Processor", 4 threads) on 17 Nov 2026, llama.cpp **b12428** (a post-v1.0.0 build; its tools report `version: 1.0.0-dev (build 12428)`), `stories15M.gguf` F32, 128-token context, our own 1,000-word eval text:
 
 | quant | size MB | PPL | PPL/F32 | mean KLD | same top-1 % | prompt t/s | gen t/s |
 |---|---|---|---|---|---|---|---|
-| F32 | 98.4 | 5.282 | 1.0 | 0.0 | 100.0 | 9021.2 | 1057.3 |
-| Q8_0 | 26.7 | 5.289 | 1.0014 | 0.0011 | 97.4 | 23279.7 | 2982.0 |
-| Q4_K_M | 21.0 | 5.429 | 1.0279 | 0.0269 | 90.7 | 11779.7 | 2235.5 |
-| Q4_0 | 19.1 | 6.02 | 1.1396 | 0.1242 | 82.9 | 24590.3 | 3456.8 |
+| F32 | 98.4 | 5.282 | 1.0 | 0.0 | 100.0 | 13444.2 | 1352.9 |
+| Q8_0 | 26.7 | 5.289 | 1.0014 | 0.0011 | 97.4 | 35872.2 | 3610.7 |
+| Q4_K_M | 21.0 | 5.429 | 1.0279 | 0.0269 | 90.7 | 17956.7 | 3071.7 |
+| Q4_0 | 19.1 | 5.939 | 1.1243 | 0.1114 | 83.3 | 37984.4 | 4154.0 |
+
+The first version of this table (14 Nov 2026) used **b12359**, the v1.0.0 build. Re-running b12359 on the same box straight after the table above gave the same sizes and the same F32, Q8_0 and Q4_K_M quality numbers, and Q4_0 at PPL 5.944 / KLD 0.1115 / 83.3% (5.939 / 0.1114 / 83.3% on b12428), so the bump changed no quality number beyond run-to-run noise. Its speeds were lower in that run (e.g. Q8_0 prompt 23,513 t/s, generation 2,674 t/s), but speeds on a shared box vary between runs, so don't read the difference as a b12428 speed-up.
 
 What to take from it (and what not to):
 
 - **KL divergence and "same top-1" are better quality signals than perplexity alone**: they compare each token's distribution against the F32 model's (`--kl-divergence-base`, then `--kl-divergence`).
 - Q8_0 was nearly lossless here; Q4_0 lost noticeably (17% of next-token picks changed); Q4_K_M sat between them.
 - **Q4_K_M was slower than Q4_0 and Q8_0 on this CPU and model.** Speed depends on kernels and hardware; don't assume.
-- Repeated runs moved some numbers (Q4_0 PPL was 5.94 in one run, 6.02 in another). Treat the last digits as noise and check tasks, not just perplexity.
-- A real finding: `-ctk q8_0` (quantized KV cache) **failed on this model**: "K cache type q8_0 with block size 32 does not divide n_embd_head_k=48". Quantized KV caches need a head dimension divisible by the block size.
+- Repeated runs moved some numbers (Q4_0 PPL has been 5.94 in some runs, 6.02 in another). Treat the last digits as noise and check tasks, not just perplexity.
+- A real finding: `-ctk q8_0` (quantized KV cache) **failed on this model** (on both b12359 and b12428): "K cache type q8_0 with block size 32 does not divide n_embd_head_k=48". Quantized KV caches need a head dimension divisible by the block size.
 - These are x86 numbers on a toy model. **No A73 numbers** until measured on the phone (*untested*).
 
 The CI `llamacpp` job downloads the same release and model and re-runs this table on every push (assertions check ordering, not exact values).

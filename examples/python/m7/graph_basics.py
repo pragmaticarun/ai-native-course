@@ -4,7 +4,7 @@ The same three-step job ("fetch a changelog, classify each line, render notes") 
 written twice: as a model-driven loop that asks the model what to do next on every
 turn, and as a LangGraph `StateGraph` where only the classification step uses the
 model. Reducers decide how parallel or repeated writes to one state key combine.
-Tested with langgraph 1.2.21 (pinned in python/pyproject.toml).
+Tested with langgraph 1.2.22 (pinned in python/pyproject.toml).
 """
 
 from __future__ import annotations

@@ -18,6 +18,11 @@ import Snippet from "../../../../components/Snippet.astro";
 
 Prices in the code are illustrative, not any provider's list price.
 
+Two real cases from one week of browser-use releases (Nov 2026), worked through in [M15's browser-use notes](/ai-native-course/gui-agents/m15/computer-use-apis/#browser-use-104--106-three-small-lessons-in-one-week):
+
+- **Defaults are part of your cost.** browser-use 1.0.6 changed the model used when you pass none to one whose tokens cost 15 times as much. Pin the model in code (`llm=`), not only the library version.
+- **Don't break your own cache.** 1.0.4 stopped rewriting old messages on every step (it dropped old screenshots one by one, which made almost every request a cache miss) and roughly halved model cost per task on its benchmark with the same score.
+
 <Snippet path="examples/python/m6/cost_latency.py" />
 
 ## Try it

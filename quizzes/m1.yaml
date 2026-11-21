@@ -49,3 +49,9 @@ questions:
     choices: ["Five numbered maturity levels", "Perspectives of foundational capabilities plus an adoption cycle", "A quiz with a score", "A list of models to buy"]
     answer: 1
     explanation: "Six perspectives (Business, People, Governance, Platform, Security, Operations) and Envision → Align → Launch → Scale."
+  - id: m1q9
+    type: single
+    prompt: "In Flatiron Health's four-layer Agentic Maturity Model (Nov 2026), what does the post say unlocks trust as a team moves from Layer 1 (Manual) to Layer 4 (Autonomous)?"
+    choices: ["Adopting the newest frontier model", "Externalizing human expertise into artifacts and checks the agent must pass", "Removing humans from review entirely", "Deploying more agents than other teams"]
+    answer: 1
+    explanation: "Flatiron: what moves is not how much expertise is involved but where it lives; by Layer 4 it must be externalized into the artifacts and checks that govern the agent, and that externalization, 'not better models', is what unlocks trust."

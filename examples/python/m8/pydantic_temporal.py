@@ -4,7 +4,7 @@ Inside a workflow, the agent's model requests and tool calls become Temporal act
 so a crash mid-run resumes without re-asking the model or re-running finished tools.
 Outside a workflow the same `Agent` behaves normally. The model here is a `FunctionModel`
 (deterministic, offline); with a real provider you would pass a model name instead.
-Tested with pydantic-ai-slim 2.68.0 and temporalio 1.36.0 (time-skipping test server).
+Tested with pydantic-ai-slim 2.68.0 and temporalio 1.36.1 (time-skipping test server).
 """
 
 from __future__ import annotations

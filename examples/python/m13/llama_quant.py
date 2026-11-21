@@ -1,8 +1,9 @@
 """M13 L13.6 / Ex2: quantize a small GGUF model with llama.cpp and chart quality vs speed vs size.
 
 Real tools, run on the box and in the CI `llamacpp` job:
-* llama.cpp release **b12359** (the build the `v1.0.0` tag points at; its binaries report
-  `version: 1.0.0-dev (build 12359)`), prebuilt `llama-b12359-bin-ubuntu-x64.tar.gz`;
+* llama.cpp release **b12428** (a post-v1.0.0 build, 16 Nov 2026; its binaries report
+  `version: 1.0.0-dev (build 12428)`), prebuilt `llama-b12428-bin-ubuntu-x64.tar.gz`. Until
+  17 Nov 2026 the course used b12359, the build the `v1.0.0` tag points at;
 * model: `ggml-org/models` `tinyllamas/stories15M.gguf` (F32, ~98 MB, a 15M-parameter
   TinyStories Llama). Tiny on purpose: the *method* transfers, the numbers don't.
 
@@ -11,7 +12,7 @@ fixtures/tiny_stories_eval.txt (our own text) with `--kl-divergence` against the
 `llama-bench -o json` for prompt and generation tokens/s. Numbers are x86 CPU numbers, **not**
 Galaxy A73 numbers (the A73 run is untested).
 
-    LLAMA_CPP_DIR=/path/to/llama-b12359 LLAMA_MODEL=/path/to/stories15M.gguf \
+    LLAMA_CPP_DIR=/path/to/llama-b12428 LLAMA_MODEL=/path/to/stories15M.gguf \
         uv run --project ../../python python -m m13.llama_quant
 """
 

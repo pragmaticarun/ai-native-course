@@ -1,4 +1,4 @@
-"""L7.6: retries, timeouts and fallbacks on graph nodes (langgraph 1.2.21 node options).
+"""L7.6: retries, timeouts and fallbacks on graph nodes (langgraph 1.2.22 node options).
 
 * `retry_policy=RetryPolicy(...)`: exponential backoff with jitter, only for the exception
   types you list (retrying a validation error just burns money);

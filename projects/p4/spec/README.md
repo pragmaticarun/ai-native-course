@@ -1,6 +1,6 @@
 # P4 — Durable triage & remediation workflow (Temporal)
 
-**After:** M7–M8 · **Language:** Python, temporalio 1.36.0 · Temporal's local test servers
+**After:** M7–M8 · **Language:** Python, temporalio 1.36.1 · Temporal's local test servers
 (downloaded by the SDK on first use), mock model, no cloud account
 
 An incident report comes in. The workflow classifies it, gathers logs (a flaky tool, so

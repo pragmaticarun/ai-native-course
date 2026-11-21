@@ -1,7 +1,7 @@
 """L6.2: the same idea in Inspect AI (UK AISI's eval framework), offline.
 
 Inspect's built-in `mockllm/model` provider returns outputs we script, so the
-task runs in CI with no API key. Tested with inspect-ai 0.3.289.
+task runs in CI with no API key. Tested with inspect-ai 0.3.290.
 Swap `model=` for a real provider id to run it live (not exercised in CI).
 """
 

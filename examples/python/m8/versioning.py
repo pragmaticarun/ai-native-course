@@ -9,6 +9,11 @@ with a non-determinism error. So a change like "add a review step" must be gated
 
 `replay_check` records a history with v1, then replays it against a candidate v2. This is
 the same check you would run in CI against histories exported from production.
+
+`sdk_flags` lists the SDK "logic flags" a history recorded. The SDK sets a flag the first time
+a run uses a behaviour change, and replay keeps honouring it, so one worker can run old and new
+histories side by side. temporalio 1.36.0 turned flag 2 (single-batch activation) on for new
+runs; 1.36.1 turned it off again by default. Histories that already recorded flag 2 keep it.
 """
 
 from __future__ import annotations
@@ -81,6 +86,16 @@ async def record_history(client, workflow_cls, name: str = "talk") -> WorkflowHi
         )
         await handle.result()
     return await handle.fetch_history()
+
+
+def sdk_flags(history: WorkflowHistory) -> set[int]:
+    """The SDK logic flags recorded in a history's completed workflow tasks."""
+    flags: set[int] = set()
+    for event in history.events:
+        if event.HasField("workflow_task_completed_event_attributes"):
+            meta = event.workflow_task_completed_event_attributes.sdk_metadata
+            flags.update(meta.lang_used_flags)
+    return flags
 
 
 async def replay_check(history: WorkflowHistory, candidate) -> str | None:
