@@ -55,6 +55,10 @@ Claude Code reads `CLAUDE.md` at project, user and organisation level. Anthropic
 | Where things live, what's generated | Long tutorials (link them, or make a skill) |
 | What needs a human ("ask before running migrations") | Secrets, tokens, internal URLs with credentials |
 
+<Aside type="note" title="A rule worth writing down: how the agent may add a dependency">
+Coding agents add packages casually: `pip install x`, `pnpm add y`, a `>=` range in `pyproject.toml`. On 17 Nov 2026 a release of Microsoft's own `agent-framework` package on PyPI carried a credential stealer that ran at every Python start ([M12 L12.3](/ai-native-course/ai-native/m12/governance/)). A short rule closes most of that gap: "New dependencies need a human. Pin exactly with `==` and update the lockfile with `uv lock` / `pnpm install`, never `pip install` into the environment. Respect the repo's cooldown (`exclude-newer`, `minimumReleaseAge`)." Pair it with a hook or CI check, because a rule file is advice and a check is enforcement.
+</Aside>
+
 `lint_instructions` checks a file against these: line budget (default 200), secret-looking strings, vague phrases, and commands that don't exist (a `make verify` with no Makefile target, a `pnpm` script that isn't in package.json). The tests run it on this repo's own AGENTS.md files.
 
 <Snippet path="examples/python/m10/rules.py" />

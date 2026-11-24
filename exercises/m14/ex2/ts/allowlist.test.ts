@@ -19,6 +19,14 @@ test("protocol tricks in inputs and outputs", () => {
   expect(checkArgs(["-i", "a.mp4", "tcp://1.2.3.4:9000"], ROOT)).toEqual(["protocol not allowed: tcp://1.2.3.4:9000"]);
 });
 
+test("FFmpeg 9.1's libcurl protocol: a prefix and an option, both refused", () => {
+  // 9.1 "Gauss" adds a libcurl protocol: `libcurl:https://...` forces it, and the generic
+  // `-prefer_libcurl 1` routes every http(s) URL through it.
+  expect(checkArgs(["-i", "libcurl:https://evil.example/x.mp4", "o.mp4"], ROOT)).toEqual(["protocol not allowed: libcurl:https://evil.example/x.mp4"]);
+  expect(checkArgs(["-i", "a.mp4", "libcurl:http://1.2.3.4/up.mp4"], ROOT)).toEqual(["protocol not allowed: libcurl:http://1.2.3.4/up.mp4"]);
+  expect(checkArgs(["-prefer_libcurl", "1", "-i", "a.mp4", "o.mp4"], ROOT)).toEqual(["option not allowed: -prefer_libcurl", "option not allowed: 1"]);
+});
+
 test("path escapes", () => {
   expect(checkArgs(["-i", "../../etc/passwd", "o.mp4"], ROOT)).toEqual(["path escapes root: ../../etc/passwd"]);
   expect(checkArgs(["-i", "a.mp4", "/tmp/o.mp4"], ROOT)).toEqual(["path escapes root: /tmp/o.mp4"]);

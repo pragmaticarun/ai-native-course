@@ -1,9 +1,14 @@
-"""L15.2: what browser-use 1.0.4-1.0.6 changed, as a cost lesson and an eval lesson.
+"""L15.2: what browser-use 1.0.4-1.0.8 changed, as a cost lesson and an eval lesson.
 
-No browser-use import here: the facts are copied from the release notes and the docs' model
-card, and `test_browser_use_pins.py` checks them against the real browser-use 1.0.6 package
-(CI installs it in an isolated environment; its exact pins conflict with the course lock).
+No browser-use import here: the facts are copied from the release notes, the docs' model
+card and the 1.0.8 source, and `test_browser_use_pins.py` checks them against the real
+browser-use 1.0.8 package (CI installs it in an isolated environment; its exact pins conflict
+with the course lock).
 
+* 1.0.8: the judge asks as one more turn of the run (`judge_cached`), so the provider reads
+  the run's prefix from its prompt cache; if that turn calls a tool or doesn't answer the
+  schema, it falls back to the separate judge (`judge_run`) and you pay for both
+  (`judge_cost`).
 * 1.0.6: `Agent(task)` with no `llm` now runs `bu-4.0`, about 15x the token price of the old
   default `bu-fast`. So always pass `llm=` yourself (`explicit_llm`).
 * 1.0.5: every run is judged by your own model and fills `result.judgement`
@@ -31,7 +36,7 @@ PRICES: dict[str, tuple[float, float, float]] = {
     "bu-fast": (0.12, 0.012, 0.60),
 }
 
-# The six Judgement fields browser-use 1.0.6 defines (browser_use.agent.judge.Judgement).
+# The six Judgement fields browser-use 1.0.6-1.0.8 define (browser_use.agent.judge.Judgement).
 JUDGEMENT_FIELDS = (
     "success",
     "failure_reason",
@@ -40,6 +45,35 @@ JUDGEMENT_FIELDS = (
     "bot_block_or_captcha_detected",
     "gotchas",
 )
+
+
+# ------------------------------------------------ 1.0.8: the judge as one more cached turn
+def judge_cost(
+    run_prefix_tokens: int,
+    *,
+    mode: str,
+    model: str = "bu-fast",
+    trace_tokens: int | None = None,
+    ask_tokens: int = 600,
+    output_tokens: int = 300,
+) -> float:
+    """USD for the judge call alone (a toy model, like `prompt_cost`).
+
+    `mode="separate"` (1.0.5-1.0.7, and 1.0.8's fallback): the trace goes out as a new prompt,
+    none of it cached. `trace_tokens` defaults to the run's size; the real trace is a condensed
+    rendering, so pass your own estimate. `mode="cached"` (1.0.8): the run's own messages go
+    first and are read from the cache; only the judge's question is new input.
+    `mode="fallback"`: the cached turn didn't produce a valid verdict, so both calls are paid.
+    """
+    trace = run_prefix_tokens if trace_tokens is None else trace_tokens
+    separate = token_cost(model, trace + ask_tokens, output_tokens)
+    cached = token_cost(
+        model, run_prefix_tokens + ask_tokens, output_tokens, cached_tokens=run_prefix_tokens
+    )
+    costs = {"separate": separate, "cached": cached, "fallback": separate + cached}
+    if mode not in costs:
+        raise ValueError("mode is 'separate', 'cached' or 'fallback'")
+    return round(costs[mode], 6)
 
 
 # ------------------------------------------------ 1.0.6: never rely on the default
@@ -149,5 +183,7 @@ def prompt_cost(
 if __name__ == "__main__":
     for p in ("every", "batch"):
         print(p, prompt_cost(100, policy=p))
+    for m in ("separate", "cached", "fallback"):
+        print("judge", m, judge_cost(60_000, mode=m))
     print("bu-4.0 vs bu-fast, 1M in + 100k out:", token_cost("bu-4.0", 10**6, 10**5),
           token_cost("bu-fast", 10**6, 10**5))  # fmt: skip

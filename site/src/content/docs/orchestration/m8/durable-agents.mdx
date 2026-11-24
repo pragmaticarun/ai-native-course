@@ -10,7 +10,7 @@ import { Aside } from "@astrojs/starlight/components";
 
 ## Pydantic AI on Temporal (tested)
 
-Give the agent the `TemporalDurability()` capability and run it inside a `PydanticAIWorkflow` that lists it in `__pydantic_ai_agents__`. Inside the workflow, every **model request and tool call becomes an activity**: after a crash, finished model calls aren't re-sent (or re-billed) and finished tools aren't re-run. The client and worker need `plugins=[PydanticAIPlugin()]`. (Older docs show a `TemporalAgent` wrapper. In 2.68.0 it's deprecated in favour of the capability.)
+Give the agent the `TemporalDurability()` capability and run it inside a `PydanticAIWorkflow` that lists it in `__pydantic_ai_agents__`. Inside the workflow, every **model request and tool call becomes an activity**: after a crash, finished model calls aren't re-sent (or re-billed) and finished tools aren't re-run. The client and worker need `plugins=[PydanticAIPlugin()]`. (Older docs show a `TemporalAgent` wrapper. Since 2.68.0 it's deprecated in favour of the capability; still so in 2.71.0.)
 
 The model is a deterministic `FunctionModel`: it asks for `probe`, then answers. The test runs it on the time-skipping server and gets "The recording is 7200 seconds long."
 

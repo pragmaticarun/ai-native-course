@@ -44,14 +44,14 @@ jobs:
         run: bash ../scripts/typecheck_python.sh
       - name: Worked examples (mock models)
         run: uv run pytest -q -rs ../examples/python
-      - name: browser-use 1.0.6 API check (M15; isolated env, its exact pins conflict with the course lock)
+      - name: browser-use 1.0.8 API check (M15; isolated env, its exact pins conflict with the course lock)
         env:
           M15_REQUIRE_BROWSER_USE: "1"
           BROWSER_USE_NO_UPDATE_CHECK: "1"
           ANONYMIZED_TELEMETRY: "false"
         run: >
           uv run --isolated --no-project --python ${{ matrix.python }}
-          --with browser-use==1.0.6 --with pytest==9.2.0 --with pytest-asyncio==1.5.0
+          --with browser-use==1.0.8 --with pytest==9.2.0 --with pytest-asyncio==1.5.0
           pytest -q -rs -c ../pytest.ini ../examples/python/m15/test_browser_use_pins.py
       - name: Exercises and projects (solutions pass, starters fail)
         run: uv run python ../scripts/check_exercises.py --lang py
@@ -194,7 +194,7 @@ jobs:
         run: uv run pytest -q -rs ../examples/python/m10 -k "bench or audit"
 
   speckit:
-    name: Spec Kit v1.4.0 template check (M10)
+    name: Spec Kit v1.4.3 template check (M10)
     runs-on: ubuntu-latest
     env:
       COURSE_LLM_PROVIDER: mock
@@ -204,7 +204,7 @@ jobs:
         with:
           version: "0.13.8"
       - name: specify init (from the tagged GitHub release; no agent CLI needed)
-        run: uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init /tmp/sk --integration claude --script sh --ignore-agent-tools --non-interactive
+        run: uvx --from git+https://github.com/github/spec-kit.git@v1.4.3 specify init /tmp/sk --integration claude --script sh --ignore-agent-tools --non-interactive
       - name: Course spec parser vs the real template (skips become failures)
         working-directory: python
         env:

@@ -34,7 +34,7 @@ The policies are scripted and `sigma_px` is a simulation knob, so "invalid 0.7" 
 The hybrid path still sends screenshots in this example (136 KB). If the element list is enough for the task, drop the screenshot and the cost falls to a few KB.
 
 ## Kotlin notes
-- On Android, the (c) path is an **AppFunction** (`@AppFunctionDeclaration`, Android 16+, experimental) or your own MCP/tool layer; the (b) path is the accessibility tree via UI Automator or an `AccessibilityService`. Same rule: if the app exposes a function, call it.
+- On Android, the (c) path is an **AppFunction** (`@AppFunctionDeclaration`, Android 16+; Jetpack library stable at 1.0.0 since 18 Nov 2026, the platform feature still labelled experimental) or your own MCP/tool layer; the (b) path is the accessibility tree via UI Automator or an `AccessibilityService`. Same rule: if the app exposes a function, call it.
 
 ## Sources
 - Playwright Python: https://playwright.dev/python/ · AppFunctions: https://developer.android.com/ai/appfunctions

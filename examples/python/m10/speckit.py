@@ -2,7 +2,7 @@
 
 The section names, `**Given** / **When** / **Then**` scenarios, `FR-###` / `SC-###` ids,
 `[NEEDS CLARIFICATION: ...]` markers and the `T### [P] [US#]` task format all come from
-the templates that `specify init` (Spec Kit v1.4.0) writes into `.specify/templates/`.
+the templates that `specify init` (Spec Kit v1.4.3) writes into `.specify/templates/`.
 Kiro's `WHEN ... THE SYSTEM SHALL ...` lines are EARS notation, as its docs describe.
 
 Two things here are this course's own conventions, not Spec Kit's or Kiro's:

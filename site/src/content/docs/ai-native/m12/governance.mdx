@@ -6,6 +6,7 @@ sidebar:
 ---
 
 import Snippet from "../../../../components/Snippet.astro";
+import { Aside } from "@astrojs/starlight/components";
 
 M1 covered the cloud vendors' adoption frameworks ([L1.3](/ai-native-course/maturity/vendor-capability-maps/)): Microsoft's has a *govern* and *secure* step, AWS's CAF for AI has governance and security perspectives, Google's has a *Secure* theme. At team scale, those become four concrete questions:
 
@@ -37,10 +38,49 @@ Each audit entry stores the hash of the previous one, so editing or deleting an 
 | Review | who can approve agent PRs (M11 policy) |
 | Incident path | how to stop all agents (kill switch) and who decides |
 
+## Supply chain: when the agent adds a dependency
+
+**Intuition first.** An agent asked to "add Microsoft Agent Framework" will type `pip install agent-framework` or write `agent-framework>=1.26` into a requirements file. That one line trusts every future upload under that name. On **17 Nov 2026** that trust was abused.
+
+**What happened.** Versions **1.26.1** and **1.26.2** of Microsoft's official `agent-framework` package on PyPI were published 33 minutes apart, through Microsoft's own publisher account, with a credential stealer inside. Each wheel dropped a `.pth` file into `site-packages` (`agent_framework_meta.pth`, then `af_runtime_diag.pth`). Python executes `import` lines in `.pth` files **on every interpreter start**, so the stealer ran whenever Python started in that environment, `pip` included, even if nothing imported the package. It collected environment variables and credential files (Azure CLI, `.npmrc`, `pip.conf`, `.netrc`, `.git-credentials`, Docker, Hugging Face, `.env`) and asked the platform for **fresh** tokens: Azure DevOps OIDC, Azure managed identity and, in 1.26.2, **GitHub Actions OIDC**. To look normal it still pulled in the genuine 1.26.0. Both versions were quarantined on PyPI, and Microsoft made several GitHub repositories private while it investigated (including `microsoft/agent-framework` and `microsoft/onnxruntime`; see [M13 L13.6](/ai-native-course/on-device-media/m13/quantization/)). The course never used this package; it's here because it's exactly the dependency a coding agent would add.
+
+<Aside type="caution" title="Short-lived tokens are necessary, not sufficient">
+The stealer requested new tokens and sent them off at once, so a 10-minute token was still useful to it. Short-lived tokens limit how long a stolen token works; keeping token-minting rights away from jobs that install packages is what stops it being minted in the first place.
+</Aside>
+
+**Four controls, all cheap:**
+
+| Control | What it stops | How |
+|---|---|---|
+| Exact pins **plus hashes** | a new upload under a name you already trust | `==` pins and `--hash=sha256:…` with `pip install --require-hashes`; `uv.lock` and `pnpm-lock.yaml` record hashes for every file |
+| A **cooldown** (minimum release age) | installing a release in its first hours, when most malware is caught | pnpm: `minimumReleaseAge` in `pnpm-workspace.yaml`, in minutes (default 1440 = 1 day; 10080 = a week). uv: `exclude-newer = "1 day"` under `[tool.uv]` (a duration or a date; `exclude-newer-package` per package) |
+| **Startup-hook review** | code that runs at every Python start | list `.pth` files with `import` lines (deprecated in Python 3.15 but still executed) and 3.15's `.start` entry-point files; allowlist the few you've reviewed |
+| **Token scoping** in CI | minting cloud tokens from a job that ran a hostile install | top-level `permissions: contents: read`; grant `id-token: write` only to a deploy job that installs nothing; use short-lived OIDC credentials rather than stored secrets |
+
+`supply_chain.py` implements all four checks offline:
+
+<Snippet path="examples/python/m12/supply_chain.py" />
+
+The tests (`test_supply_chain.py`) run it on fixtures and on this repository:
+
+- **Pins and hashes.** An agent's `requirements.txt` with `agent-framework>=1.26` and an unpinned `requests` gets five findings. A hash on a backslash continuation line counts, and `agent-framework==1.26.2` is flagged as a known-compromised release even when pinned and hashed.
+- **Startup hooks.** A path-only `.pth` (what an editable install writes) passes. `import` lines, `.start` entry points and the two agent-framework file names are flagged, and an indicator of compromise can't be allowlisted. The test also scans the venv running the tests, and it finds no startup hooks.
+- **Cooldown.** Using the published timeline, an agent that "upgrades to latest" 30 minutes after 1.26.2 appeared gets a finding (0.5 h old). A one-day cooldown would have waited until after both releases were pulled.
+- **Tokens.** A deploy job with `id-token: write` that also runs `pip install` is flagged, and the split version passes. Run on this repo's own workflows, the checker caught that our Pages deploy granted `id-token: write` at the top level, which reached the build job running `withastro/action` (a full `pnpm install`). **We fixed it in v0.8.0:** now only the `deploy` job, which runs `actions/deploy-pages` alone, has `pages: write` and `id-token: write`.
+- **Practice what we teach.** `python/pyproject.toml` sets `exclude-newer = "1 day"`, every `uv.lock` registry package has sha256 hashes, and both `pnpm-workspace.yaml` files write down `minimumReleaseAge: 1440`.
+
+The rules are the course's, not a published standard. In a real repo, add `pip-audit` or `osv-scanner` for known vulnerabilities, and put the dependency rule into the agent's instructions ([M10 rules files](/ai-native-course/ai-native/m10/rules-files/), [M11 review](/ai-native-course/ai-native/m11/review/)).
+
 ## C++/Rust notes
 - Add supply-chain rules to the policy: agents may not add crates or vcpkg/Conan packages without review; run `cargo deny` / `cargo audit` (or your C++ equivalent) on every agent PR.
+- Cargo already has the hash part: `Cargo.lock` stores a checksum per crate, and `cargo build --locked` refuses to change it. Build scripts (`build.rs`) and proc macros are Rust's startup hooks. They run at build time with your environment, so review them for a new crate the way you'd review a `.pth` file. For C++, vcpkg manifest baselines and Conan lockfiles give you pins; check them in.
 
 ## Sources
 - Microsoft CAF, AI scenario: https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/ai/
 - AWS CAF for AI: https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html
 - DORA, clear and communicated AI stance: https://dora.dev/capabilities/
+- agent-framework compromise: The Register, 18 Nov 2026: https://www.theregister.com/security/2026/11/18/microsofts-official-python-agent-framework-hijacked-to-distribute-malware/5310858 · The Hacker News, 18 Nov 2026 (updated 20 Nov): https://thehackernews.com/2026/11/attackers-compromise-microsofts-agent.html
+- Python `site` module, `.pth` and `.start` files: https://docs.python.org/3/library/site.html
+- pnpm `minimumReleaseAge`: https://pnpm.io/supply-chain-security · uv `exclude-newer` (dependency cooldowns): https://docs.astral.sh/uv/concepts/resolution/#dependency-cooldowns
+- pip secure installs (`--require-hashes`): https://pip.pypa.io/en/stable/topics/secure-installs/
+- GitHub Actions OIDC: https://docs.github.com/en/actions/concepts/security/openid-connect

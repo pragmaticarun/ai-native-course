@@ -1,7 +1,7 @@
 // M7 worked example (TypeScript): the document-triage graph in LangGraph.js.
 // router -> parallel extractors (Send) -> supervisor merge -> interrupt for approval.
-// Tested with @langchain/langgraph 1.7.4 and @langchain/core 1.4.1 (bumped from 1.7.3 on
-// 17 Nov 2026, once 1.7.4 was past pnpm's minimum-release-age window).
+// Tested with @langchain/langgraph 1.7.5 and @langchain/core 1.4.1 (1.7.3 → 1.7.4 on 17 Nov 2026,
+// once 1.7.4 was past pnpm's minimum-release-age window; 1.7.5 on 24 Nov 2026).
 import { Annotation, Command, END, MemorySaver, Send, START, StateGraph, interrupt } from "@langchain/langgraph";
 
 const FIELDS: Record<string, string[]> = { invoice: ["amount", "due_date"], bug_report: ["device", "version"] };

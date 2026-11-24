@@ -12,7 +12,7 @@ import { Aside } from "@astrojs/starlight/components";
 | **LiteRT-LM** | 0.19.1 | `.litertlm` | CPU (XNNPACK) baseline; GPU "verify on device" | supported (per docs) | Apache-2.0 |
 | **llama.cpp** | v1.0.0; course pin build b12428 | GGUF | CPU (arm64 NEON); Adreno 642L not on the OpenCL verified list | via `llama-server` / chat templates | MIT |
 | **ExecuTorch** | v1.6.0 (Maven `executorch-android` 1.5.1) | `.pte` | XNNPACK CPU; Qualcomm backend excludes SM7325 | in your app code | BSD-style (GitHub reports NOASSERTION) |
-| **ONNX Runtime GenAI** | 0.19.0 (ORT 1.32.0) | ONNX | CPU; QNN EP on HTP is a stretch | in your app code | MIT |
+| **ONNX Runtime GenAI** | 0.20.0 (ORT 1.32.0); install from PyPI/Maven/npm only while its GitHub repo is private ([L13.6](/ai-native-course/on-device-media/m13/quantization/)) | ONNX | CPU; QNN EP on HTP is a stretch | in your app code | MIT |
 | **MLC LLM** | not verified (no stable release) | MLC | conceptual only | — | Apache-2.0 |
 | MediaPipe LLM Inference | tasks-genai 0.10.35, **deprecated** | `.task` | migrate to LiteRT-LM | — | — |
 

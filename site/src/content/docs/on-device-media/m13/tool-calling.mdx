@@ -25,7 +25,7 @@ This example has no androidMain backend ([P6](/ai-native-course/projects/p6/) ha
 
 ## (b) `AgentRunner` + AppFunctions (documented, with fakes)
 
-ML Kit's `genai-agent` (`1.0.0-alpha1`) adds `AgentRunner`, a loop described as observe → reason → act → evaluate with `maxTurns`. Tools are **AppFunctions** (`@AppFunctionDeclaration`, KDoc as tool descriptions), restricted to the app with `ACCESS_LEVEL_SELF`, scoped with `addAppFunctionIds`, with structured error maps and a decorator for human confirmation. AppFunctions need Android 16+ and are experimental; they can also be OS-level tools for system agents, tested with `adb shell cmd app_function list-app-functions`.
+ML Kit's `genai-agent` (`1.0.0-alpha1`) adds `AgentRunner`, a loop described as observe → reason → act → evaluate with `maxTurns`. Tools are **AppFunctions** (`@AppFunctionDeclaration`, KDoc as tool descriptions), restricted to the app with `ACCESS_LEVEL_SELF`, scoped with `addAppFunctionIds`, with structured error maps and a decorator for human confirmation. AppFunctions need Android 16+. The Jetpack library went **stable at 1.0.0 on 18 Nov 2026** (`androidx.appfunctions:appfunctions`, `-compiler` and `-testing`). The Android developer overview still calls the feature an experimental preview, though, and ML Kit's agent docs still pin `1.0.0-alpha13`. Whether `genai-agent` 1.0.0-alpha1 works with 1.0.0 is **untested**: nothing here builds against either. AppFunctions can also be OS-level tools for system agents, tested with `adb shell cmd app_function list-app-functions`.
 
 On the A73, `AgentRunner` is unavailable (not a listed device), and whether AppFunctions can be hosted depends on its Android version, which still has to be checked on the phone. M5's `RequiresConfirmation` mirrors the decorator idea with our own types; it is **not the ML Kit API**.
 
@@ -38,5 +38,5 @@ On the A73, `AgentRunner` is unavailable (not a listed device), and whether AppF
 
 ## Sources
 - ML Kit agent API: https://developers.google.com/ml-kit/genai/agent/android · tools: https://developers.google.com/ml-kit/genai/agent/android/define-tools
-- AppFunctions: https://developer.android.com/ai/appfunctions · Koog: https://docs.koog.ai/
+- AppFunctions: https://developer.android.com/ai/appfunctions · Jetpack releases (1.0.0 stable, 18 Nov 2026): https://developer.android.com/jetpack/androidx/releases/appfunctions · Koog: https://docs.koog.ai/
 - MCP Kotlin SDK: https://github.com/modelcontextprotocol/kotlin-sdk

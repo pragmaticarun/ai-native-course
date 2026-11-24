@@ -3,7 +3,7 @@
 **Status:** v0.3, approved by Arunkumar on 13 Nov 2026. Repo created and modules M0–M15 built (see the changelog; M13 only up to the host side, its Android parts untested); the projects are still the plan.
 **v0.3 changes (13 Nov 2026, ~20:15 IST):** applied your answers. **(1)** A self-hosted Linux KVM runner runs the emulator jobs (6.8). **(2)** P8 ships **both** the Anthropic and OpenAI computer-use adapters **and** a vendor-neutral reference. **(3)** Kotlin examples are now **Kotlin Multiplatform (KMP)** (shared `commonMain` agent logic, `androidMain`/`jvmMain` backends). **(4)** The reference device is a **Samsung Galaxy A73 5G (Snapdragon 778G, SM7325)**. Gemini Nano, ML Kit GenAI agent/prompt APIs and LiteRT/ExecuTorch NPU paths are **not supported** on it (official device lists, see 2.3.1), so M13/P6 now use a **CPU-first path that runs on the A73** (LiteRT-LM, llama.cpp, ExecuTorch XNNPACK), with GPU as "verify on device" and NPU only as an experimental ORT QNN stretch. Gemini Nano/AgentRunner stays a documented path backed by fakes. Defaults applied for open questions 1, 2, 3 and 5 (marked as defaults in section 7). Answered questions removed from section 7.
 **v0.2 changes (13 Nov 2026, ~20:00 IST):** added more depth on Android, on-device AI, multimedia, and computer-use/mobile-use agents. New modules **M13** (on-device & Android agents), **M14** (multimedia & multimodal agents), and **M15** (computer-use & mobile-use agents). Android, media, and GUI-agent worked examples added to M2–M11. **P3** extended. New projects **P6** (on-device Android agent app), **P7** (multimodal media-analysis graph), and **P8** (mobile/computer-use agent graph with eval harness). New research section 2.3, Kotlin/Gradle and native pins in 2.4, plus CI and site updates.
-**Prepared:** Friday 13 Nov 2026, ~19:45 IST (v0.1), updated ~20:00 IST (v0.2) and ~20:15 IST (v0.3). All versions and links checked on this date (versions from the PyPI/npm registries and GitHub releases; links checked by HTTP request or by fetching the page). **Pins updated 17 Nov 2026** after the weekly freshness check of 16 Nov 2026 (approved by Arunkumar): langgraph 1.2.22, `@langchain/langgraph` 1.7.4, `@langchain/core` 1.4.1, inspect-ai 0.3.290, Playwright (PyPI) 1.65.2, `ai` 7.0.173, claude-agent-sdk 0.2.182 / 0.3.325, openai 3.51.0, temporalio 1.36.1, browser-use 1.0.6, llama.cpp build b12428, Astro 7.4.12, Starlight 0.43.1. Each of these was re-checked against its registry or GitHub release on 17 Nov 2026; see the changelog (v0.7.0).
+**Prepared:** Friday 13 Nov 2026, ~19:45 IST (v0.1), updated ~20:00 IST (v0.2) and ~20:15 IST (v0.3). All versions and links checked on this date (versions from the PyPI/npm registries and GitHub releases; links checked by HTTP request or by fetching the page). **Pins updated 17 Nov 2026** after the weekly freshness check of 16 Nov 2026 (approved by Arunkumar): langgraph 1.2.22, `@langchain/langgraph` 1.7.4, `@langchain/core` 1.4.1, inspect-ai 0.3.290, Playwright (PyPI) 1.65.2, `ai` 7.0.173, claude-agent-sdk 0.2.182 / 0.3.325, openai 3.51.0, temporalio 1.36.1, browser-use 1.0.6, llama.cpp build b12428, Astro 7.4.12, Starlight 0.43.1. Each of these was re-checked against its registry or GitHub release on 17 Nov 2026; see the changelog (v0.7.0). **Pins updated 24 Nov 2026** after the weekly freshness check of 23 Nov 2026 (approved by Arunkumar): pydantic-ai 2.71.0, pydantic 2.14.4, langgraph 1.2.24, inspect-ai 0.3.291, openai 3.57.0, `@langchain/langgraph` 1.7.5, Temporal TS 1.26.0, browser-use 1.0.8, rmcp 3.11.0, Spec Kit v1.4.3, openai-agents 0.25.0, claude-agent-sdk 0.2.187 / 0.3.330, onnxruntime-genai 0.20.0, AppFunctions 1.0.0, AGP 9.5.2, Astro 7.4.13, logfire 6.0.0, arize-phoenix 22.0.1. Each was checked against its registry on 24 Nov 2026, and none is less than a day old. Compose BOM 2026.11.01 was tried and kept at 2026.09.00, because its libraries require compileSdk 37.1; see the changelog (v0.8.0).
 **Audience:** Experienced systems engineers (C++, Rust, Android, multimedia) who want to build agents and adopt AI-native engineering practices. You can already write software; this course teaches what's new.
 **Languages:** Python and TypeScript are the main languages, side by side. **Kotlin** is the main language for the Android/on-device parts (M13, P6, Android pieces of M15/P8). All Kotlin examples are **Kotlin Multiplatform**: agent logic, tool schemas and MCP code live in `commonMain` (Koog and the MCP Kotlin SDK are both multiplatform), and platform backends (LiteRT-LM, ML Kit, llama.cpp JNI) live in `androidMain`/`jvmMain`, so most Kotlin examples also run on the Linux JVM in CI. Each module also has a **"C++/Rust/Kotlin developer notes"** box that maps the new ideas to things you already know (state machines, actors, RAII, back-pressure, fuzzing, etc.).
 **Target repo / site:** `pragmaticarun/ai-native-course` → `https://pragmaticarun.github.io/ai-native-course/` (repo created 13 Nov 2026).
@@ -91,27 +91,29 @@ Only frameworks whose published levels we could read at the source (or, where ma
 | DORA ROI of AI-assisted Software Development | DORA | Apr 2026 | ROI framework and calculator (no annual survey in 2026, according to secondary reports). | https://dora.dev/ai/roi/report/ |
 | Thoughtworks Technology Radar, Vol. 35 | Thoughtworks | 4 Nov 2026 | Not levels. Themes: harness engineering at scale, keeping human judgment as agents multiply (warns against "human-in-the-loop theater"), choosing beyond frontier models, AI economics. Adopt ring includes agent sandboxing and threat modeling. | https://www.thoughtworks.com/en-us/about-us/news/2026/thoughtworks-technology-radar-highlights-stronger-controls · https://www.thoughtworks.com/radar · https://www.thoughtworks.com/en-us/radar/techniques/agent-sandboxing |
 
+*Footnote (24 Nov 2026):* **TM Forum IG1554 Agentic AIOps Maturity Model v1.0.0** (Introductory Guide, team-approved 29 Oct 2026, published 16 Nov 2026, pre-production / Alpha) targets telecom operators' network and IT operations, so it's out of scope. M1 L1.4 mentions it in one footnote; its levels weren't read (only the summary page). https://www.tmforum.org/resources/guidebook/ig1554-agentic-aiops-maturity-model-v1-0-0/
+
 **How M1 frames the comparison:**
 - *Ladders* (Gartner, MIT CISR, BCG, Shapiro, Feng et al.) versus *capability maps* (Google themes, AWS perspectives, DORA capabilities, Microsoft process). Ladders are good for saying where you are; maps are good for deciding what to fix next.
 - *Organisation scope* (Gartner/MIT/BCG/Accenture/Google/AWS/Microsoft) versus *engineering-team scope* (Shapiro, DORA, Thoughtworks) versus *single-agent design scope* (Feng et al.).
 - Caveats we teach explicitly: vendor frameworks steer you toward that vendor's products; survey-derived segments depend on self-reported data; Shapiro's levels are one practitioner's opinion; the Gartner stage names have changed over time.
 - The course's **working ladder** for the team-practice modules (M12, P5) is Shapiro's L0–L5 for the engineering workflow, *combined with* DORA's 7 capabilities as the prerequisites for moving up. The course will say plainly that this is our synthesis, not a published standard.
 
-### 2.2 Tooling snapshot (checked 13 Nov 2026; course pins re-checked 17 Nov 2026)
+### 2.2 Tooling snapshot (checked 13 Nov 2026; course pins re-checked 17 and 24 Nov 2026)
 
-Versions are the latest on PyPI/npm on 13 Nov 2026 (release date in brackets), except the entries marked *(17 Nov 2026)*, which were bumped and re-checked on 17 Nov 2026.
+Versions are the latest on PyPI/npm on 13 Nov 2026 (release date in brackets), except the entries marked *(17 Nov 2026)* or *(24 Nov 2026)*, which were bumped and re-checked on those dates. From 24 Nov 2026 the course also applies a **one-day cooldown**: a release less than 24 hours old isn't pinned (uv `exclude-newer = "1 day"`, pnpm `minimumReleaseAge: 1440`; see M12 L12.3).
 
 **Agent frameworks**
 
 | Tool | Python | TypeScript | Notes |
 |---|---|---|---|
-| LangGraph | `langgraph 1.2.22` (2026-11-14) *(17 Nov 2026)*, `langchain-core 1.8.0` | `@langchain/langgraph 1.7.4`, `@langchain/core 1.4.1` *(17 Nov 2026)* | Graph/state-machine orchestration; checkpointers and durable execution built in. Docs: https://docs.langchain.com/oss/python/langgraph/overview |
-| OpenAI Agents SDK | `openai-agents 0.24.0` (2026-10-15) | `@openai/agents 0.22.0` (2026-11-12) | Agents, handoffs, guardrails, sessions, tracing. Still 0.x, so pin exactly. https://openai.github.io/openai-agents-python/ · https://openai.github.io/openai-agents-js/ |
-| Claude Agent SDK | `claude-agent-sdk 0.2.182` (2026-11-13) *(17 Nov 2026)* | `@anthropic-ai/claude-agent-sdk 0.3.325` (2026-11-13) *(17 Nov 2026)* | The Claude Code agent harness as a library; very frequent releases. https://docs.claude.com/en/docs/agent-sdk/overview |
-| Pydantic AI | `pydantic-ai 2.68.0` (2026-11-12) | — | Type-safe agents; `TestModel`/`FunctionModel` for offline tests; built-in Temporal/DBOS durable execution. https://ai.pydantic.dev/ |
+| LangGraph | `langgraph 1.2.24` (2026-11-20) *(24 Nov 2026)*, `langchain-core 1.8.0` | `@langchain/langgraph 1.7.5` (2026-11-17) *(24 Nov 2026)*, `@langchain/core 1.4.1` *(17 Nov 2026)* | Graph/state-machine orchestration; checkpointers and durable execution built in. Docs: https://docs.langchain.com/oss/python/langgraph/overview |
+| OpenAI Agents SDK | `openai-agents 0.25.0` (2026-11-17) *(24 Nov 2026)* | `@openai/agents 0.22.0` (2026-11-12) | Agents, handoffs, guardrails, sessions, tracing. Still 0.x, so pin exactly. **0.25.0:** run-state checkpoints move to RunState schema `1.22` (nested agent-tool approvals with output guardrails resume; Pydantic contexts keep defaults and in-place edits), so upgrade checkpoint *readers* before writers; the beta **Runloop sandbox provider is removed** (move to another provider, e.g. Modal, or stay on 0.24.0 while migrating); MCP v2 Streamable HTTP now sends **concurrent** requests (v1 stays serialized). https://github.com/openai/openai-agents-python/releases/tag/v0.25.0. `1.0.0-alpha.1` is also out and adds Codex as a provider; it's a pre-release, so not pinned. 0.26.0 (24 Nov 2026) was under a day old at the check and is left for the next one. https://openai.github.io/openai-agents-python/ · https://openai.github.io/openai-agents-js/ |
+| Claude Agent SDK | `claude-agent-sdk 0.2.187` (2026-11-20) *(24 Nov 2026)* | `@anthropic-ai/claude-agent-sdk 0.3.330` (2026-11-20) *(24 Nov 2026)* | The Claude Code agent harness as a library; very frequent releases. https://docs.claude.com/en/docs/agent-sdk/overview |
+| Pydantic AI | `pydantic-ai 2.71.0` (2026-11-19) *(24 Nov 2026)* | — | Renames since 2.68: 2.69.0 folds `RequestInput` into `HandleDeferredToolCalls` (its handler can take a resume token); 2.71.0 renames `PeerNetwork` to `PeerConnection` (`Peers(network)` joins an `InMemoryPeerNetwork` under the agent's name). The course uses neither. https://github.com/pydantic/pydantic-ai/releases/tag/v2.69.0 · https://github.com/pydantic/pydantic-ai/releases/tag/v2.71.0. Type-safe agents; `TestModel`/`FunctionModel` for offline tests; built-in Temporal/DBOS durable execution. https://ai.pydantic.dev/ |
 | Vercel AI SDK | — | `ai 7.0.173` *(17 Nov 2026)*, `@ai-sdk/openai 4.0.117`, `@ai-sdk/anthropic 4.0.104` | TS toolkit for tool calling, streaming, and agent loops. https://ai-sdk.dev/docs/introduction |
 | Mastra | — | `@mastra/core 1.83.0` (2026-11-12) | TS agent framework (agents, workflows, memory, evals). https://mastra.ai/docs |
-| Provider SDKs | `openai 3.51.0` *(17 Nov 2026)*, `anthropic 2.8.0`, `litellm 1.109.1` | — | Used in M2 to show the raw API before any framework. |
+| Provider SDKs | `openai 3.57.0` *(24 Nov 2026; 3.58.0 was under a day old)*, `anthropic 2.8.0`, `litellm 1.109.1` | — | Used in M2 to show the raw API before any framework. |
 
 **MCP (Model Context Protocol)**
 - **Current spec revision: `2026-07-28`** (latest GitHub release of `modelcontextprotocol/modelcontextprotocol`, 28 Jul 2026; previous revision `2025-11-25`). Big changes: a **stateless protocol** (no `initialize` handshake; version and capabilities travel in `_meta` on every request), new `server/discover`, no protocol-level sessions or `Mcp-Session-Id`, `subscriptions/listen` replaces GET/subscribe, the **Multi Round-Trip Requests** (`input_required`) pattern replaces server-initiated sampling/elicitation/roots requests, tasks moved into an official extension, and **Roots, Sampling, and Logging are deprecated**. Changelog: https://modelcontextprotocol.io/specification/2026-07-28/changelog
@@ -122,17 +124,17 @@ Versions are the latest on PyPI/npm on 13 Nov 2026 (release date in brackets), e
 - Governance: MCP and AGENTS.md were contributed to the Linux Foundation's **Agentic AI Foundation (AAIF)**: https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation
 
 **Durable execution**
-- Temporal: `temporalio 1.36.1` (Py) *(17 Nov 2026; turns single-batch activation, logic flag 2, off again by default for unflagged workflows: https://github.com/temporalio/sdk-python/releases/tag/1.36.1)*; `@temporalio/client`/`@temporalio/workflow 1.25.0` (TS). Official OpenAI Agents SDK integration: https://docs.temporal.io/develop/python/integrations/openai-agents
+- Temporal: `temporalio 1.36.1` (Py) *(17 Nov 2026; turns single-batch activation, logic flag 2, off again by default for unflagged workflows: https://github.com/temporalio/sdk-python/releases/tag/1.36.1)*; `@temporalio/client`/`@temporalio/workflow 1.26.0` (TS) *(24 Nov 2026; its breaking changes, such as `Runtime.logger` returning a wrapper and `MockActivityEnvironment.run` taking one type parameter, don't touch the course's code: https://github.com/temporalio/sdk-typescript/releases/tag/v1.26.0)*. Official OpenAI Agents SDK integration: https://docs.temporal.io/develop/python/integrations/openai-agents
 - Pydantic AI durable execution (Temporal, DBOS, and others): https://pydantic.dev/docs/ai/capabilities/durable_execution/temporal/
 - DBOS: `dbos 3.5.0` (Postgres-backed durable workflows). https://docs.dbos.dev/
 - Restate: `restate-sdk 1.5.1` (Py), `@restatedev/restate-sdk 1.18.3` (TS). Inngest: `inngest 4.26.2` (TS).
 - LangGraph durable execution / checkpointing: https://docs.langchain.com/oss/python/langgraph/durable-execution
 
 **Evals and observability**
-- `inspect-ai 0.3.290` *(17 Nov 2026)* (UK AISI; https://inspect.aisi.org.uk/), `deepeval 4.3.4`, `promptfoo 0.125.1` (npm CLI; https://www.promptfoo.dev/docs/intro/), `ragas 0.4.3`, `autoevals 0.4.1` (npm), `braintrust 0.50.0`, `langsmith 0.14.17`, `arize-phoenix 21.0.0`, `logfire 5.6.0`. Note: `evalite` (npm 0.19.0) and `@inngest/agent-kit` (0.13.2) haven't been released in about a year, so they're **not** recommended.
+- `inspect-ai 0.3.291` *(24 Nov 2026; 0.3.292 was under a day old)* (UK AISI; https://inspect.aisi.org.uk/), `deepeval 4.3.4`, `promptfoo 0.125.1` (npm CLI; https://www.promptfoo.dev/docs/intro/), `ragas 0.4.3`, `autoevals 0.4.1` (npm), `braintrust 0.50.0`, `langsmith 0.14.17`, `arize-phoenix 22.0.1` *(24 Nov 2026)*, `logfire 6.0.0` *(24 Nov 2026; 6.0.1 was under a day old)*. The course doesn't install either, and their major-version changes weren't reviewed. Note: `evalite` (npm 0.19.0) and `@inngest/agent-kit` (0.13.2) haven't been released in about a year, so they're **not** recommended.
 
 **Spec-driven development**
-- **GitHub Spec Kit**: latest release `v1.4.0` (10 Nov 2026), CLI `specify`. https://github.com/github/spec-kit. Install from the GitHub repo (`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify ...`). There is a PyPI package `specify-cli 1.4.0`, but its metadata doesn't link to GitHub, so we couldn't confirm it's official; don't use it until confirmed.
+- **GitHub Spec Kit**: course pin `v1.4.3` (19 Nov 2026) *(24 Nov 2026; v1.4.4 was under a day old)*, CLI `specify`. https://github.com/github/spec-kit. Install from the GitHub repo (`uvx --from git+https://github.com/github/spec-kit.git@v1.4.3 specify ...`). There is a PyPI package `specify-cli 1.4.3`, but its metadata doesn't link to GitHub, so we couldn't confirm it's official; don't use it until confirmed.
 - **Kiro** (AWS): specs as `requirements.md` → `design.md` → `tasks.md`, with requirements-first and design-first variants, plus "quick spec". https://kiro.dev/docs/specs/
 
 **Coding & background agents (CLI versions from npm, 13 Nov 2026)**
@@ -140,7 +142,7 @@ Versions are the latest on PyPI/npm on 13 Nov 2026 (release date in brackets), e
 - OpenAI Codex CLI `@openai/codex 0.169.0`; Codex cloud: https://developers.openai.com/codex/cloud
 - GitHub Copilot CLI `@github/copilot 1.0.111`; Copilot coding agent (assign an issue, get a PR): https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent
 - Gemini CLI `@google/gemini-cli 0.68.0`
-- Cursor (IDE agent and cloud/background agents), Devin, and others are covered conceptually. *Unverified:* a third-party ranking says Google Jules is being shut down after 11 Nov 2026. Confirm with Google before the course says anything about Jules.
+- Cursor (IDE agent and cloud/background agents), Devin, and others are covered conceptually. **Google Jules is shutting down** *(confirmed 24 Nov 2026)*: Google's own changelog (29 Oct 2026) says Jules went read-only after 11 Nov 2026 and winds down on **31 Dec 2026**, with an export path for settings, sessions and patches. The course doesn't teach Jules. https://jules.google/docs/changelog/2026-10-29/
 
 **Rules & skills files**
 - **AGENTS.md**: an open Markdown format for agent instructions, now stewarded by AAIF. https://agents.md/
@@ -158,13 +160,13 @@ Versions come from Google Maven (`dl.google.com/android/maven2`), Maven Central,
 - Model tiers (per Firebase docs): `STABLE` (e.g. Gemini Nano 3 `nano-v3` / `nano-v2`), `PREVIEW` (Gemini Nano 4 Full, based on Gemma 4 E4B), and `PREVIEW_FAST` (Nano 4 Fast, based on Gemma 4 E2B). https://firebase.google.com/docs/ai-logic/hybrid/android/configuration-options
 
 **AppFunctions (Android's on-device MCP-equivalent)**
-- Platform API plus Jetpack library (`androidx.appfunctions`; latest `1.0.0-rc01`, while ML Kit's agent docs pin `1.0.0-alpha13`). Lets apps expose typed functions as tools to authorised callers (`EXECUTE_APP_FUNCTIONS`). Android 16+. **Experimental**; Gemini integration is in private preview. Test with `adb shell cmd app_function list-app-functions`. https://developer.android.com/ai/appfunctions
+- Platform API plus Jetpack library (`androidx.appfunctions`; **`1.0.0` stable since 18 Nov 2026** *(24 Nov 2026)*, while ML Kit's agent docs still pin `1.0.0-alpha13`). https://developer.android.com/jetpack/androidx/releases/appfunctions Lets apps expose typed functions as tools to authorised callers (`EXECUTE_APP_FUNCTIONS`). Android 16+. The library is stable, but the platform feature is still labelled an **experimental preview** on the overview page, and Gemini integration is in private preview. Test with `adb shell cmd app_function list-app-functions`. https://developer.android.com/ai/appfunctions
 
 **Firebase AI Logic hybrid inference**
 - `com.google.firebase:firebase-ai` `18.2.0` + `firebase-ai-ondevice` `16.0.0-beta08` (BoM `35.2.0`; the on-device SDK isn't in the BoM). Inference modes: `PREFER_ON_DEVICE`, `ONLY_ON_DEVICE`, `PREFER_IN_CLOUD`, `ONLY_IN_CLOUD`. On-device side is single-turn only (text, or text plus one image, or structured output), validated for English and Korean, with output under about 256 tokens recommended. App Check is used for the cloud side. https://firebase.google.com/docs/ai-logic/hybrid/android/get-started · https://developer.android.com/ai/hybrid
 
 **Google AI Edge**
-- **LiteRT** `2.3.2` (GitHub/Google Maven; Python `ai-edge-litert 2.3.0`). The `CompiledModel` API handles CPU/GPU/NPU. **NPU vendors:** Qualcomm AI Engine Direct (AOT plus on-device compilation; SM8450 → SM8850), MediaTek NeuroPilot (Dimensity 7300 → 9500), Google Tensor (AOT only, beta), Intel OpenVINO, and Samsung Exynos. Delivery through Google Play for On-device AI; from 2.3.0, NPU runtime libraries ship as Maven packages. https://developers.google.com/edge/litert/next/npu · https://developer.android.com/ai/custom
+- **LiteRT** `2.3.2` (GitHub/Google Maven; Python `ai-edge-litert 2.3.0`). *(24 Nov 2026: `2.4.0` is on PyPI (uploaded 20 Nov 2026) and Google Maven, with no release notes yet; the course keeps 2.3.2 / 2.3.0 until notes appear.)* The `CompiledModel` API handles CPU/GPU/NPU. **NPU vendors:** Qualcomm AI Engine Direct (AOT plus on-device compilation; SM8450 → SM8850), MediaTek NeuroPilot (Dimensity 7300 → 9500), Google Tensor (AOT only, beta), Intel OpenVINO, and Samsung Exynos. Delivery through Google Play for On-device AI; from 2.3.0, NPU runtime libraries ship as Maven packages. https://developers.google.com/edge/litert/next/npu · https://developer.android.com/ai/custom
 - **LiteRT-LM** `0.19.1` (`com.google.ai.edge.litertlm:litertlm-android`; also a JVM artifact). Kotlin `Engine` / `Conversation` with streaming `Flow`. Uses `.litertlm` models and supports GPU/NPU, multimodality, and tool use. The docs say to initialise off the main thread. Gemma 4 models are listed. https://developers.google.com/edge/litert-lm/android · https://developers.google.com/edge/litert-lm/models/gemma-4 · https://github.com/google-ai-edge/LiteRT-LM
 - **MediaPipe LLM Inference API is now maintenance-only.** Its Java `LlmInference` class is `@Deprecated` in favour of LiteRT-LM (`tasks-genai` `0.10.35`). We cover it only for migration. MediaPipe Tasks vision/audio stay current at `1.2.3`. https://developers.google.com/edge/mediapipe/solutions/genai/llm_inference
 - **LiteRT Torch** PyTorch → LiteRT export: PyPI `litert-torch 0.10.0`, matching GitHub `google-ai-edge/ai-edge-torch` v0.10.0. The old `ai-edge-torch` PyPI name stopped at 0.7.2 (Jan 2026); we infer a rename. Google AI Edge Gallery sample app `1.0.23`. https://github.com/google-ai-edge/gallery
@@ -175,7 +177,7 @@ Versions come from Google Maven (`dl.google.com/android/maven2`), Maven Central,
 
 **Kotlin agent frameworks & MCP SDKs**
 - **JetBrains Koog** `1.3.0` (Maven Central `ai.koog:koog-agents`; Koog 1.0 shipped May 2026). Kotlin/Java agents with graph strategies, tools, persistence, history compression, MCP and ACP integration, and Kotlin Multiplatform (Android included). Since 1.0 it can run LiteRT models locally on Android. The MCP module `ai.koog:agents-mcp` is still `1.3.0-beta`. https://docs.koog.ai/ · https://github.com/JetBrains/koog · https://blog.jetbrains.com/ai/2026/05/koog-1-0-is-out-stable-core-better-interop-and-multiplatform-observability/
-- **MCP Kotlin SDK** `0.16.0` (`io.modelcontextprotocol:kotlin-sdk`) · **MCP Rust SDK** `rmcp` `3.10.0`. https://github.com/modelcontextprotocol/kotlin-sdk · https://github.com/modelcontextprotocol/rust-sdk
+- **MCP Kotlin SDK** `0.16.0` (`io.modelcontextprotocol:kotlin-sdk`) · **MCP Rust SDK** `rmcp` `3.11.0` *(24 Nov 2026; default handlers now return `-32601` for capabilities the server didn't advertise, tested in `rust/media-probe/tests/contract.rs`: https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v3.11.0)*. https://github.com/modelcontextprotocol/kotlin-sdk · https://github.com/modelcontextprotocol/rust-sdk
 
 **General on-device runtimes**
 
@@ -184,13 +186,13 @@ Versions come from Google Maven (`dl.google.com/android/maven2`), Maven Central,
 | llama.cpp / ggml | **v1.0.0** (released 13 Nov 2026); course pin: build **b12428** (16 Nov 2026) *(17 Nov 2026)* | First 1.0: removed 35 deprecated `llama.h` functions; GGUF quantization; `mtmd` multimodal (vision/audio); `llama-server` with MCP tool cancellation. https://github.com/ggml-org/llama.cpp · https://huggingface.co/blog/ggml-org/llama-cpp-v1 |
 | whisper.cpp | v1.9.5 | On-device ASR (C/C++). https://github.com/ggml-org/whisper.cpp |
 | ExecuTorch | v1.6.0 (PyPI `executorch 1.6.0`; Maven `org.pytorch:executorch-android` **1.5.1**) | PyTorch's on-device runtime. https://docs.pytorch.org/executorch/stable/index.html |
-| ONNX Runtime / ORT GenAI | ORT 1.32.0 (PyPI + `onnxruntime-android`); `onnxruntime-genai` 0.19.0 | GenAI loop on top of ORT; QNN execution provider for Qualcomm NPUs. https://onnxruntime.ai/docs/genai/ · https://onnxruntime.ai/docs/execution-providers/QNN-ExecutionProvider.html |
+| ONNX Runtime / ORT GenAI | ORT 1.32.0 (PyPI + `onnxruntime-android`); `onnxruntime-genai` 0.20.0 *(24 Nov 2026)* | GenAI loop on top of ORT; QNN execution provider for Qualcomm NPUs. **Since ~22:20 UTC on 17 Nov 2026 (03:50 IST on 18 Nov), ONNX Runtime's GitHub repository and at least seven related repos (ORT GenAI included) return 404.** Microsoft: "We have made some repositories private while we investigate malicious content." Install only from the official registries (PyPI 1.32.0, Maven Central 1.32.0, npm 1.31.1), not from mirrors; GitHub source builds and release downloads fail for now. Not linked while private. Sources: https://news.ycombinator.com/item?id=50539610 · https://tokenstrom.com/posts/onnx-runtime-vanishes-from-github-what-breaks-what-works-and-why-mirro/ (M13 L13.6). https://onnxruntime.ai/docs/genai/ · https://onnxruntime.ai/docs/execution-providers/QNN-ExecutionProvider.html |
 | MLC LLM | **not verified** | Docs are live (https://llm.mlc.ai/docs/), but there are no stable GitHub releases (only a 2023 pre-release tag) and no PyPI package. Covered conceptually only. |
 | Python/JS bindings | `llama-cpp-python 0.3.36` (1 Oct 2026), `node-llama-cpp 3.22.3`, `@huggingface/transformers 4.3.2`, `onnxruntime-node 1.31.1` | Compatibility of `llama-cpp-python` with llama.cpp v1.0.0 is **not verified**. |
 | Quantization tooling | `torchao 0.18.0`, `optimum 2.3.0`, `transformers 5.23.0`, `torch 2.15.0`; llama.cpp `llama-quantize` | https://github.com/pytorch/ao · https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md |
 
 **Multimedia**
-- **FFmpeg 9.0.2 "Lei"** is the newest release listed on https://ffmpeg.org/download.html (8.1.3 and 8.0.3 are also listed). Filters reference: https://ffmpeg.org/ffmpeg-filters.html. Python: `av` (PyAV) `19.0.2`. *Not recommended:* `ffmpeg-python` (last release 2019).
+- **FFmpeg 9.1 "Gauss"** (20 Nov 2026) *(24 Nov 2026)* is the newest release listed on https://ffmpeg.org/download.html (9.0.2 "Lei", 8.1.3 and 8.0.3 are also listed). 9.1 adds a **`libcurl` protocol** (`libcurl:https://…`, or `-prefer_libcurl 1` for all http(s) URLs), so M14 Ex 2's tests now check that both are refused. Changelog: https://ffmpeg.org/download.html ("Changelog" under 9.1). Filters reference: https://ffmpeg.org/ffmpeg-filters.html. Python: `av` (PyAV) `19.0.2`. *Not recommended:* `ffmpeg-python` (last release 2019).
 - **GStreamer 1.28.9** (released 6 Nov 2026). The 1.28 series adds ML inference elements, e.g. `onnxinference` + `tensordecodebin`. Python bindings: `PyGObject 3.58.1`. https://gstreamer.freedesktop.org/releases/1.28/ · https://gstreamer.freedesktop.org/documentation/onnx/index.html · https://www.collabora.com/news-and-blog/news-and-events/gstreamer-128-brings-ai-inference-to-your-media-pipeline.html
 - Android media: Jetpack **Media3** (ExoPlayer/Transformer) stable `1.11.1`; **CameraX** stable `1.6.2`. https://developer.android.com/media/media3
 - Audio/vision helpers: `faster-whisper 1.2.1`, `pywhispercpp 1.5.1`, `silero-vad 6.2.3`, `pyannote.audio 4.0.7`, `scenedetect 0.7.3`, `opencv-python-headless 5.0.0.93`, `mediapipe 1.2.3`.
@@ -219,7 +221,7 @@ Versions come from Google Maven (`dl.google.com/android/maven2`), Maven Central,
 **Computer-use & mobile-use**
 - **Anthropic computer use:** `computer_toolset_20260801` is the stable, client-executed toolset with no beta header. It has 17 member tools (`screenshot`, `left_click`, `type`, `zoom`, …) and supports batched actions. Successor to beta `computer_20251124` / `computer_20250124`. Plus a new `browser_toolset_20260801`. https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool · https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-reference
 - **OpenAI computer use (Responses API):** `tools: [{type: "computer"}]` returns `computer_call` items with ordered `actions` (`click`, `double_click`, `drag`, `move`, `scroll`, `keypress`, `type`, `wait`, `screenshot`). You reply with `computer_call_output` screenshots. The docs also recommend a code-execution approach (Playwright/PyAutoGUI) for their newest model, and the SDK ships `ComputerToolset` / `BrowserToolset` helpers with `before_action` / `confirm` hooks. https://developers.openai.com/api/docs/guides/tools-computer-use
-- **Browser automation:** Playwright `1.65.x` (PyPI 1.65.2 with Chromium 159 *(17 Nov 2026)* / npm 1.65.0), `@playwright/mcp 0.0.85`, `browser-use 1.0.6` *(17 Nov 2026; with no `llm` it now defaults to `bu-4.0`, 15× the token price of `bu-fast`, so always pass `llm=`)*. Sandboxes: `e2b-desktop 2.7.2`, trycua/cua (`cua-agent 0.9.1`).
+- **Browser automation:** Playwright `1.65.x` (PyPI 1.65.2 with Chromium 159 *(17 Nov 2026)* / npm 1.65.0), `@playwright/mcp 0.0.85`, `browser-use 1.0.8` *(24 Nov 2026; with no `llm` it defaults to `bu-4.0` since 1.0.6, 15× the token price of `bu-fast`, so always pass `llm=`; since 1.0.8 the judge runs as one more turn of the run, read from the prompt cache)*. Sandboxes: `e2b-desktop 2.7.2`, trycua/cua (`cua-agent 0.9.1`).
 - **Android UI automation:** `adb` (screencap, `input`, `uiautomator dump`) https://developer.android.com/tools/adb · UI Automator https://developer.android.com/training/testing/other-components/ui-automator · Accessibility tree (`AccessibilityNodeInfo`) https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo · `uiautomator2 3.7.1`, `adbutils 2.12.0` (Python) · `@mobilenext/mobile-mcp 1.0.17` (MCP server for mobile automation) · DroidRun `0.7.4` · minitap `mobile-use` (PyPI `minitap-mobile-use 4.0.0`, but GitHub's latest release is `v3.3.0`; see unverified list) · Appium `3.9.0`.
 - **Benchmarks:** **AndroidWorld**: 116 parameterised tasks across 20 apps on a live emulator (Pixel 6, API 33 AVD, launched with `-grpc 8554`), durable state-based rewards, installed from source (Python 3.11+). https://github.com/google-research/android_world · **OSWorld / OSWorld-Verified**: real Ubuntu desktop tasks, execution-based evaluation (`desktop-env 1.0.3`). https://github.com/xlang-ai/OSWorld · https://xlang.ai/blog/osworld-verified · **WebArena**: self-hosted web environments. https://github.com/web-arena-x/webarena. *Leaderboard numbers are mostly self-reported or come from aggregators. The course won't quote them.*
 
@@ -234,22 +236,24 @@ Pin exact versions in `uv.lock` / `pnpm-lock.yaml`. Renovate opens a PR when a n
 [project]
 requires-python = ">=3.13"
 dependencies = [
-  "pydantic==2.14.3",
-  "pydantic-ai==2.68.0",
-  "langgraph==1.2.22",
+  "pydantic==2.14.4",
+  "pydantic-ai==2.71.0",
+  "langgraph==1.2.24",
   "langchain-core==1.8.0",
-  "openai-agents==0.24.0",
-  "claude-agent-sdk==0.2.182",
-  "openai==3.51.0",
+  "openai-agents==0.25.0",
+  "claude-agent-sdk==0.2.187",
+  "openai==3.57.0",
   "anthropic==2.8.0",
   "mcp==2.3.0",
   "fastmcp==4.1.8",
   "temporalio==1.36.1",
   "dbos==3.5.0",
-  "inspect-ai==0.3.290",
+  "inspect-ai==0.3.291",
   "deepeval==4.3.4",
-  "logfire==5.6.0",
+  "logfire==6.0.0",
 ]
+[tool.uv]
+exclude-newer = "1 day"   # cooldown (M12 L12.3); the real python/pyproject.toml sets it too
 [dependency-groups]
 dev = ["pytest==9.2.0", "pytest-asyncio==1.5.0", "ruff==0.17.5", "mypy==2.4.1"]
 ```
@@ -263,16 +267,16 @@ dev = ["pytest==9.2.0", "pytest-asyncio==1.5.0", "ruff==0.17.5", "mypy==2.4.1"]
     "@ai-sdk/openai": "4.0.117",
     "@ai-sdk/anthropic": "4.0.104",
     "@mastra/core": "1.83.0",
-    "@langchain/langgraph": "1.7.4",
+    "@langchain/langgraph": "1.7.5",
     "@langchain/core": "1.4.1",
     "@openai/agents": "0.22.0",
-    "@anthropic-ai/claude-agent-sdk": "0.3.325",
+    "@anthropic-ai/claude-agent-sdk": "0.3.330",
     "@modelcontextprotocol/server": "2.4.0",
     "@modelcontextprotocol/client": "2.4.0",
     "@modelcontextprotocol/node": "2.1.2",
-    "@temporalio/client": "1.25.0",
-    "@temporalio/workflow": "1.25.0",
-    "@temporalio/worker": "1.25.0",
+    "@temporalio/client": "1.26.0",
+    "@temporalio/workflow": "1.26.0",
+    "@temporalio/worker": "1.26.0",
     "zod": "4.6.7"
   },
   "devDependencies": {
@@ -281,7 +285,7 @@ dev = ["pytest==9.2.0", "pytest-asyncio==1.5.0", "ruff==0.17.5", "mypy==2.4.1"]
 }
 ```
 
-Site: `astro 7.4.12`, `@astrojs/starlight 0.43.1`, `starlight-links-validator 0.27.0` *(17 Nov 2026; Starlight 0.43 now follows Astro's default `attribute` scoped-style strategy instead of forcing `:where()`. Before/after screenshots of the built site showed no visual change)*.
+Site: `astro 7.4.13` *(24 Nov 2026)*, `@astrojs/starlight 0.43.1`, `starlight-links-validator 0.27.0` *(17 Nov 2026; Starlight 0.43 now follows Astro's default `attribute` scoped-style strategy instead of forcing `:where()`. Before/after screenshots of the built site showed no visual change)*.
 
 **Optional dependency groups for M13–M15 / P3, P6–P8** (in `python/pyproject.toml`, so the core install stays light):
 ```toml
@@ -291,13 +295,13 @@ media = [
   "silero-vad==6.2.3", "scenedetect==0.7.3", "opencv-python-headless==5.0.0.93", "mediapipe==1.2.3",
 ]
 ondevice = [
-  "llama-cpp-python==0.3.36", "onnxruntime==1.32.0", "onnxruntime-genai==0.19.0",
+  "llama-cpp-python==0.3.36", "onnxruntime==1.32.0", "onnxruntime-genai==0.20.0",
   "executorch==1.6.0", "ai-edge-litert==2.3.0", "litert-torch==0.10.0",
   "torch==2.15.0", "torchao==0.18.0", "transformers==5.23.0", "optimum==2.3.0",
 ]
 cua = [
-  "playwright==1.65.2", "browser-use==1.0.6", "uiautomator2==3.7.1", "adbutils==2.12.0",
-  # browser-use 1.0.6 pins pydantic-ai-slim==2.66.0 (course: 2.68.0), so it can't share uv.lock;
+  "playwright==1.65.2", "browser-use==1.0.8", "uiautomator2==3.7.1", "adbutils==2.12.0",
+  # browser-use 1.0.8 pins pydantic-ai-slim==2.66.0 and pydantic==2.14.3 (course: 2.71.0, 2.14.4), so it can't share uv.lock;
   # the course checks it in an isolated env (examples/python/m15/test_browser_use_pins.py)
   "desktop-env==1.0.3",
   # AndroidWorld: installed from source at a pinned git SHA (no PyPI package)
@@ -305,21 +309,21 @@ cua = [
 ```
 `ts/package.json` additions: `"playwright": "1.65.0"`, `"@playwright/mcp": "0.0.85"`, `"@mobilenext/mobile-mcp": "1.0.17"`, `"node-llama-cpp": "3.22.3"`, `"@huggingface/transformers": "4.3.2"`.
 
-**Native / system (pinned in Dockerfiles, built or downloaded by tag):** FFmpeg `9.0.2`, GStreamer `1.28.9` (Ubuntu's packaged versions lag, so CI uses a container), llama.cpp `v1.0.0` (prebuilt build `b12428` since 17 Nov 2026), whisper.cpp `v1.9.5`, ExecuTorch `v1.6.0`, ONNX Runtime `1.32.0` / ORT GenAI `0.19.0`, LiteRT `2.3.2`, LiteRT-LM `0.19.1`, MediaPipe `1.2.3`. Rust: `rmcp = "3.10.0"`.
+**Native / system (pinned in Dockerfiles, built or downloaded by tag):** FFmpeg `9.1` (newest release on 24 Nov 2026; CI and the box still use the distro ffmpeg), GStreamer `1.28.9` (Ubuntu's packaged versions lag, so CI uses a container), llama.cpp `v1.0.0` (prebuilt build `b12428` since 17 Nov 2026), whisper.cpp `v1.9.5`, ExecuTorch `v1.6.0`, ONNX Runtime `1.32.0` / ORT GenAI `0.20.0` (registries only while the GitHub repos are private), LiteRT `2.3.2`, LiteRT-LM `0.19.1`, MediaPipe `1.2.3`. Rust: `rmcp = "3.11.0"`.
 
 **Android (`android/gradle/libs.versions.toml`, proposed):**
 ```toml
 [versions]
 kotlin = "2.4.21"            # latest stable (2.5.0-RC exists)
-agp = "9.5.1"                # latest stable (9.6.0-alpha exists)
-composeBom = "2026.09.00"
+agp = "9.5.2"                # latest stable (9.6.0-alpha exists); 24 Nov 2026
+composeBom = "2026.09.00"     # 2026.11.01 needs compileSdk 37.1 (its foundation 1.13.0 AAR metadata); kept, 24 Nov 2026
 coroutines = "1.11.0"
 coreKtx = "1.19.1"
 koog = "1.3.0"               # agents-mcp is 1.3.0-beta
 mcpKotlin = "0.16.0"
 mlkitGenaiPrompt = "1.0.0-beta5"
 mlkitGenaiAgent = "1.0.0-alpha1"
-appfunctions = "1.0.0-alpha13"   # version ML Kit's agent docs pair with genai-agent; 1.0.0-rc01 exists, compatibility untested
+appfunctions = "1.0.0"          # stable 18 Nov 2026; ML Kit's agent docs still pair alpha13 with genai-agent, compatibility untested
 mlkitGenaiSummarization = "1.0.0-beta1"
 mlkitGenaiImageDescription = "1.0.0-beta1"
 mlkitGenaiSpeech = "1.0.0-alpha2"
@@ -572,7 +576,7 @@ Each project has a spec (written Spec Kit-style), milestones, an eval suite, a r
 **P3 — Media MCP server + agent that uses it** (after M9; the extended version after M14)
 - **Core:** an MCP server `media-toolkit` in **both** Py and TS on spec `2026-07-28`. Tools: `probe` (ffprobe JSON), `detect_scenes`, `detect_silence`, `measure_loudness`, `extract_frames`, `transcode` (preset allowlist), `cut`/`concat` (from an edit decision list). Destructive or expensive operations go through `input_required` confirmation; long jobs use the tasks extension with progress; OAuth on the Streamable HTTP transport; contract tests on golden media fixtures. Then an agent client that uses it, plus an eval suite (objective checks via `ffprobe`/loudness/duration).
 - **Extended (after M14):** add GStreamer tools: `validate_pipeline` (parse + element allowlist), `run_pipeline` (sandboxed, with a timeout), and `live_detect` (1.28 `onnxinference` → `tensordecodebin` → events as MCP notifications on the request stream). Add a **Kotlin** port with the MCP Kotlin SDK (`0.16.0`) that exposes Android-side media tools through adb (`screenrecord`, pulling files from a device, Media3 Transformer jobs triggered by intent). Connect the server to Android Studio Agent Mode over HTTP.
-- Concepts: MCP server/client, tool design for dangerous CLIs, security, MRTR, tasks, evals, packaging. **Rust component (required, default):** the `probe` and `loudness` tools ship as a Rust `rmcp` (`3.10.0`) server that the Python/TS client calls, with the same contract tests as the Python server. Stretch: a custom GStreamer element (Rust or C) whose analytics metadata appears as a resource.
+- Concepts: MCP server/client, tool design for dangerous CLIs, security, MRTR, tasks, evals, packaging. **Rust component (required, default):** the `probe` and `loudness` tools ship as a Rust `rmcp` (`3.11.0`) server that the Python/TS client calls, with the same contract tests as the Python server. Stretch: a custom GStreamer element (Rust or C) whose analytics metadata appears as a resource.
 
 **P4 — Durable triage & remediation workflow** (after M7–M8)
 - Takes an incident/bug report → classify → gather logs (tools) → propose a fix → human approval (a signal that may come days later) → apply the change and verify. Runs on Temporal (Py or TS) and survives worker kills.
@@ -640,7 +644,7 @@ ai-native-course/
 ├─ rust/                      # rmcp media server (P3), emulator screenshot/diff helper (P8)
 ├─ android/                   # Gradle app module for M13/P6 consuming kmp/shared (libs.versions.toml)
 ├─ media-fixtures/            # small CC-licensed clips + reference transcripts/chapters (Git LFS)
-├─ envs/                      # Dockerfiles: media (FFmpeg 9.0.2, GStreamer 1.28.9), cua-web sandbox, emulator helpers
+├─ envs/                      # Dockerfiles: media (FFmpeg 9.1, GStreamer 1.28.9), cua-web sandbox, emulator helpers
 ├─ exercises/mXX/exYY/{starter,solution,tests}
 ├─ projects/pN/{spec,starter,solution,evals}
 ├─ quizzes/mXX.yaml
@@ -679,7 +683,7 @@ Top level: *Start here · Maturity · Agent Fundamentals · Orchestration · AI-
   5. `services`: Temporal dev server and Postgres as service containers for the M8/P4 tests.
   6. `kmp-android`: `./gradlew :kmp:shared:jvmTest :android:assembleDebug :android:testDebugUnitTest lint`. Model calls go through an interface with a fake (including recorded Gemini Nano responses/errors for the documented flavour); no AICore or device in CI.
    6b. `rust`: `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test` for `rust/` (P3 server contract tests, P8 helper).
-  7. `media`: in the `envs/media` container (FFmpeg 9.0.2, GStreamer 1.28.9), run M14/P3/P7 examples on `media-fixtures/` with mock model outputs and objective checks (ffprobe, loudness, WER on fixed transcripts).
+  7. `media`: in the `envs/media` container (FFmpeg 9.1, GStreamer 1.28.9), run M14/P3/P7 examples on `media-fixtures/` with mock model outputs and objective checks (ffprobe, loudness, WER on fixed transcripts).
   8. `cua`: headless Playwright against the local sandbox web app, with the GUI-agent graph replaying recorded trajectories through a mock model (deterministic). Mobile trajectories are replayed against recorded screenshots and UI-tree fixtures, so no emulator is needed here.
   9. `site`: `astro build` + `starlight-links-validator` + quiz schema validation + a check that every `?raw` import points to a tested file.
 - **`link-check.yml`** (weekly): an external link checker (e.g. lychee) over all source links. It opens an issue rather than failing deploys, because some publishers (Gartner, BCG, McKinsey) block bots.
@@ -715,7 +719,7 @@ Top level: *Start here · Maturity · Agent Fundamentals · Orchestration · AI-
   - **llama.cpp on the A73's CPU:** CPU builds for Android are documented generically; no A73-specific result. OpenCL on the Adreno 642L isn't on the verified list, so it's not used.
 - **Android / on-device / media / GUI-agent items (v0.2):**
   - **Gemini Nano on emulators:** not verified. We assume AICore paths need a supported physical device (the A73 isn't one), and CI uses fakes.
-  - **`genai-agent 1.0.0-alpha1` + AppFunctions:** ML Kit docs pair it with `appfunctions 1.0.0-alpha13`, but `1.0.0-rc01` is on Google Maven. Compatibility with rc01 hasn't been tested, so the course pins alpha13.
+  - **`genai-agent 1.0.0-alpha1` + AppFunctions:** ML Kit docs pair it with `appfunctions 1.0.0-alpha13`, but the Jetpack library has been stable at `1.0.0` since 18 Nov 2026 (the beta01 release renamed and moved several APIs). From 24 Nov 2026 the proposed pin is the stable `1.0.0`. Whether `genai-agent 1.0.0-alpha1` works with it **hasn't been tested**; nothing in the repo builds against either.
   - **ML Kit Prompt API version:** the docs show `genai-prompt 1.0.0-beta4`, while Google Maven has `1.0.0-beta5`. We pinned beta5 without testing it.
   - **`llama-cpp-python 0.3.36`** (1 Oct 2026) predates **llama.cpp v1.0.0** (13 Nov 2026), which removed deprecated APIs. Whether the binding works with v1.0.0 is unknown, so pin a llama.cpp build the binding supports, or call llama.cpp's server/CLI.
   - **`ai-edge-torch` → `litert-torch` rename:** inferred from matching version numbers and the docs' "LiteRT Torch" naming. Not confirmed by an announcement.
@@ -734,7 +738,6 @@ Top level: *Start here · Maturity · Agent Fundamentals · Orchestration · AI-
 - **BCG's emerging/stagnating split** of the 60% laggards: seen only in search summaries, not on the BCG page we fetched.
 - **Accenture archetype percentages** and **Deloitte statistics**: not quoted, because we didn't read those figures in the source text.
 - **McKinsey "State of AI in 2026"** (reportedly Aug 2026 PDF): found via search, but the PDF didn't load from our tools, so it isn't cited and the 2025 edition is used instead.
-- **Google Jules shutdown** claim: from a third-party ranking only. Not stated as fact.
-- **PyPI `specify-cli` provenance**: its version matches Spec Kit v1.4.0, but there's no repo link in its metadata. We recommend installing from GitHub.
+- **PyPI `specify-cli` provenance**: its version matches Spec Kit v1.4.3, but there's no repo link in its metadata. We recommend installing from GitHub.
 - **Deloitte 2025 "autonomous agents" statistics** and any "Level 0–5 AI coding" scales other than Shapiro's: excluded, because we found no single authoritative source.
 - No published "official" levels from GitHub (Octoverse) or OpenAI/Anthropic for AI-coding autonomy were found, so none are claimed.

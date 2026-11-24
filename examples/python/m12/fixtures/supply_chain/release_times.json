@@ -1,0 +1,8 @@
+{
+  "_source": "agent-framework times: The Hacker News and Tokenstrom, 18 Nov 2026 (1.26.1 appeared 20:35 UTC, 1.26.2 at 21:08 UTC on 17 Nov; both since removed from PyPI). 1.26.0 and the course pins: PyPI upload times, read 24 Nov 2026.",
+  "agent-framework==1.26.0": "2026-11-12T18:24:57Z",
+  "agent-framework==1.26.1": "2026-11-17T20:35:00Z",
+  "agent-framework==1.26.2": "2026-11-17T21:08:00Z",
+  "pydantic-ai-slim==2.71.0": "2026-11-19T02:45:48Z",
+  "langgraph==1.2.24": "2026-11-20T01:10:12Z"
+}

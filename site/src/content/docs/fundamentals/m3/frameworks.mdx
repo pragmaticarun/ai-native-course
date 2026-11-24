@@ -28,7 +28,7 @@ The step budget is `stopWhen: isStepCount(n)`; `MockLanguageModelV4` plays the L
 ## OpenAI Agents SDK and Claude Agent SDK
 
 <Aside type="caution" title="Not run in this milestone">
-The course pins `openai-agents 0.24.0` and `claude-agent-sdk 0.2.182` (syllabus 2.4), but this milestone has **no tested example** for them: neither is installed in CI yet, and the Claude Agent SDK drives the Claude Code CLI, which needs a live account. They'll get tested examples, with fakes where the SDK allows, when M5/M11 land. Until then, compare them conceptually:
+The course pins `openai-agents 0.25.0` and `claude-agent-sdk 0.2.187` (syllabus 2.4; since 24 Nov 2026), but this milestone has **no tested example** for them: neither is installed in CI yet, and the Claude Agent SDK drives the Claude Code CLI, which needs a live account. They'll get tested examples, with fakes where the SDK allows, when M5/M11 land. Until then, compare them conceptually:
 </Aside>
 
 | | Scratch loop | Pydantic AI | AI SDK | OpenAI Agents SDK | Claude Agent SDK |
@@ -38,6 +38,8 @@ The course pins `openai-agents 0.24.0` and `claude-agent-sdk 0.2.182` (syllabus 
 | Test double used here | `ScriptedModel` | `FunctionModel`/`TestModel` | `MockLanguageModelV4` | not yet | not yet |
 
 The last two columns describe each SDK's documented features in general terms; check their docs for exact names before use.
+
+Names move even in minor releases, which is why the course pins exactly. Two Pydantic AI renames since the course started: 2.69.0 folded `RequestInput` into `HandleDeferredToolCalls`, and 2.71.0 renamed `PeerNetwork` to `PeerConnection`. The course's examples use neither, so they pass unchanged on 2.71.0. In the OpenAI Agents SDK, 0.25.0 removed the beta Runloop sandbox provider and moved run-state checkpoints to schema 1.22. Read the *Compatibility notes* section of the release notes before you bump.
 
 ## Try it
 1. Add a fourth tool to both framework versions and confirm the mock still drives them.

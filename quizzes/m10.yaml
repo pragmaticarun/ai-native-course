@@ -3,7 +3,7 @@ title: "M10 quiz: spec-driven development & agent-friendly repos"
 questions:
   - id: m10q1
     type: single
-    prompt: "In Spec Kit v1.4.0, which command order matches the core workflow?"
+    prompt: "In Spec Kit v1.4.3, which command order matches the core workflow?"
     choices: ["/speckit-plan → /speckit-specify → /speckit-implement", "/speckit-constitution → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement", "specify build → specify test → specify ship", "/speckit-tasks → /speckit-constitution → /speckit-plan"]
     answer: 1
     explanation: "Principles first, then what and why (spec), how (plan), an ordered task list, then implementation. /speckit-clarify, -analyze and -checklist are optional checks in between."

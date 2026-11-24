@@ -22,7 +22,9 @@ def match_clip(tmp_path_factory) -> Path:
 # ------------------------------------------------------------ media_tools
 def test_resolve_in_root_blocks_protocols_and_escapes(tmp_path):
     assert mt.resolve_in_root(tmp_path, "a/b.mp4") == (tmp_path / "a/b.mp4").resolve()
-    for bad in ["concat:a.mp4|b.mp4", "http://x/y.mp4", "pipe:0", "../etc/passwd", "/etc/passwd"]:
+    bad_paths = ["concat:a.mp4|b.mp4", "http://x/y.mp4", "pipe:0", "../etc/passwd", "/etc/passwd"]
+    bad_paths.append("libcurl:https://x/y.mp4")  # FFmpeg 9.1's new libcurl protocol
+    for bad in bad_paths:
         with pytest.raises(mt.MediaToolError):
             mt.resolve_in_root(tmp_path, bad)
 

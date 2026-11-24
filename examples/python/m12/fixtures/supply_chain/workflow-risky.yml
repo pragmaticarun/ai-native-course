@@ -1,0 +1,15 @@
+# A deploy workflow an agent wrote (fixture). Problems: no top-level permissions, and the job
+# that can mint an Azure OIDC token also installs packages, so a malicious install hook could
+# request that token (what agent-framework 1.26.2 did with GitHub Actions OIDC).
+name: deploy
+on: push
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - run: pip install -r requirements.txt
+      - run: python deploy.py

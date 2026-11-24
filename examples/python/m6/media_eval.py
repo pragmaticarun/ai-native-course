@@ -6,7 +6,7 @@
 * word error rate (WER) for transcripts: word-level edit distance / reference words.
 
 Uses whatever ffmpeg/ffprobe is on PATH (CI installs Ubuntu's package; the course's
-pinned FFmpeg 9.0.2 container arrives with M14). Tests generate their own audio.
+pinned FFmpeg 9.1 container arrives with M14). Tests generate their own audio.
 """
 
 from __future__ import annotations

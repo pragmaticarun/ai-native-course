@@ -74,3 +74,15 @@ def test_short_runs_never_prune_so_both_policies_cost_the_same_until_keep():
     assert a == b
     with pytest.raises(ValueError):
         bn.prompt_cost(3, policy="never")
+
+
+def test_cached_judge_turn_costs_less_than_a_separate_judge_until_it_falls_back():
+    run = 60_000  # tokens in the run's last request (the cached prefix)
+    separate = bn.judge_cost(run, mode="separate")
+    cached = bn.judge_cost(run, mode="cached")
+    assert cached < separate / 5  # cached input is 10x cheaper on bu-fast
+    assert bn.judge_cost(run, mode="fallback") == pytest.approx(separate + cached, abs=1e-6)
+    # A condensed trace much smaller than the run can make the separate judge the cheaper one.
+    assert bn.judge_cost(run, mode="separate", trace_tokens=2_000) < cached
+    with pytest.raises(ValueError):
+        bn.judge_cost(run, mode="both")

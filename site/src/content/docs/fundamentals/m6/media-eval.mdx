@@ -15,7 +15,7 @@ Media agents produce files, and files can be graded **objectively**:
 - **loudness:** ffmpeg's `loudnorm` filter with `print_format=json` reports integrated loudness (`input_i`, in LUFS);
 - **transcripts:** word error rate (WER) = word-level edit distance ÷ reference length.
 
-The tests generate their own audio: two 1 kHz tones 20 dB apart. They check that ffprobe sees 3 s / 48 kHz / stereo and that the measured loudness differs by ~20 LU. This runs with Ubuntu's ffmpeg in CI; the course's pinned FFmpeg 9.0.2 container arrives with M14.
+The tests generate their own audio: two 1 kHz tones 20 dB apart. They check that ffprobe sees 3 s / 48 kHz / stereo and that the measured loudness differs by ~20 LU. This runs with Ubuntu's ffmpeg in CI; the course's pinned FFmpeg 9.1 container arrives with M14.
 
 <Snippet path="examples/python/m6/media_eval.py" />
 

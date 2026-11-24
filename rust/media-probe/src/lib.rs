@@ -1,4 +1,4 @@
-//! media-probe: `probe` and `loudness` as MCP tools (rmcp 3.10.0).
+//! media-probe: `probe` and `loudness` as MCP tools (rmcp 3.11.0).
 //!
 //! The parsing functions are pure, so they are unit-tested against fixtures. The tool methods
 //! shell out to `ffprobe`/`ffmpeg`, but only for files inside a sandbox root.
