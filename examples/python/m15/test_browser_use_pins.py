@@ -1,8 +1,8 @@
-"""Checks browser_use_notes against the real browser-use 1.0.6 package.
+"""Checks browser_use_notes against the real browser-use 1.0.8 package.
 
-Skipped unless browser-use is installed: its exact pins (e.g. pydantic-ai-slim 2.66.0) conflict
-with the course lock, so CI runs this file in an isolated env:
-    uv run --isolated --no-project --with browser-use==1.0.6 --with pytest==9.2.0 \\
+Skipped unless browser-use is installed: its exact pins (pydantic-ai-slim 2.66.0,
+pydantic 2.14.3) conflict with the course lock, so CI runs this file in an isolated env:
+    uv run --isolated --no-project --with browser-use==1.0.8 --with pytest==9.2.0 \\
         pytest -c ../pytest.ini ../examples/python/m15/test_browser_use_pins.py
 Nothing here constructs an Agent or calls a model (no key, no network).
 """
@@ -20,7 +20,7 @@ if os.environ.get("M15_REQUIRE_BROWSER_USE"):
     import browser_use  # noqa: F401  (fail, don't skip, when CI asks for it)
 browser_use = pytest.importorskip("browser_use")
 
-from browser_use.agent import loop  # noqa: E402
+from browser_use.agent import judge, loop  # noqa: E402
 from browser_use.agent.judge import Judgement  # noqa: E402
 from browser_use.agent.views import AgentHistoryList  # noqa: E402
 from browser_use.llm import DEFAULT_MODEL, ChatBrowserUse  # noqa: E402
@@ -29,7 +29,7 @@ FIXTURE = Path(__file__).parent / "fixtures" / "browser_use_judgements.json"
 
 
 def test_installed_version_is_the_course_pin():
-    assert importlib.metadata.version("browser-use") == "1.0.6"
+    assert importlib.metadata.version("browser-use") == "1.0.8"
 
 
 def test_default_model_is_bu_4_0():
@@ -55,3 +55,11 @@ def test_batch_screenshot_pruning_constants():
         bn.PRUNE_IMAGES_AT,
         bn.KEEP_IMAGE_RESULTS,
     )
+
+
+def test_1_0_8_judges_as_a_cached_turn_with_a_separate_fallback():
+    assert "judge_cached" in judge.__all__ and "judge_run" in judge.__all__
+    params = inspect.signature(judge.judge_cached).parameters
+    assert list(params)[:3] == ["agent", "history", "params"]  # the run's own messages go first
+    # Per-request settings it drops from the run's settings for the judge's turn.
+    assert "tool_choice" in judge.CACHED_DROPPED

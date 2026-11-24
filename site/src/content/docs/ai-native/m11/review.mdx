@@ -34,7 +34,7 @@ The same policy in TypeScript, with a `canMerge` check a bot could call:
 
 ## Checklists
 
-A short checklist turns "looks fine" into specific questions: tests changed with code? dependencies pinned? TODOs linked to issues? migrations reversible? tests deleted? Ex 11.3 implements five such checks and applies them to three agent PRs.
+A short checklist turns "looks fine" into specific questions: tests changed with code? dependencies pinned? TODOs linked to issues? migrations reversible? tests deleted? Ex 11.3 implements five such checks and applies them to three agent PRs. For "dependencies pinned?", also look at the lockfile diff of an agent PR. Check that every new package is an exact pin with a hash, that no release in it is under a day old, and that no new `.pth`/`.start` startup hook or `build.rs` appears. That's the check the 17 Nov 2026 agent-framework compromise argues for; `supply_chain.py` in [M12 L12.3](/ai-native-course/ai-native/m12/governance/) implements it.
 
 ## Stacked PRs
 

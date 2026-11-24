@@ -1,0 +1,22 @@
+# The same deploy, split: read-only by default; the build job installs packages without any
+# token-minting right; only the deploy job, which installs nothing, gets id-token: write.
+name: deploy
+on: push
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: uv sync --locked
+      - run: uv build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v7
+      - run: ./deploy.sh dist/

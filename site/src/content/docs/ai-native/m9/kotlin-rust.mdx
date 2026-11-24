@@ -1,6 +1,6 @@
 ---
 title: "Worked example: media-probe in Kotlin and Rust"
-description: The MCP Kotlin SDK 0.16.0 server in KMP commonMain (JVM tests), a real Rust rmcp 3.10.0 server, and a comparison with Android AppFunctions.
+description: The MCP Kotlin SDK 0.16.0 server in KMP commonMain (JVM tests), a real Rust rmcp 3.11.0 server, and a comparison with Android AppFunctions.
 sidebar:
   order: 9
 ---
@@ -24,7 +24,7 @@ The tests link a client and server with the SDK's testing transport (`ChannelTra
 - Only the JVM target is built and tested. Android/native targets of this code are untested.
 </Aside>
 
-## Rust: `rmcp` 3.10.0
+## Rust: `rmcp` 3.11.0
 
 A real Rust server: `#[tool_router]` on an impl block, `#[tool(description = ..., annotations(read_only_hint = true))]` per tool, `Parameters<T>` for input and `Json<T>` for structured output. The schemas come from `schemars` derives. It shells out to ffprobe and ffmpeg and refuses path escapes.
 
@@ -34,6 +34,8 @@ A real Rust server: `#[tool_router]` on an impl block, `#[tool(description = ...
 Its integration test generates a tone with ffmpeg, connects an `rmcp` client over an in-memory duplex pipe, and checks list → probe → loudness → escape refusal. The Python and TS contract suites then drive the **built binary over stdio**: it negotiated 2026-07-28 in auto mode and 2025-11-25 in legacy mode.
 
 <Snippet path="rust/media-probe/tests/contract.rs" lang="rust" />
+
+**What changed in 3.11.0 (17 Nov 2026):** rmcp's default handlers now answer `prompts/list`, `resources/list`, `resources/templates/list`, `completion/complete` and `tools/list` with **`-32601` (method not found)** when `get_info()` doesn't advertise that capability. Up to 3.10.0 they returned an empty success. `MediaProbe` advertises tools only, so the contract test now expects `-32601` for `prompts/list`. We ran the same test against 3.10.0 to check: there it fails with `Ok([])`. The fix is for conformance, but it changes what clients see on the wire. A client that treated "empty list" and "not supported" the same way keeps working; one that called every list method and expected success breaks. Read the capabilities a server advertises before calling a method, as the 2026-07-28 spec's `server/discover` intends. [Release notes](https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v3.11.0) · [PR #1446](https://github.com/modelcontextprotocol/rust-sdk/pull/1446)
 
 CI's `rust` job runs `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`, then the cross-language contract tests against the binary.
 

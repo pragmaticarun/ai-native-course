@@ -2,6 +2,48 @@
 
 All notable changes to the course. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.0] - 2026-11-24 (weekly freshness update of 23 Nov 2026)
+
+Applies the updates from the 23 Nov 2026 weekly check, approved by Arunkumar ("Apply all of the updates"). Pins re-checked against their registries and GitHub releases on 24 Nov 2026. Releases less than 24 hours old on 24 Nov were not pinned (see "Skipped").
+
+### Security / supply chain (HIGH)
+- **M12 governance, "Supply chain: when the agent adds a dependency"**: the `agent-framework` 1.26.1 / 1.26.2 incident (17 Nov 2026, published 33 minutes apart, both quarantined and removed from PyPI; 1.26.0 is the last good release). 1.26.1 shipped `agent_framework_meta.pth` and 1.26.2 `af_runtime_diag.pth`, which run at every interpreter start; 1.26.2 also asked for GitHub Actions OIDC tokens. The lesson covers exact pins with hashes, a release-age cooldown, startup-hook scanning (`.pth` import lines, Python 3.15 `.start` files) and short-lived, job-scoped CI tokens, plus a C++/Rust note (Cargo.lock checksums, `build.rs`).
+- New tested example `examples/python/m12/supply_chain.py` (`audit_requirements`, `scan_startup_hooks`, `cooldown_violations`, `workflow_token_findings`) with 8 tests in `test_supply_chain.py` and fixtures. The tests also run the checker on this repo: the real venv, both workflows, `uv.lock` hashes and pnpm's `minimumReleaseAge`.
+- Quiz question **m12q7**. **M10** rules files: an aside on a dependency rule. **M11** review checklist: read the lockfile diff.
+- **24-hour cooldown** for the course's own deps: `[tool.uv] exclude-newer = "1 day"` in `python/pyproject.toml` (`uv.lock` records `exclude-newer-span = "P1D"`) and `minimumReleaseAge: 1440` in both `pnpm-workspace.yaml` files. `AGENTS.md` now says new dependencies need the owner's OK, exact pins, lockfiles and the 1-day cooldown.
+- **ONNX Runtime GitHub outage**: github.com/microsoft/onnxruntime and related repos (onnxruntime-genai among them) have returned 404 since about 03:50 IST 18 Nov 2026. A caution in **M13** quantization and a note in SYLLABUS §2.3: PyPI (1.32.0), Maven (1.32.0) and npm (1.31.1) packages still install, but `onnxruntime-node`'s Linux postinstall fetches from GitHub and fails, and third-party mirrors are not byte-identical. The course doesn't link the repo while it's down.
+
+### Changed (versions)
+- **rmcp** 3.10.0 → **3.11.0** (M9, P3 `media-probe`). Unadvertised capability methods now return `-32601` (method not found); `tests/contract.rs` asserts this, and the assertion fails on 3.10.0. The M9 Kotlin/Rust page has a "What changed in 3.11.0" paragraph.
+- **browser-use** 1.0.6 → **1.0.8** (M15, M6). 1.0.8 adds `judge_cached` (the judge runs as one more turn of the cached run, falling back to a separate `judge_run`). New `judge_cost()` in `browser_use_notes.py` (13 tests) and a pins test for `judge_cached` / `CACHED_DROPPED` (6 tests). It still pins `pydantic-ai-slim==2.66.0` / `pydantic==2.14.3`, so CI keeps checking it in an isolated env. The L15.2 heading changed to "browser-use 1.0.4 → 1.0.8: four small lessons in ten days", and the M6 and M15 links follow it.
+- **Spec Kit** v1.4.0 → **v1.4.3** (M10, CI `speckit` job, quiz m10).
+- **FFmpeg** 9.0 → **9.1 "Gauss"** (20 Nov) in M14, the syllabus and the versions page. 9.1 adds a `libcurl` protocol (`libcurl:https://…`, `-prefer_libcurl 1`; default whitelist `http,https,libcurl`). M14 has a caution, and Ex 14.2's allowlist test and the M14 Python tests now reject both forms.
+- **pydantic-ai-slim** 2.68.0 → **2.71.0** (2.69.0 folds `RequestInput` into `HandleDeferredToolCalls`; 2.71.0 renames `PeerNetwork` to `PeerConnection`; the course uses neither), **pydantic** 2.14.3 → 2.14.4, **langgraph** 1.2.22 → 1.2.24, **inspect-ai** 0.3.290 → 0.3.291, **openai** 3.51.0 → 3.57.0 (`live` extra). The lockfile also moved `langgraph-prebuilt` 1.1.3, `pydantic-core` 2.50.5, `pydantic-graph` 2.71.0.
+- **@temporalio/*** 1.25.0 → 1.26.0, **@langchain/langgraph** 1.7.4 → 1.7.5 (lockfile: `langgraph-sdk` 1.17.0, `langgraph-checkpoint` 1.2.3), **Astro** 7.4.12 → 7.4.13.
+- **AGP** 9.5.1 → 9.5.2 (KMP, P6).
+- **ONNX Runtime GenAI** 0.19.0 → 0.20.0 (M13, syllabus `ondevice`), noted as registries-only.
+- Syllabus pins and notes only: OpenAI Agents SDK 0.24.0 → 0.25.0 (RunState schema 1.22, Runloop sandbox removed, concurrent MCP Streamable HTTP), claude-agent-sdk 0.2.182 / 0.3.325 → 0.2.187 / 0.3.330, Arize Phoenix 21.0.0 → 22.0.1, Logfire 5.6.0 → 6.0.0.
+
+### Content
+- **AppFunctions**: the Jetpack library is 1.0.0 stable (18 Nov 2026). M13 tool calling, M15 and P6 say so, and note that the Android overview page still says "experimental preview" and ML Kit's docs still use alpha13.
+- **Jules** (M11 landscape): read-only since 11 Nov, shuts down 31 Dec 2026.
+- **TM Forum IG1554** (M1 L1.4 footnote, syllabus §2.1): team-approved 29 Oct, published 16 Nov 2026, marked Alpha / pre-production. tmforum.org returns 403 to automated checkers, so it's in `.lycheeignore`.
+- M3 frameworks: the Pydantic AI renames. M5, M6, M7, M8 and P2/P4/P6/P7/P8 pages and specs updated to the new pins.
+
+### CI
+- `deploy.yml`: top-level permissions are now `contents: read`. `pages: write` and `id-token: write` move to the `deploy` job, so the build job (which runs `withastro/action` and installs packages) can't mint OIDC tokens. The new M12 checker found this.
+- `python` job: browser-use pins step uses 1.0.8. `speckit` job uses v1.4.3.
+
+### Skipped (with reason)
+- **Compose BOM 2026.11.01**: tried and reverted to 2026.09.00. Its Compose 1.13.0 libraries need compileSdk 37.1 (`:p6-app:checkDebugAarMetadata` failed on 37.0). Moving to compileSdk 37.1 is for a later update.
+- **LiteRT 2.4.0**: a syllabus note only; the pin is unchanged until it's tested on device.
+- **AppFunctions Gradle dependency**: none added; the course has no AppFunctions build yet.
+- Releases less than 24 hours old on 24 Nov (the new cooldown): inspect-ai 0.3.292, claude-agent-sdk 0.2.188 / 0.3.331, openai 3.58.0, logfire 6.0.1, Spec Kit v1.4.4, openai-agents 0.26.0.
+
+### Not run / untested
+- The `deploy.yml` permissions change only runs on a push to main, so it's untested until the next merge.
+- No device, emulator or Galaxy A73 run. No real LLM, browser-use agent or judge call. FFmpeg 9.1's binary isn't run (the libcurl tests check the allowlist logic, not ffmpeg). LiteRT-LM and genai-agent with AppFunctions 1.0.0 aren't built.
+
 ## [0.7.0] - 2026-11-17 (weekly freshness update of 16 Nov 2026)
 
 Applies all six updates from the 16 Nov 2026 weekly check, approved by Arunkumar. Pins re-checked against their registries and GitHub releases on 17 Nov 2026.

@@ -2,8 +2,8 @@
 //! The ffmpeg-backed calls need `ffmpeg`/`ffprobe` on PATH (installed in CI).
 use media_probe::MediaProbe;
 use rmcp::{
-    ClientHandler, ServiceExt,
-    model::{CallToolRequestParams, ClientConfig},
+    ClientHandler, ServiceError, ServiceExt,
+    model::{CallToolRequestParams, ClientConfig, ErrorCode},
 };
 use serde_json::{Value, json};
 
@@ -75,6 +75,14 @@ async fn tools_contract() -> anyhow::Result<()> {
         )
         .await?;
     assert_eq!(bad.is_error, Some(true));
+
+    // rmcp 3.11.0: a method for a capability the server didn't advertise is "method not found"
+    // (-32601). Up to 3.10.0 the default handler answered `prompts/list` with an empty list.
+    // MediaProbe advertises tools only.
+    match client.list_all_prompts().await {
+        Err(ServiceError::McpError(e)) => assert_eq!(e.code, ErrorCode::METHOD_NOT_FOUND),
+        other => panic!("expected -32601 for prompts/list, got {other:?}"),
+    }
     client.cancel().await?;
     Ok(())
 }

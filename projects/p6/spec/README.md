@@ -1,6 +1,6 @@
 # P6 · Field Notes: an on-device Android agent app (Kotlin Multiplatform + Koog)
 
-**After:** M13 · **Language:** Kotlin · **Build:** `kmp/` Gradle (Kotlin 2.4.21, AGP 9.5.1, Koog 1.3.0)
+**After:** M13 · **Language:** Kotlin · **Build:** `kmp/` Gradle (Kotlin 2.4.21, AGP 9.5.2, Koog 1.3.0)
 
 An offline assistant that searches, creates, tags, summarises, deletes and shares notes and voice
 memos. The agent lives in `commonMain`, so the same code runs on the JVM in CI (with a fake

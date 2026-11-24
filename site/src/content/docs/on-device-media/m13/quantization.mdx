@@ -46,6 +46,17 @@ The CI `llamacpp` job downloads the same release and model and re-runs this tabl
 
 A 64→256→3 MLP trained with numpy and written with `onnx.helper`; `quantize_dynamic` (int8 weights) shrank it from 68.2 KB to 19.0 KB on the box with the same test accuracy (0.996) and full agreement with FP32. The **ORT QNN EP on the A73's Hexagon HTP** (HTP V68, compile the context on the device) is the "may not work" stretch, and it is *untested*.
 
+<Aside type="caution" title="ONNX Runtime's GitHub repo is offline (since 17–18 Nov 2026)">
+Since about 22:20 UTC on 17 Nov 2026 (03:50 IST on 18 Nov), ONNX Runtime's GitHub repository has returned **404**: code, issues, the API and every release download. At least seven related repos went with it, including ONNX Runtime GenAI. Microsoft said only: "We have made some repositories private while we investigate malicious content." That came the same evening as the [agent-framework PyPI compromise (M12 L12.3)](/ai-native-course/ai-native/m12/governance/). Nobody has reported ONNX Runtime itself as compromised, and Microsoft hasn't linked the two.
+
+What this means for the course (checked 24 Nov 2026):
+- **Install only from the official registries:** PyPI `onnxruntime` 1.32.0 and `onnxruntime-genai` 0.20.0, Maven Central `com.microsoft.onnxruntime:onnxruntime-android` 1.32.0, npm `onnxruntime-node` / `onnxruntime-web` 1.31.1. CI installs from PyPI through `uv.lock` with hashes, so it's unaffected.
+- **Expect GitHub source builds and release-asset downloads to fail for now.** That includes scripts that `curl` an ORT tarball from GitHub Releases. Tokenstrom reports that `onnxruntime-node`'s Linux postinstall step, which fetches CUDA files from GitHub, is one of them.
+- **Don't switch to a mirror or a "re-upload" of the binaries.** Their origin is hard to verify, and Tokenstrom found some aren't byte-identical (one macOS library differed by 304,583 bytes), so your old checksums no longer match. A hash mismatch is the signal to stop, not something to paper over. Wait for the official source, or vendor a copy you already hashed.
+
+We don't link the repository while it's private. Sources: [Hacker News thread](https://news.ycombinator.com/item?id=50539610) · [Tokenstrom analysis, 18 Nov 2026](https://tokenstrom.com/posts/onnx-runtime-vanishes-from-github-what-breaks-what-works-and-why-mirro/) · [The Hacker News update, 20 Nov 2026](https://thehackernews.com/2026/11/attackers-compromise-microsofts-agent.html)
+</Aside>
+
 ## Accelerators, using the A73 as the example
 
 | Path | A73 (SM7325) |

@@ -87,7 +87,7 @@ def test_tasks_lint_and_waves():
 
 
 def test_real_speckit_template_matches_the_parser():
-    """CI's speckit job runs `specify init` (v1.4.0) and points SPECKIT_DIR at the result."""
+    """CI's speckit job runs `specify init` (v1.4.3) and points SPECKIT_DIR at the result."""
     root = os.environ.get("SPECKIT_DIR")
     need(
         bool(root),

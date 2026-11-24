@@ -1,6 +1,6 @@
 # P8 · Mobile/computer-use agent graph with safety checkpoints and an eval harness
 
-**After:** M6, M7, M15 · **Language:** Python (LangGraph 1.2.22, Playwright 1.65.2)
+**After:** M6, M7, M15 · **Language:** Python (LangGraph 1.2.24, Playwright 1.65.2)
 
 Build a GUI agent as an explicit, checkpointed graph, drive it through three model adapters, and
 measure it on 20 tasks with state-based checkers.

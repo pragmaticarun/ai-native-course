@@ -9,7 +9,7 @@ import Snippet from "../../../components/Snippet.astro";
 import Solution from "../../../components/Solution.astro";
 import { Aside } from "@astrojs/starlight/components";
 
-**After:** M9 (core), M14 (extended) · **Suggested time:** ~10 hours · **Code:** [`projects/p3`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p3) · mcp 2.3.0 (Python), @modelcontextprotocol/server 2.4.0 (TS), rmcp 3.10.0 (Rust), MCP Kotlin SDK 0.16.0
+**After:** M9 (core), M14 (extended) · **Suggested time:** ~10 hours · **Code:** [`projects/p3`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p3) · mcp 2.3.0 (Python), @modelcontextprotocol/server 2.4.0 (TS), rmcp 3.11.0 (Rust), MCP Kotlin SDK 0.16.0
 
 ```
              ┌── probe, loudness ──────────▶ Rust rmcp server (media-probe, M9)
@@ -53,7 +53,7 @@ Over Streamable HTTP the server is an OAuth resource server (`AuthSettings` + a 
 
 ## M5 · TypeScript and Rust, one contract
 
-The TypeScript server covers `probe`, `loudness`, `detect_scenes`, `detect_silence` and `transcode` (with `inputRequired`). The Rust server is M9's `rust/media-probe` (rmcp 3.10.0, `probe` + `loudness`). The same Python contract runs against all of them, on both protocol revisions.
+The TypeScript server covers `probe`, `loudness`, `detect_scenes`, `detect_silence` and `transcode` (with `inputRequired`). The Rust server is M9's `rust/media-probe` (rmcp 3.11.0, `probe` + `loudness`). The same Python contract runs against all of them, on both protocol revisions.
 
 <Solution path="projects/p3/solution/ts/mediaToolkit.ts" label="Show the TypeScript server" />
 

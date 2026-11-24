@@ -38,6 +38,8 @@ Most coding agents share the same loop (M2): a model, tools to read and edit fil
 
 The trade-off is the same for all three: you give up watching each step and get back a PR. That only works if the repo is agent-friendly (M10) and review is set up for it (L11.4).
 
+These products also come and go. **Google Jules**, an early background agent, went read-only after 11 Nov 2026 and shuts down on 31 Dec 2026, according to Google's own changelog (it offers an export of settings, sessions and patches). Keep your agent setup (rules files, skills, CI guardrails) in the repo, where it outlives any one vendor's product.
+
 ## What actually differs
 
 1. **Approval model.** Per action (IDE), per rule (CLI), or per PR (cloud). The later the approval, the more your tests and review must catch.
@@ -55,3 +57,4 @@ The trade-off is the same for all three: you give up watching each step and get 
 - Copilot coding agent: https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent
 - Gemini CLI headless: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/headless.md
 - Cursor cloud agents: https://cursor.com/docs/cloud-agent
+- Jules turndown (29 Oct 2026): https://jules.google/docs/changelog/2026-10-29/

@@ -29,6 +29,10 @@ Every path goes through `resolve_in_root`: protocol-style names (`concat:`, `htt
 
 `concat_argv(...)` builds the command without running it, so the plan can be logged, shown to a human, or diffed. `render` then runs it, and the [highlight-reel worked example](/ai-native-course/on-device-media/m14/highlight-reel/) checks the output with `ffprobe` and `ebur128` against the plan. Agents claim success easily; files don't lie.
 
+<Aside type="caution" title="New FFmpeg release, new protocol (9.1, 20 Nov 2026)">
+FFmpeg 9.1 "Gauss" adds a **`libcurl` protocol**: HTTP/HTTPS through libcurl, as an alternative to the native `http`. You can force it with a `libcurl:https://…` URL, or send all `http(s)` URLs through it with the generic `-prefer_libcurl 1` option (it does nothing on builds without libcurl). An agent tool that blocks "the network protocols we know about" wouldn't know this one. The course's tools reject **any** `scheme:` prefix, and Ex 14.2 accepts only listed options, so both forms are refused, and tests check that in Python and TypeScript. The course still runs the distro's ffmpeg (7.1.5 on the box), so none of this was run against a 9.1 binary.
+</Aside>
+
 ## Things the tests taught us
 
 - **Scene detection is luma-heavy.** A cut from pure red to pure green (nearly equal luma) was *not* detected at the default threshold; the fixtures use colours with distinct brightness. Check detectors against fixtures you understand.
@@ -50,5 +54,5 @@ When you need exact frames (not ffmpeg's seek semantics), decode with PyAV (`av`
 
 ## Sources
 - ffmpeg filters: https://ffmpeg.org/ffmpeg-filters.html · ffprobe: https://ffmpeg.org/ffprobe.html
-- FFmpeg releases (9.0.2 is the newest listed): https://ffmpeg.org/download.html
+- FFmpeg releases (9.1 "Gauss", 20 Nov 2026, is the newest listed; 9.0.2 is the newest 9.0): https://ffmpeg.org/download.html · protocols, including 9.1's `libcurl`: https://ffmpeg.org/ffmpeg-protocols.html
 - Media3: https://developer.android.com/media/media3

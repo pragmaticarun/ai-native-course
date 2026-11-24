@@ -1,0 +1,7 @@
+# What a coding agent proposed after "add Microsoft Agent Framework" (fixture, not installed).
+agent-framework>=1.26
+pydantic-ai-slim==2.71.0
+langgraph==1.2.24 \
+    --hash=sha256:0000000000000000000000000000000000000000000000000000000000000000
+requests
+pyyaml==6.0.3 --hash=sha256:1111111111111111111111111111111111111111111111111111111111111111

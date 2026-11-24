@@ -9,7 +9,7 @@ import Snippet from "../../../components/Snippet.astro";
 import Solution from "../../../components/Solution.astro";
 import { Aside } from "@astrojs/starlight/components";
 
-**After:** M13 · **Suggested time:** ~10 hours · **Code:** [`projects/p6`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p6) · Kotlin 2.4.21, Koog 1.3.0 (LiteRT client 1.3.0-beta, preview), LiteRT-LM 0.19.1, AGP 9.5.1, compileSdk 37, minSdk 29
+**After:** M13 · **Suggested time:** ~10 hours · **Code:** [`projects/p6`](https://github.com/pragmaticarun/ai-native-course/tree/main/projects/p6) · Kotlin 2.4.21, Koog 1.3.0 (LiteRT client 1.3.0-beta, preview), LiteRT-LM 0.19.1, AGP 9.5.2, compileSdk 37, minSdk 29
 
 ```
 user turn ─▶ [Koog graph] LLM ─(tool calls)─▶ tools ─▶ LLM … ─(text)─▶ reply
@@ -85,7 +85,7 @@ The evals: [`projects/p6/evals/src/commonTest/kotlin/course/fieldnotes/P6Test.kt
 
 - **Not run on any device or emulator:** the Compose UI tests, the golden suite on LiteRT-LM, and the offline (airplane-mode) check. No TTFT, tokens/s or Perfetto energy numbers. The A73 self-hosted runner job (`device-lab.yml`) doesn't exist yet.
 - The LiteRT-LM backend has never loaded a model file; the GPU option is untested.
-- Not built: ML Kit GenAI speech recognition for voice memos (voice memos are notes with a flag), the Gemma 3 1B / Gemma 4 E2B answer model (only referenced), a cloud summariser (the interface and router are there; the app configures none), the Gemini Nano / AppFunctions / Firebase AI Logic flavour, the llama.cpp JNI stretch, and the ORT QNN NPU stretch.
+- Not built: ML Kit GenAI speech recognition for voice memos (voice memos are notes with a flag), the Gemma 3 1B / Gemma 4 E2B answer model (only referenced), a cloud summariser (the interface and router are there; the app configures none), the Gemini Nano / AppFunctions / Firebase AI Logic flavour (AppFunctions' Jetpack library is stable at 1.0.0 since 18 Nov 2026, but P6 has no AppFunctions dependency, so nothing was bumped or built), the llama.cpp JNI stretch, and the ORT QNN NPU stretch.
 - The Kotlin starter and solution use a Gradle property (`-Pp6.variant`), not `PROJECT_VARIANT`; `check_exercises.py` doesn't cover P6, and the CI `kmp` job checks it instead.
 
 ## Sources

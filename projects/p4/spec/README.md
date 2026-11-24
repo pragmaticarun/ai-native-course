@@ -30,6 +30,6 @@ All evals pass with `PROJECT_VARIANT=solution`.
 
 ## Stretch (not built here)
 
-A TypeScript worker (`@temporalio/worker` 1.25.0) for the same workflow; a real model behind
+A TypeScript worker (`@temporalio/worker` 1.26.0) for the same workflow; a real model behind
 `MockTriageModel`; OpenTelemetry interceptors; Temporal Cloud or a self-hosted cluster;
 worker versioning (build IDs) instead of `patched`.

@@ -60,6 +60,8 @@ const rows = (pairs) => pairs.map(([n, v]) => `| \`${n}\` | ${v} |`).join("\n");
 
 const body = `Generated at build time (${today}) from the lockfiles, so this always matches what CI tested.
 
+Both package managers wait a day before taking a new release: \`python/pyproject.toml\` sets uv's \`exclude-newer = "1 day"\`, and both \`pnpm-workspace.yaml\` files set \`minimumReleaseAge: 1440\` (minutes). \`uv.lock\` records a sha256 hash for every file and \`pnpm-lock.yaml\` a sha512 \`integrity\` hash for every package. See [M12 L12.3](/ai-native-course/ai-native/m12/governance/).
+
 ## Runtimes
 | Tool | Version |
 |---|---|
@@ -95,12 +97,12 @@ ${rows(rustDeps)}
 ## Tools run by the tests (not lockfile-managed)
 | Tool | Version | Where |
 |---|---|---|
-| GitHub Spec Kit (\`specify\`) | v1.4.0 (git tag) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.0 specify init\` |
+| GitHub Spec Kit (\`specify\`) | v1.4.3 (git tag; checked 24 Nov 2026) | M10; CI \`speckit\` job runs \`uvx --from git+https://github.com/github/spec-kit.git@v1.4.3 specify init\` |
 | git | runner's version | M10 hooks, M11 worktrees and sandbox repos |
 | llama.cpp | build b12428 (post-v1.0.0; prebuilt \`llama-b12428-bin-ubuntu-x64.tar.gz\`; checked 17 Nov 2026) | M13 quantization; CI \`llamacpp\` job with \`stories15M.gguf\` from \`ggml-org/models\` |
-| browser-use | 1.0.6 (PyPI; isolated env, not in \`uv.lock\`, because its exact pins conflict with the course lock; checked 17 Nov 2026) | M15 API check, \`examples/python/m15/test_browser_use_pins.py\`; no agent run |
+| browser-use | 1.0.8 (PyPI; isolated env, not in \`uv.lock\`, because its exact pins conflict with the course lock; checked 24 Nov 2026) | M15 API check, \`examples/python/m15/test_browser_use_pins.py\`; no agent run |
 | Playwright browsers | Chromium bundled with \`playwright\` (Python, locked above) | M15 sandbox agents; CI runs \`playwright install --with-deps chromium\` |
-| ffmpeg / ffprobe | Ubuntu package on the CI runner (7.1.5 on the course box) | M8, M9, M14 |
+| ffmpeg / ffprobe | Ubuntu package on the CI runner (7.1.5 on the course box; FFmpeg 9.1, 20 Nov 2026, is the newest release and is not used) | M8, M9, M14 |
 | GStreamer | Ubuntu packages on the CI runner (1.28.9 from conda-forge on the course box) | M14 pipeline validator (\`gst-launch-1.0\`, base/good plugins) |
 
 ## Site (\`site/pnpm-lock.yaml\`)

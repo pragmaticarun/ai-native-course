@@ -35,7 +35,7 @@ Earlier revisions (up to 2025-11-25) open a **session**: the client sends `initi
 Both eras coexist. The SDKs used here negotiate: the client probes `server/discover`, and falls back to `initialize` when the server is 2025-era. The tests in this module run every server on **both** revisions.
 
 <Aside type="note" title="Measured, not assumed">
-In this repo: the Python `mcp` 2.3.0 client defaults to negotiating (`mode="auto"`); the TypeScript 2.4.0 client defaults to `'legacy'` unless you set `versionNegotiation: { mode: "auto" }`; the Rust `rmcp` 3.10.0 server negotiated 2026-07-28; the Kotlin SDK 0.16.0 tops out at 2025-11-25.
+In this repo: the Python `mcp` 2.3.0 client defaults to negotiating (`mode="auto"`); the TypeScript 2.4.0 client defaults to `'legacy'` unless you set `versionNegotiation: { mode: "auto" }`; the Rust `rmcp` 3.11.0 server negotiated 2026-07-28; the Kotlin SDK 0.16.0 tops out at 2025-11-25.
 </Aside>
 
 ## How the spec evolves
